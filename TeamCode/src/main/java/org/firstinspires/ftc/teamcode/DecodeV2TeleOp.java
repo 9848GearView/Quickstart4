@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+import org.firstinspires.ftc.teamcode.mech.LLMech;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 
 //guarantee this wont work whatsoever
@@ -13,7 +14,8 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 public class DecodeV2TeleOp extends OpMode {
     MecanumDrive chassis = null;
     IntakeV2 cannon = null;
-    ColorSensor colSens = null;
+    LLMech camera = null;
+    //ColorSensor colSens = null;
 
 
 
@@ -45,15 +47,23 @@ public class DecodeV2TeleOp extends OpMode {
     private double leftY;
     private double rightX;
 
+    private double tInc;
+
 
     @Override
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV2(hardwareMap);
-        colSens = new ColorSensor(hardwareMap);
+        camera = new LLMech(hardwareMap);
+        cannon.setTurret(.5);
+        cannon.setActuatorPos(0);
+        //colSens = new ColorSensor(hardwareMap);
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
     }
-
+    @Override
+    public void start(){
+        camera.startLL();
+    }
     @Override
     public void loop(){
         dPadUpPressed = gamepad2.dpad_up;
@@ -71,16 +81,18 @@ public class DecodeV2TeleOp extends OpMode {
         leftX = gamepad1.left_stick_x;
         leftY = gamepad1.left_stick_y;
         rightX = gamepad1.right_stick_x;
+        tInc = 0.05;
 
-        //intake
-        if (gamepad2.a && !oldAPressed){
-            intakeOn = !intakeOn;
-            if(intakeOn){
-                cannon.intake(0);
-            }else {
-                cannon.intake(1);
+
+            //intake
+            if (gamepad2.a && !oldAPressed){
+                intakeOn = !intakeOn;
+                if(intakeOn){
+                    cannon.intake(0);
+                }else {
+                    cannon.intake(1);
+                }
             }
-        }
 
         /*
         if (gamepad2.b && !oldBPressed){
@@ -94,15 +106,7 @@ public class DecodeV2TeleOp extends OpMode {
 
          */
 
-        //shoot
-        if (gamepad2.x) {
-            cannon.launch(.75);//.13
-        }
-        if (gamepad2.y) {
-            cannon.stopLaunch();
-        }
-
-        /*if (dPadDownPressed && !oldDPadDownPressed) {
+            /*if (dPadDownPressed && !oldDPadDownPressed) {
             cannon.intake(-.5);
             oldDPadDownPressed = true;
         }
@@ -111,18 +115,18 @@ public class DecodeV2TeleOp extends OpMode {
             oldDPadDownPressed = false;
         }*/
 
-        //spits out balls
-        if(gamepad2.dpad_down){
-            pushDown = !pushDown;
-            if(pushDown) {
-                cannon.intake(0);
-            } else {
-                cannon.intake(-1);
+            //spits out balls
+            if(gamepad2.dpad_down){
+                pushDown = !pushDown;
+                if(pushDown) {
+                    cannon.intake(0);
+                } else {
+                    cannon.intake(-1);
+                }
             }
-        }
 
 
-        //intake wheel end
+            //intake wheel end
 
        /* if(gamepad2.dpad_right){
             cannon.launchSmarter(true);
@@ -130,38 +134,70 @@ public class DecodeV2TeleOp extends OpMode {
         */
 
 
-        //angle recognition end
+            //angle recognition end
 
-        // (FI) color sensor begin
-        detectedColor = colSens.getDetectedColor(telemetry);
-        // color sensor end
+            // (FI) color sensor begin
+            //detectedColor = colSens.getDetectedColor(telemetry);
+            // color sensor end
+
+            if(gamepad2.dpad_left) {
+                //if(cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
+                    cannon.setTurret(cannon.getTurretPos() - tInc);
+                //}
+            }
+            if(gamepad2.dpad_right) {
+               // if (cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
+                    cannon.setTurret(cannon.getTurretPos() + tInc);
+               // }
+            }
+            if(gamepad2.dpad_up) {
+                cannon.setTurret(.5);
+            }
+            //auto-aim
+//            camera.getLlResult();
+//            if (camera.getLlResult() != null && camera.getLlResult().isValid()){
+//                float botCorr = camera.botCorrection();
+//                cannon.setTurret(botCorr);
+//            }
 
 
-        //controlled drive begin not finished
-/*
-        if (rStickPressed && !oldrStickPressed) {
-            leftX = leftX/1.5;
-            leftY = leftY/1.5;
-            rightX = rightX/1.5;
-            oldrStickPressed = true;
+
+            //test launch in case break
+            if(gamepad2.right_bumper){
+                cannon.testLaunch();
+            }
+
+            //Slow turn code :D
+            if (gamepad1.right_bumper){
+                chassis.slowTurn(0.1);
+            }
+            else if(gamepad1.left_bumper){
+                chassis.slowTurn(-0.1);
+            }
+            else {
+                chassis.drive(-leftY, leftX, rightX);
+            }
+        // bracket was here
+
+        if (cannon.getActuatorPos() < .5) {
+            if (Math.abs(gamepad2.left_stick_y) > 0.1) {
+                cannon.setActuatorPos(cannon.getActuatorPos() + 0.1);
+            }
         }
 
-        if (rStickPressed && oldrStickPressed){
-            chassis.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x / 1.5);
-            oldrStickPressed = false;
+        //shoot
+        if (gamepad2.x) {
+            cannon.launch(true);//.13
+        }
+        if (gamepad2.y) {
+            cannon.stopLaunch();
+        }
 
-        }
-        */
-        //Slow turn code :D
-        if (gamepad1.right_bumper){
-            chassis.slowTurn(0.1);
-        }
-        else if(gamepad1.left_bumper){
-            chassis.slowTurn(-0.1);
-        }
-        else {
-            chassis.drive(-leftY, leftX, rightX);
-        }
+
+
+
+
+
         oldAPressed = gamepad2.a;
         oldBPressed = gamepad2.b;
         oldDPadDownPressed = gamepad2.dpad_down;
@@ -170,15 +206,18 @@ public class DecodeV2TeleOp extends OpMode {
 
         //cannon.launchSmarter(gamepad2.right_bumper);
 
-        colSens.getDetectedColor(telemetry);
+        //colSens.getDetectedColor(telemetry);
         telemetry.addData("aPressed: ", aPressed);
         telemetry.addData("Was a pressed before?: ", oldAPressed);
-        telemetry.addData("Methinks the color is", detectedColor);
+        //telemetry.addData("Methinks the color is", detectedColor);
         telemetry.addData("stick pressed", rStickPressed);
         telemetry.addData("did it stick", oldrStickPressed);
-        telemetry.addData("Launcher Velocity", cannon.getLauncherVelocity());
-        telemetry.addData("Launch Angle", chassis.getLaunchAngle());
-        telemetry.addData("IMU", chassis.getRobotAngle());
+        //
+        // telemetry.addData("Launch Angle", chassis.getLaunchAngle());
+        telemetry.addData("Launcher Pos", cannon.getTurretPos());
+        telemetry.addData("Elevator Actuation:",cannon.getActuatorPos());
+        telemetry.addData("Launch State: ", cannon.getLaunchState());
+        telemetry.addData("Launcher Velocity: ", cannon.getLauncherVelocity());
         //telemetry.addData();
         telemetry.update();
     }

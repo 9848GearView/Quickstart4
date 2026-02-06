@@ -7,11 +7,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx; //extended DcMotor class for extra controls
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class LauncherV175 {
+
+    private VoltageSensor batteryVoltageSensor;
 
     final double FEED_TIME_SECONDS = 4; //The feeder servos run this long when a shot is requested.
     final double STOP_SPEED = 0.0; //We send this power to the servos when we want them to stop.
@@ -39,6 +42,8 @@ public class LauncherV175 {
     private CRServo IHLServo;
     private CRServo IHRServo;
 
+    double voltage = batteryVoltageSensor.getVoltage();
+    double adjustedF = 12 * (12.0 / voltage);
 
     private LaunchState launchState; //LaunchState enums are written below for launching switch
 
@@ -75,6 +80,10 @@ public class LauncherV175 {
          * to 'get' must correspond to the names assigned during the robot configuration
          * step.
          */
+
+        batteryVoltageSensor = hwMap.voltageSensor.iterator().next();
+
+
         ICLServo = hwMap.get(CRServo.class, "ICLServo");
         ICRServo = hwMap.get(CRServo.class, "ICRServo");
         //added for 1.75, OG = Outtake Gate
@@ -128,7 +137,7 @@ public class LauncherV175 {
          * mechanisms, we will also need to adjust the "PIDF" coefficients with some that are a better fit * for our application.
          */
 
-        OWMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(2.5, .1, .2, .5));
+        OWMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(0, 0, 0, adjustedF));
 
         /*
          * We set the left feeder servo to reverse so that they both work to feed the ball into the robot.
@@ -151,7 +160,7 @@ public class LauncherV175 {
         IHRServo.setPower(FULL_SPEED);
         OGLServo.setPower(FULL_SPEED);
         OGRServo.setPower(FULL_SPEED);
-
+     
     }
 
     public void stopLaunch(){

@@ -110,7 +110,7 @@ public class DecodeV1TeleOp extends OpMode {
             chassis.drive(-leftY, leftX, rightX);
         }
 
-        chassis.setLightColor();
+        //chassis.setLightColor();
 
         //cannon.launchSmarter(gamepad2.right_bumper);
 

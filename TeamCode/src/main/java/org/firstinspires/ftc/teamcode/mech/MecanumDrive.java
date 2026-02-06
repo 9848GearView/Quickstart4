@@ -24,7 +24,7 @@ public class MecanumDrive {
 
     private IMU imu;
 
-    private Servo blinky;
+    //private Servo blinky;
 
     private double absoluteValueLA = -164;// 153 red || -153 blue || 164 red/blue
     private double LA = absoluteValueLA;
@@ -42,12 +42,12 @@ public class MecanumDrive {
         imu.initialize(new IMU.Parameters(RevOrientation));
         //imu.resetYaw();
 
-        blinky = hwMap.get(Servo.class, "blinky");
+        //blinky = hwMap.get(Servo.class, "blinky");
 
 
         flMotor.setDirection(DcMotor.Direction.REVERSE);
         frMotor.setDirection(DcMotor.Direction.FORWARD);
-        blMotor.setDirection(DcMotor.Direction.REVERSE);
+        blMotor.setDirection(DcMotor.Direction.FORWARD);
         brMotor.setDirection(DcMotor.Direction.FORWARD);
 
         flMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -85,10 +85,10 @@ public class MecanumDrive {
 
     //public method to be called from opMode
     public void drive(double forward, double right, double rotate){
-        double fl = forward - right + rotate;
+        double fl = forward + right + rotate;
         double fr = forward + right - rotate;
         //adjusted for bad rotation
-        double bl = forward + right + rotate;
+        double bl = forward - right + rotate;
         double br = forward - right - rotate;
 
         //calling helper method
@@ -107,26 +107,26 @@ public class MecanumDrive {
         imu.resetYaw();
     }
 
-    public void setLightColor(){
-        //launch angle is positive, so blue
-        if(LA > 0) {
-            if (getRobotAngle() > LA + 2) {
-                blinky.setPosition(.28);//show red
-            } else if (getRobotAngle() < LA - 2) {
-                blinky.setPosition(.611);//show blue
-            } else {
-                blinky.setPosition(.500);//show green
-            }
-        }else{//launch angle is negative so red
-            if (getRobotAngle() > LA + 2) {
-                blinky.setPosition(.611);//show blue
-            } else if (getRobotAngle() < LA - 2) {
-                blinky.setPosition(.28);//show red
-            } else {
-                blinky.setPosition(.500);//show green
-            }
-        }
-    }
+//    public void setLightColor(){
+//        //launch angle is positive, so blue
+//        if(LA > 0) {
+//            if (getRobotAngle() > LA + 2) {
+//                blinky.setPosition(.28);//show red
+//            } else if (getRobotAngle() < LA - 2) {
+//                blinky.setPosition(.611);//show blue
+//            } else {
+//                blinky.setPosition(.500);//show green
+//            }
+//        }else{//launch angle is negative so red
+//            if (getRobotAngle() > LA + 2) {
+//                blinky.setPosition(.611);//show blue
+//            } else if (getRobotAngle() < LA - 2) {
+//                blinky.setPosition(.28);//show red
+//            } else {
+//                blinky.setPosition(.500);//show green
+//            }
+//        }
+//    }
 
 
     public void redLaunchAngle(){

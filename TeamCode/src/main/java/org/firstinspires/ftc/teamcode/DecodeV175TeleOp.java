@@ -59,7 +59,7 @@ public class DecodeV175TeleOp extends OpMode {
         cannon = new IntakeV175(hardwareMap);
         colSens = new ColorSensor(hardwareMap);
         camera = new LLMech(hardwareMap);
-     //   camera.getLlResult();
+        camera.getLlResult();
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
     }
 
@@ -144,16 +144,16 @@ public class DecodeV175TeleOp extends OpMode {
             chassis.drive(-leftY, leftX, rightX);
         }
 
-        /*if (gamepad1.a){
+        if (gamepad1.a){
             tLockOn = true;
-          //  if (camera.getLlResult() != null && camera.getLlResult().isValid()){ //checks to see if camera is seeing sonething that it is supposed to see
-             //   float botCorr = camera.botCorrection();
+            if (camera.getLlResult() != null && camera.getLlResult().isValid()){ //checks to see if camera is seeing sonething that it is supposed to see
+                float botCorr = camera.botCorrection();
                 chassis.drive(-leftY, leftX, botCorr*.5);
             }
         } else {
             tLockOn = false;
             chassis.drive(-leftY, leftX, rightX);
-        }*/
+        }
         oldAPressed = gamepad2.a;
         oldBPressed = gamepad2.b;
         oldDPadDownPressed = gamepad2.dpad_down;
