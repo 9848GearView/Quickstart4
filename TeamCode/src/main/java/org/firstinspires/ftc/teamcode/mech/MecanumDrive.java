@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.mech;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
@@ -22,6 +23,10 @@ public class MecanumDrive {
     private DcMotor blMotor = null;
     private DcMotor brMotor = null;
 
+    //half park
+    private Servo halfParkL;
+    private Servo halfParkR;
+
     private IMU imu;
 
     //private Servo blinky;
@@ -36,6 +41,10 @@ public class MecanumDrive {
         blMotor = hwMap.get(DcMotor.class, "BL");
         brMotor = hwMap.get(DcMotor.class, "BR");
 
+        //half park
+        halfParkL = hwMap.get(Servo.class, "halfParkL");
+        halfParkR = hwMap.get(Servo.class, "halfParkR");
+
         imu = hwMap.get(IMU.class,"imu");
 
         RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
@@ -47,7 +56,7 @@ public class MecanumDrive {
 
         flMotor.setDirection(DcMotor.Direction.REVERSE);
         frMotor.setDirection(DcMotor.Direction.FORWARD);
-        blMotor.setDirection(DcMotor.Direction.FORWARD);
+        blMotor.setDirection(DcMotor.Direction.REVERSE);
         brMotor.setDirection(DcMotor.Direction.FORWARD);
 
         flMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -55,10 +64,10 @@ public class MecanumDrive {
         blMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         brMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        flMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        blMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        brMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        blMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        brMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
 
@@ -86,10 +95,10 @@ public class MecanumDrive {
     //public method to be called from opMode
     public void drive(double forward, double right, double rotate){
         double fl = forward + right + rotate;
-        double fr = forward + right - rotate;
+        double fr = forward - right - rotate;
         //adjusted for bad rotation
         double bl = forward - right + rotate;
-        double br = forward - right - rotate;
+        double br = forward + right - rotate;
 
         //calling helper method
         setPowers(fl, fr, bl, br);
@@ -101,6 +110,11 @@ public class MecanumDrive {
 
     public double getRobotAngle(){
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+    }
+
+    public void setHalfPark(double i){
+        halfParkL.setPosition(i);
+        halfParkR.setPosition(i);
     }
 
     public void resetRobotAngle(){

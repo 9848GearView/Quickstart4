@@ -58,8 +58,8 @@ public class TeleOpTest175 extends OpMode {
         chassis = new MecanumDrive(hardwareMap);
         cannon = new LauncherV175(hardwareMap);
         colSens = new ColorSensor(hardwareMap);
-        camera = new LLMech(hardwareMap);
-        //   camera.getLlResult();
+       // camera = new LLMech(hardwareMap);
+        //   camera.updateResult();
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
     }
 
@@ -148,7 +148,7 @@ public class TeleOpTest175 extends OpMode {
 
         /*if (gamepad1.a){
             tLockOn = true;
-          //  if (camera.getLlResult() != null && camera.getLlResult().isValid()){ //checks to see if camera is seeing sonething that it is supposed to see
+          //  if (camera.updateResult() != null && camera.updateResult().isValid()){ //checks to see if camera is seeing sonething that it is supposed to see
              //   float botCorr = camera.botCorrection();
                 chassis.drive(-leftY, leftX, botCorr*.5);
             }

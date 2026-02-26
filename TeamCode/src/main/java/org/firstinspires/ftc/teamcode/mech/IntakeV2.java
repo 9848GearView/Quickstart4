@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.mech;
 
 
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -32,14 +33,24 @@ public class IntakeV2 {
 
     //gate
     private Servo gate;
+    private Servo blinky;
+    private boolean shot;
 
-    //half park
-//    private Servo halfParkL;
-//    private Servo halfParkR;
+
 
     //turret
     private Servo turretL;
     private Servo turretR;
+    private double tInc = .001;
+    private double leftLim = .65;
+    private boolean leftLimReached = false;
+    private double rightLim = .35;
+    private boolean rightLimReached = false;
+    private boolean movingRight = false;
+
+    private double goalBX = 12;
+    private double goalRX = 132;
+    private double goalY = 136;
 
     ElapsedTime feederTimer = new ElapsedTime();
 
@@ -53,10 +64,13 @@ public class IntakeV2 {
     final double FULL_SPEED = 1.0;
 
     //likely change
-    final double LAUNCHER_TARGET_VELOCITY= 850;//started at 1125//was725//Mrs.b changed to 850
-    final double LAUNCHER_MIN_VELOCITY = 800;//started at 1075//was 675//mrs B changed to 800
+    final double LAUNCHER_TARGET_VELOCITY= 1600;//started at 1125//was725//Mrs.b changed to 850
+    final double LAUNCHER_MIN_VELOCITY = 1550;//started at 1075//was 675//mrs B changed to 800
 
+    private String launchStatus;
 
+    PIDFCoefficients farCoeffs  = new PIDFCoefficients(10, 0, 0, 12);
+    PIDFCoefficients closeCoeffs = new PIDFCoefficients(6, 0, 0, 6);
 
 
 
@@ -74,7 +88,7 @@ public class IntakeV2 {
     }
 
     public IntakeV2(HardwareMap hwMap) {
-        launchState = IntakeV2.LaunchState.IDLE;
+        launchState = LaunchState.IDLE;
 
         batteryVoltageSensor = hwMap.voltageSensor.iterator().next();
 
@@ -91,14 +105,15 @@ public class IntakeV2 {
         
         //gate
         gate = hwMap.get(Servo.class, "gate");
+        blinky = hwMap.get(Servo.class, "blinky");
 
-        //half park
-//        halfParkL = hwMap.get(Servo.class, "halfParkL");
-//        halfParkR = hwMap.get(Servo.class, "halfParkR");
+
 
         //turret
         turretL = hwMap.get(Servo.class, "turretL");
         turretR = hwMap.get(Servo.class, "turretR");
+
+        shot = false;
 
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -129,13 +144,11 @@ public class IntakeV2 {
          * control method "RUN_USING_ENCODER". This contrasts to the default "RUN_WITHOUT_ENCODER" where
          * you control the power applied to the motor directly.
          * Since the dynamics of a OWMotor wheel system varies greatly from those of most other FTC
-         * mechanisms, we will also need to adjust the "PIDF" coefficients with some that are a better fit * for our application.
+         * mechanisms, we will also need to adjust the "PI++++DF" coefficients with some that are a better fit * for our application.
          */
-        double voltage = batteryVoltageSensor.getVoltage();
-        double adjustedF = 12 * (12.0 / voltage);
 
-        outtakeT.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(20, 0, 0, adjustedF));
-        outtakeB.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(20, 0, 0, adjustedF));
+        outtakeT.setVelocity(0);
+        outtakeB.setVelocity(0);
 
 
         /*
@@ -151,70 +164,194 @@ public class IntakeV2 {
         gate.setPosition(i);
     }
 
-    public void stopLaunch(){
-        launchState = IntakeV2.LaunchState.IDLE;
-        outtakeT.setPower(0);
-        outtakeB.setPower(0);
-        // change set positions to whatever
+    public void setLightColor(){
+        if (gate.getPosition() ==0){
+            blinky.setPosition(.500); //open, green
+        }
+        if (gate.getPosition() == .5){
+            blinky.setPosition(.28); //closed, red
+        }
     }
 
-    public void testLaunch() {
-        outtakeT.setPower(0.3);
-        outtakeB.setPower(0.3);
+    public void stopLaunch(){
+        launchState = LaunchState.IDLE;
+        outtakeT.setVelocity(0);
+        outtakeB.setVelocity(0);
+        // change set positions to whatever
     }
 
     public void setTurret(double i) {
         turretL.setPosition(i);
         turretR.setPosition(i);
     }
+
+    public void scanTurret(){
+        //update if I've reached right or left limit
+        leftLimReached = getTurretPos() > leftLim;
+        rightLimReached = getTurretPos() < rightLim;
+
+        //scan right (towards 0.35 right limit)
+        if(movingRight){
+            if(rightLimReached){
+                setTurret(getTurretPos() + tInc);
+                movingRight = false;
+            }else {
+                setTurret(getTurretPos() - tInc);
+                movingRight = true;
+            }
+        }
+            //scan left (towards 0.65 right limit)
+        if(!movingRight){
+            if(leftLimReached){
+                setTurret(getTurretPos() - tInc);
+                movingRight = true;
+            }else{
+                setTurret(getTurretPos() + tInc);
+                movingRight = false;
+            }
+        }
+
+
+
+    }
+
     public double getTurretPos(){
         return turretL.getPosition();
+    }
+
+    public boolean getRightLimitReached(){
+        return rightLimReached;
+    }
+
+    public boolean getLeftLimitReached(){
+        return leftLimReached;
     }
 
     public void setActuatorPos(double i){ angle.setPosition(i); }
 
     public double getActuatorPos(){return angle.getPosition();}
 
+    public void toggleSpinUp() {
+        if (launchState == LaunchState.IDLE) {
+            launchState = LaunchState.SPIN_UP;
+        } else {
+            stopLaunch();
+        }
+    }
 
+    //not used, outtake is on all match and only thing that's necessary is to use right bumper to close and open gate
+    public void requestLaunch() {
+        if (launchState == LaunchState.SPIN_UP &&
+                getLauncherVelocity() > LAUNCHER_MIN_VELOCITY) {
+            launchState = LaunchState.LAUNCH;
+        }
+    }
 
     //launch method using state machine concept
-    public void launch(boolean shotRequested) {
+    public void launchClose() {
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
+        outtakeT.setVelocity(1450);
+        outtakeB.setVelocity(1450);
+        launchStatus = "close";
+    }//closes method
+
+    public void launchFar() {
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
+        outtakeT.setVelocity(1930);
+        outtakeB.setVelocity(1930);
+        launchStatus = "far";
+    }//closes method
+
+
+    public void launchAutoFar(boolean b) {
         switch (launchState) {
             case IDLE:
-                if (shotRequested) {
-                    launchState = IntakeV2.LaunchState.SPIN_UP;
+                setGatePosition(.5);
+                outtakeT.setVelocity(0);
+                outtakeB.setVelocity(0);
+                if(b) {
+                    launchState = LaunchState.SPIN_UP;
                 }
                 break;
             case SPIN_UP:
-                outtakeT.setVelocity(LAUNCHER_TARGET_VELOCITY);
-                outtakeB.setVelocity(LAUNCHER_TARGET_VELOCITY);
-                if (getLauncherVelocity() > LAUNCHER_MIN_VELOCITY) {
-                    launchState = IntakeV2.LaunchState.LAUNCH;
+                outtakeT.setVelocity(1930);
+                outtakeB.setVelocity(1930);
+                if (getLauncherVelocity() > 1880) {
+                    launchState = LaunchState.LAUNCH;
                 }
                 break;
             case LAUNCH:
-                setGatePosition(1);  //set position, change later
                 feederTimer.reset();
                 launchState = IntakeV2.LaunchState.LAUNCHING;
                 break;
-            case LAUNCHING:
+            case LAUNCHING: // not used, just use stopLaunch method manually
+                intake(1);
+                setGatePosition(0);
                 if (feederTimer.seconds() > FEED_TIME_SECONDS) {
+                    intake(0);
                     stopLaunch();
-                    launchState = IntakeV2.LaunchState.IDLE;
+                    launchState = LaunchState.IDLE;
                 }
                 break;
         }//closes switch
     }//closes method
 
+    public void launchAutoClose(boolean b) {
+        switch (launchState) {
+            case IDLE:
+                setGatePosition(.5);
+                outtakeT.setVelocity(0);
+                outtakeB.setVelocity(0);
+                if(b) {
+                    launchState = LaunchState.SPIN_UP;
+                }
+                break;
+            case SPIN_UP:
+                outtakeT.setVelocity(1450);
+                outtakeB.setVelocity(1450);
+                if (getLauncherVelocity() > 1400) {
+                    launchState = LaunchState.LAUNCH;
+                }
+                break;
+            case LAUNCH:
+                feederTimer.reset();
+                launchState = IntakeV2.LaunchState.LAUNCHING;
+                break;
+            case LAUNCHING: // not used, just use stopLaunch method manually
+                intake(1);
+                setGatePosition(0);
+                if (feederTimer.seconds() > FEED_TIME_SECONDS) {
+                    intake(0);                    stopLaunch();
+                    launchState = LaunchState.IDLE;
+                }
+                break;
+        }//closes switch
+    }//closes method
+
+
+
     public LaunchState getLaunchState(){
         return launchState;
     }
 
+    public double getMinVelocity() { return LAUNCHER_MIN_VELOCITY;}
 
     //accessor method for OWMotor’s velocity
     public double getLauncherVelocity(){
         return (Math.abs(outtakeT.getVelocity())
         );
+    }
+
+    public double getActuatorPosition() {
+        return angle.getPosition();
+    }
+
+    public String getLaunchStatus() {return launchStatus;}
+
+    public boolean hasFinishedShot() {
+        return launchState == LaunchState.IDLE && feederTimer.seconds() > 0.1;
     }
 
 }//closes class
