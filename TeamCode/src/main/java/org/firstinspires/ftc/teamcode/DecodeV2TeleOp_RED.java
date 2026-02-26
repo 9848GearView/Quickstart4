@@ -1,0 +1,288 @@
+package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.limelightvision.LLResult;
+
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.mech.ColorSensor;
+import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+import org.firstinspires.ftc.teamcode.mech.LLMech;
+import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
+
+//guarantee this wont work whatsoever
+
+    @TeleOp(name="RED-DecodeV2TeleOp", group="Iterative OpMode")
+    public class DecodeV2TeleOp_RED extends OpMode {
+        private Limelight3A camera;
+        MecanumDrive chassis = null;
+        IntakeV2 cannon = null;
+        //LLMech camera = null;
+        //ColorSensor colSens = null;
+
+
+
+        ColorSensor.detectedColor detectedColor;
+
+
+        private boolean dPadUpPressed;
+
+
+        private boolean rStickPressed;
+        private boolean oldrStickPressed;
+
+        //booleans for a button
+        private boolean aPressed;
+        private boolean oldAPressed;
+        private boolean intakeOn = true;
+
+        //booleans for down
+        private boolean dPadDownPressed;
+        private boolean oldDPadDownPressed;
+
+        private boolean rBumperPressed;
+        private boolean oldRBumperPressed;
+
+        //booleans for turret
+        private boolean lBumperPressed;
+        private boolean oldLBumperPressed;
+        private boolean tLock;
+        private boolean pushDown = true;
+
+        //booleans for b button
+        private boolean bPressed;
+        private boolean oldBPressed;
+        private boolean gateOn = true;
+
+        //booleans for x button
+        private boolean xPressed;
+        private boolean oldXPressed;
+        private boolean launchTrigger = false;
+
+        //booleans for y
+        private boolean yPressed;
+        private boolean oldYPressed;
+        private boolean actuatorIsDown;
+
+        private double leftX;
+        private double leftY;
+        private double rightX;
+
+        private double tInc;
+
+
+        @Override
+        public void init(){
+            chassis = new MecanumDrive(hardwareMap);
+            cannon = new IntakeV2(hardwareMap);
+            camera = hardwareMap.get(Limelight3A.class,"limabean");
+            //camera = new LLMech(hardwareMap);
+            camera.pipelineSwitch(1);
+            chassis.setHalfPark(0.80);
+            cannon.setGatePosition(.5);
+            cannon.setLightColor();
+            cannon.setTurret(.5);
+            cannon.setActuatorPos(.53);
+
+            tLock = false;
+            //colSens = new ColorSensor(hardwareMap);
+            //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
+        }
+        @Override
+        public void start(){
+            camera.start();
+        }
+        @Override
+        public void loop(){
+            LLResult llResult = camera.getLatestResult();
+
+            dPadUpPressed = gamepad2.dpad_up;
+
+            //controlled turning
+            rStickPressed = gamepad1.right_stick_button;
+
+            dPadDownPressed = gamepad2.dpad_down;
+
+
+            aPressed = gamepad2.a;
+            bPressed = gamepad2.b;
+
+            xPressed = gamepad2.x;
+
+            lBumperPressed = gamepad2.left_bumper;
+            rBumperPressed = gamepad2.right_bumper;
+
+
+            leftX = gamepad1.left_stick_x;
+            leftY = gamepad1.left_stick_y;
+            rightX = gamepad1.right_stick_x;
+            tInc = 0.01;
+
+            if(gamepad1.a){
+                chassis.setHalfPark(0);
+            }
+
+            //intake
+            if (gamepad2.a && !oldAPressed){
+                intakeOn = !intakeOn;
+                if(intakeOn){
+                    cannon.intake(0);
+                }else {
+                    cannon.intake(1);
+                }
+            }
+
+
+            //spits out balls
+            if(gamepad2.dpad_down){
+                pushDown = !pushDown;
+                if(pushDown) {
+                    cannon.intake(0);
+                } else {
+                    cannon.intake(-1);
+                }
+            }
+
+
+            //intake wheel end
+
+       /* if(gamepad2.dpad_right){
+            cannon.launchSmarter(true);
+        }
+        */
+
+
+            //angle recognition end
+
+            // (FI) color sensor begin
+            //detectedColor = colSens.getDetectedColor(telemetry);
+            // color sensor end
+            //manual aim
+            if(gamepad2.dpad_left) {
+                //if(cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
+                cannon.setTurret(cannon.getTurretPos() + tInc);
+                //}
+            }
+            if(gamepad2.dpad_right) {
+                // if (cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
+                cannon.setTurret(cannon.getTurretPos() - tInc);
+                // }
+            }
+            if(gamepad2.dpad_up) {
+                cannon.setTurret(.5);
+            }
+
+//        //auto-aim
+            // why is ts the same button as gate bro
+
+            if( bPressed && !oldBPressed) {
+                tLock = !tLock; // reminder to find a way to turn this off
+            }
+            if (tLock) {
+                if (llResult!= null && llResult.isValid()){
+                    float Kp = -0.000175f; //proportional control constant
+                    double tx = llResult.getTx();
+                    double botCorr = (Kp * tx);
+                    cannon.setTurret(cannon.getTurretPos() + botCorr);
+
+                }
+            }
+            //end auto aim
+
+            if (gamepad2.left_trigger > 0.1) {
+                //shoot close
+                cannon.launchClose();
+                cannon.setActuatorPos(0.75); //.53
+            }
+            if (gamepad2.right_trigger > 0.1) {
+                // shoot far
+                cannon.launchFar();
+                cannon.setActuatorPos(1);
+            }
+
+            if(gamepad2.x) {
+                cannon.stopLaunch();
+            }
+
+            //test launch in case break
+            if(rBumperPressed && !oldRBumperPressed){
+                cannon.setGatePosition(.5);
+                cannon.setLightColor();
+                oldRBumperPressed = true;
+            }
+
+            if(lBumperPressed && oldRBumperPressed){
+                cannon.setGatePosition(0);
+                cannon.setLightColor();
+                oldRBumperPressed = false;
+            }
+
+
+            //Slow turn code :D
+            if (gamepad1.right_bumper){
+                chassis.slowTurn(0.1);
+            }
+            else if(gamepad1.left_bumper){
+                chassis.slowTurn(-0.1);
+            }
+            else {
+                chassis.drive(-leftY, leftX, rightX);
+            }
+
+//        if (Math.abs(gamepad2.left_stick_y) > 0.1) {
+//            if (cannon.getActuatorPos() < .5) {
+//                cannon.setActuatorPos(cannon.getActuatorPos() + 0.05);
+//            }
+//        }
+            //cannon.setActuatorPos(0.25);
+
+
+//        if (Math.abs(gamepad2.right_stick_y) > 0.1){
+//            if (cannon.getActuatorPos() < .25) {
+//                cannon.setActuatorPos(cannon.getActuatorPos() - 0.05);
+//            }
+//        }
+
+            // old button presses at the bottom of loop
+            oldAPressed = gamepad2.a;
+            oldBPressed = gamepad2.b;
+            oldXPressed = gamepad2.x;
+            oldYPressed = gamepad2.y;
+            oldrStickPressed = rStickPressed;
+            oldDPadDownPressed = gamepad2.dpad_down;
+
+            //chassis.setLightColor();
+
+            //cannon.launchSmarter(gamepad2.right_bumper);
+
+            //colSens.getDetectedColor(telemetry);
+            telemetry.addData("Tlock on", tLock);
+            if (llResult != null && llResult.isValid()) {
+                telemetry.addData("Tx", llResult.getTx());
+                telemetry.addData("Ty", llResult.getTy());
+                telemetry.addData("Ta", llResult.getTa());
+            } else {
+                telemetry.addLine("Tag not found");
+            }
+            telemetry.addData("Turret Position", cannon.getTurretPos());
+
+            telemetry.addLine();
+
+            telemetry.addData("Launcher Pos", cannon.getTurretPos());
+            telemetry.addData("Elevator Actuation",cannon.getActuatorPos());
+            telemetry.addData("Launch State", cannon.getLaunchState());
+            telemetry.addData("Launcher Velocity", cannon.getLauncherVelocity());
+            telemetry.addData("Launch Status", cannon.getLaunchStatus());
+
+
+            telemetry.addData("launchTrigger", launchTrigger);
+            telemetry.addData("Actuator Position", cannon.getActuatorPosition());
+
+            //telemetry.addData();
+            telemetry.update();
+        }
+
+
+    }
+
+
