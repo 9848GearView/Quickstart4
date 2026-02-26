@@ -7,7 +7,6 @@ import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV175;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.LLMech;
-import org.firstinspires.ftc.teamcode.mech.LauncherV175;
 
 
 //this is a new version for the new intake system;
@@ -53,13 +52,15 @@ public class DecodeV175TeleOp extends OpMode {
     private double leftY;
     private double rightX;
 
+
+
     @Override
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV175(hardwareMap);
         colSens = new ColorSensor(hardwareMap);
-        camera = new LLMech(hardwareMap);
-        camera.getLlResult();
+        //camera = new LLMech(hardwareMap);
+        camera.updateResult();
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
     }
 
@@ -144,16 +145,16 @@ public class DecodeV175TeleOp extends OpMode {
             chassis.drive(-leftY, leftX, rightX);
         }
 
-        if (gamepad1.a){
-            tLockOn = true;
-            if (camera.getLlResult() != null && camera.getLlResult().isValid()){ //checks to see if camera is seeing sonething that it is supposed to see
-                float botCorr = camera.botCorrection();
-                chassis.drive(-leftY, leftX, botCorr*.5);
-            }
-        } else {
-            tLockOn = false;
-            chassis.drive(-leftY, leftX, rightX);
-        }
+//        if (gamepad1.a){
+//            tLockOn = true;
+//            if (camera.updateResult() != null && camera.updateResult().isValid()){ //checks to see if camera is seeing sonething that it is supposed to see
+//                float botCorr = camera.botCorrection();
+//                chassis.drive(-leftY, leftX, botCorr*.5);
+//            }
+//        } else {
+//            tLockOn = false;
+//            chassis.drive(-leftY, leftX, rightX);
+//        }
         oldAPressed = gamepad2.a;
         oldBPressed = gamepad2.b;
         oldDPadDownPressed = gamepad2.dpad_down;

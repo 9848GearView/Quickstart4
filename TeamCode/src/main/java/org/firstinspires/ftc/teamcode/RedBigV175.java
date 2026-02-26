@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.TimerTask;
 import org.firstinspires.ftc.teamcode.mech.IntakeV175;
 
-@Autonomous(name = "RedBigV175", group = "Examples")
+@Autonomous(name = "dont use", group = "Examples")
 @Configurable
 public class RedBigV175 extends OpMode {
 
