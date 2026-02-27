@@ -23,6 +23,7 @@ public class IntakeV2 {
 
     // intake
     private DcMotorEx intake;
+    private DcMotorEx transfer;
 
     //outtake
     private DcMotorEx outtakeT;
@@ -94,6 +95,7 @@ public class IntakeV2 {
 
         //intake
         intake = hwMap.get(DcMotorEx.class, "intake");
+        transfer = hwMap.get(DcMotorEx.class, "tranny");
 
         //outtake
         outtakeT = hwMap.get(DcMotorEx.class, "outtakeT");
@@ -158,6 +160,7 @@ public class IntakeV2 {
 
     public void intake(double i){
         intake.setPower(i);
+        transfer.setPower(i);
     }
 
     public void setGatePosition(double i) {
@@ -165,7 +168,7 @@ public class IntakeV2 {
     }
 
     public void setLightColor(){
-        if (gate.getPosition() ==0){
+        if (gate.getPosition() ==.25){
             blinky.setPosition(.500); //open, green
         }
         if (gate.getPosition() == .5){
