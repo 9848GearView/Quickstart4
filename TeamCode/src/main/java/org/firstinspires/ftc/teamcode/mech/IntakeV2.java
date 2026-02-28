@@ -95,7 +95,7 @@ public class IntakeV2 {
 
         //intake
         intake = hwMap.get(DcMotorEx.class, "intake");
-        transfer = hwMap.get(DcMotorEx.class, "tranny");
+        transfer = hwMap.get(DcMotorEx.class, "transfer");
 
         //outtake
         outtakeT = hwMap.get(DcMotorEx.class, "outtakeT");
