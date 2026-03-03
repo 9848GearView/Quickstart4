@@ -115,8 +115,8 @@ public class V2RedSmall extends OpMode {
         private Pose intake1End = new Pose(134.5, 9.5, Math.toRadians(0));
         private Pose intake1Curve = new Pose(86, 13);
         private Pose intake2End = new Pose(134, 36.5, Math.toRadians(0));
-        private Pose intake2Curve1 = new Pose(101, 39);
-        private Pose intake2Curve2 = new Pose(102, 35);
+        private Pose intake2Curve1 = new Pose(91, 39);
+        private Pose intake2Curve2 = new Pose(92, 35);
         private Pose parkPosition = new Pose(100,21, Math.toRadians(90) );//need real angle
 
 
@@ -144,7 +144,6 @@ public class V2RedSmall extends OpMode {
 
 
     public int autonomousPathUpdate() {
-        //hasShot = true;
         switch(pathState) {
             case 0:// start to launch
                 follower.followPath(paths.shoot1, .8, true);
@@ -207,17 +206,13 @@ public class V2RedSmall extends OpMode {
                 if(!follower.isBusy()){
                     if(cannon.hasFinishedShot()) {
                         follower.followPath(paths.park,.8,true);
+                        cannon.intake(0);
                         setPathState(-1);
                     }
                 }
                 break;
 
         }
-
-
-        // Add your state machine Here
-        // Access paths with paths.pathName
-        // Refer to the Pedro Pathing Docs (Auto Example) for an example state machine
         return pathState;
     }
     //classes for timer tasks
@@ -248,5 +243,5 @@ public class V2RedSmall extends OpMode {
     }
 
 
-}//closes class
+}//closes class hello
 

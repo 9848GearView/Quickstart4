@@ -19,6 +19,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
     IntakeV2 cannon = null;
+
     //LLMech camera = null;
     //ColorSensor colSens = null;
 
@@ -84,8 +85,8 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         //camera = new LLMech(hardwareMap);
         camera.pipelineSwitch(0);
         camera.setPollRateHz(90);
-        chassis.setHalfPark(0.80);
-        cannon.setGatePosition(.5);
+        chassis.setHalfPark(0.40);
+        cannon.setGatePosition(.38);
         cannon.setLightColor();
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
@@ -128,6 +129,14 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
             chassis.setHalfPark(0);
         }
 
+        if(gamepad1.x){
+            cannon.setLeftTurret(0.1);
+        }
+
+        if(gamepad1.b){
+            cannon.setRightTurret(0.1);
+        }
+
         //intake
         if (gamepad2.a && !oldAPressed){
             intakeOn = !intakeOn;
@@ -145,7 +154,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
             if(pushDown) {
                 cannon.intake(0);
             } else {
-                cannon.intake(-1);
+                cannon.intake(-.4);
             }
         }
 
@@ -216,13 +225,13 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
 
         //test launch in case break
         if(rBumperPressed && !oldRBumperPressed){
-            cannon.setGatePosition(.5);
+            cannon.setGatePosition(.38);
             cannon.setLightColor();
             oldRBumperPressed = true;
         }
 
         if(lBumperPressed && oldRBumperPressed){
-            cannon.setGatePosition(0);
+            cannon.setGatePosition(0.25);
             cannon.setLightColor();
             oldRBumperPressed = false;
         }
@@ -300,11 +309,11 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("launchTrigger", launchTrigger);
         telemetry.addData("Actuator Position", cannon.getActuatorPosition());
 
-        telemetry.addData("Robot Location", ("Coords: " + follower.getPose().getX() + ", " + follower.getPose().getY() + ", Heading: " + follower.getPose().getHeading()));
+        //telemetry.addData("Robot Location", ("Coords: " + follower.getPose().getX() + ", " + follower.getPose().getY() + ", Heading: " + follower.getPose().getHeading()));
 
         //telemetry.addData();
         telemetry.update();
-        follower.update();
+        //follower.update();
     }
 
 

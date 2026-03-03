@@ -64,15 +64,20 @@ public class IntakeV2 {
     final double STOP_SPEED = 0.0;
     final double FULL_SPEED = 1.0;
 
+    private double voltage = batteryVoltageSensor.getVoltage();
+
+    double adjustedFFar = 16 * (12/voltage);
+    double adjustedFClose = 15.5 * (12/voltage);
+
+
     //likely change
     final double LAUNCHER_TARGET_VELOCITY= 1600;//started at 1125//was725//Mrs.b changed to 850
     final double LAUNCHER_MIN_VELOCITY = 1550;//started at 1075//was 675//mrs B changed to 800
 
     private String launchStatus;
 
-    PIDFCoefficients farCoeffs  = new PIDFCoefficients(10, 0, 0, 12);
-    PIDFCoefficients closeCoeffs = new PIDFCoefficients(6, 0, 0, 6);
-
+    PIDFCoefficients farCoeffs = new PIDFCoefficients(40, 0, 0, 16);
+    PIDFCoefficients closeCoeffs = new PIDFCoefficients(10, 0, 0, 15.5);
 
 
     ElapsedTime feedTimer = new ElapsedTime();
@@ -95,7 +100,7 @@ public class IntakeV2 {
 
         //intake
         intake = hwMap.get(DcMotorEx.class, "intake");
-        transfer = hwMap.get(DcMotorEx.class, "tranny");
+        transfer = hwMap.get(DcMotorEx.class, "transfer");
 
         //outtake
         outtakeT = hwMap.get(DcMotorEx.class, "outtakeT");
@@ -120,13 +125,9 @@ public class IntakeV2 {
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-
         intake.setDirection(DcMotorEx.Direction.REVERSE);
         outtakeT.setDirection(DcMotorEx.Direction.REVERSE);
         outtakeB.setDirection(DcMotorEx.Direction.REVERSE);
-
-
-
 
         /*
          * Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to
@@ -134,11 +135,6 @@ public class IntakeV2 {
          */
         outtakeT.setZeroPowerBehavior(FLOAT);
         outtakeB.setZeroPowerBehavior(FLOAT);
-
-
-
-        //something.setDirection(CRServo.Direction.REVERSE);
-
 
         /*Likely the most niche concept we'll use in this example is closed-loop motor velocity control.
          * This control method reads the current speed as reported by the motor's encoder and applies a
@@ -152,42 +148,50 @@ public class IntakeV2 {
         outtakeT.setVelocity(0);
         outtakeB.setVelocity(0);
 
-
         /*
          * We set the left feeder servo to reverse so that they both work to feed the ball into the robot.
          */
     }
 
+    //intake
     public void intake(double i){
         intake.setPower(i);
-        transfer.setPower(i);
+        transfer.setPower(-i);
     }
 
+    //set gate position
     public void setGatePosition(double i) {
         gate.setPosition(i);
     }
 
+    //set light color
     public void setLightColor(){
         if (gate.getPosition() ==.25){
             blinky.setPosition(.500); //open, green
         }
-        if (gate.getPosition() == .5){
+        if (gate.getPosition() == .38){
             blinky.setPosition(.28); //closed, red
         }
     }
 
-    public void stopLaunch(){
-        launchState = LaunchState.IDLE;
-        outtakeT.setVelocity(0);
-        outtakeB.setVelocity(0);
-        // change set positions to whatever
-    }
+    //set actuator position
+    public void setActuatorPos(double i){ angle.setPosition(i); }
 
+    //set turret position
     public void setTurret(double i) {
         turretL.setPosition(i);
         turretR.setPosition(i);
     }
 
+    public void setLeftTurret(double i){
+        turretL.setPosition(i);
+    }
+
+    public void setRightTurret(double i){
+        turretR.setPosition(i);
+    }
+
+    //limelight scanning
     public void scanTurret(){
         //update if I've reached right or left limit
         leftLimReached = getTurretPos() > leftLim;
@@ -213,27 +217,17 @@ public class IntakeV2 {
                 movingRight = false;
             }
         }
-
-
-
     }
 
-    public double getTurretPos(){
-        return turretL.getPosition();
+    //stop launch motors
+    public void stopLaunch(){
+        launchState = LaunchState.IDLE;
+        outtakeT.setVelocity(0);
+        outtakeB.setVelocity(0);
+        // change set positions to whatever
     }
 
-    public boolean getRightLimitReached(){
-        return rightLimReached;
-    }
-
-    public boolean getLeftLimitReached(){
-        return leftLimReached;
-    }
-
-    public void setActuatorPos(double i){ angle.setPosition(i); }
-
-    public double getActuatorPos(){return angle.getPosition();}
-
+    //start spinning up outtake motors
     public void toggleSpinUp() {
         if (launchState == LaunchState.IDLE) {
             launchState = LaunchState.SPIN_UP;
@@ -242,6 +236,7 @@ public class IntakeV2 {
         }
     }
 
+    //request gate open
     //not used, outtake is on all match and only thing that's necessary is to use right bumper to close and open gate
     public void requestLaunch() {
         if (launchState == LaunchState.SPIN_UP &&
@@ -250,7 +245,7 @@ public class IntakeV2 {
         }
     }
 
-    //launch method using state machine concept
+    //pidf coefficients and velocity for big triangle
     public void launchClose() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
@@ -259,6 +254,7 @@ public class IntakeV2 {
         launchStatus = "close";
     }//closes method
 
+    //pidf coefficients and velocity for small triangle
     public void launchFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
@@ -267,8 +263,45 @@ public class IntakeV2 {
         launchStatus = "far";
     }//closes method
 
+    //big triangle shooting during auto
+    public void launchAutoClose(boolean b) {
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
+        switch (launchState) {
+            case IDLE:
+                setGatePosition(.5);
+                outtakeT.setVelocity(0);
+                outtakeB.setVelocity(0);
+                if(b) {
+                    launchState = LaunchState.SPIN_UP;
+                }
+                break;
+            case SPIN_UP:
+                outtakeT.setVelocity(1450);
+                outtakeB.setVelocity(1450);
+                if (getLauncherVelocity() > 1400) {
+                    launchState = LaunchState.LAUNCH;
+                }
+                break;
+            case LAUNCH:
+                feederTimer.reset();
+                launchState = IntakeV2.LaunchState.LAUNCHING;
+                break;
+            case LAUNCHING: // not used, just use stopLaunch method manually
+                intake(1);
+                setGatePosition(0);
+                if (feederTimer.seconds() > FEED_TIME_SECONDS) {
+                    intake(0);                    stopLaunch();
+                    launchState = LaunchState.IDLE;
+                }
+                break;
+        }//closes switch
+    }//closes method
 
+    //small triangle shooting during auto
     public void launchAutoFar(boolean b) {
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
         switch (launchState) {
             case IDLE:
                 setGatePosition(.5);
@@ -301,40 +334,27 @@ public class IntakeV2 {
         }//closes switch
     }//closes method
 
-    public void launchAutoClose(boolean b) {
-        switch (launchState) {
-            case IDLE:
-                setGatePosition(.5);
-                outtakeT.setVelocity(0);
-                outtakeB.setVelocity(0);
-                if(b) {
-                    launchState = LaunchState.SPIN_UP;
-                }
-                break;
-            case SPIN_UP:
-                outtakeT.setVelocity(1450);
-                outtakeB.setVelocity(1450);
-                if (getLauncherVelocity() > 1400) {
-                    launchState = LaunchState.LAUNCH;
-                }
-                break;
-            case LAUNCH:
-                feederTimer.reset();
-                launchState = IntakeV2.LaunchState.LAUNCHING;
-                break;
-            case LAUNCHING: // not used, just use stopLaunch method manually
-                intake(1);
-                setGatePosition(0);
-                if (feederTimer.seconds() > FEED_TIME_SECONDS) {
-                    intake(0);                    stopLaunch();
-                    launchState = LaunchState.IDLE;
-                }
-                break;
-        }//closes switch
-    }//closes method
+    //GET AND SET METHODS
 
+    //get turret position
+    public double getTurretPos(){
+        return turretL.getPosition();
+    }
 
+    //checks if the turret has reached the rightmost limit
+    public boolean getRightLimitReached(){
+        return rightLimReached;
+    }
 
+    //checks if the turret has reached the rightmost limit
+    public boolean getLeftLimitReached(){
+        return leftLimReached;
+    }
+
+    //get actuator position
+    public double getActuatorPos(){return angle.getPosition();}
+
+    //find what LaunchState the robot's in
     public LaunchState getLaunchState(){
         return launchState;
     }

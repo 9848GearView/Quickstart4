@@ -28,11 +28,11 @@ public class Constants {
             .useSecondaryDrivePIDF(true)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0.03))
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.15,0,0.02,0.015))
-            .headingPIDFCoefficients(new PIDFCoefficients(.9, 0, 0.03, 0.025))
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1,0,0.08,0.01))
+            .headingPIDFCoefficients(new PIDFCoefficients(3, 0, 0.08, 0.03))
+            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(3,0,0.1,0.02))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.02,0.0,0.001,0.6,0.01))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.02,0,0.000005,0.6,0.01))
-            .centripetalScaling(0.005)
+            .centripetalScaling(0.0005)
             ;
 
     public static PathConstraints pathConstraints = new PathConstraints(

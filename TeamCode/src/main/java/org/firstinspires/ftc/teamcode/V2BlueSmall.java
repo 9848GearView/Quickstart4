@@ -188,7 +188,7 @@ public class V2BlueSmall extends OpMode {
                     }
                 }
                 break;
-            case 3: //launch to intake2
+            case 3: //launch to intake2secret
                 if(!follower.isBusy()) {
                     follower.followPath(paths.intake2,.8, true);
                 }

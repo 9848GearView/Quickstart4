@@ -78,8 +78,8 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
             camera = hardwareMap.get(Limelight3A.class,"limabean");
             //camera = new LLMech(hardwareMap);
             camera.pipelineSwitch(1);
-            chassis.setHalfPark(0.80);
-            cannon.setGatePosition(.5);
+            chassis.setHalfPark(0.40);
+            cannon.setGatePosition(.38);
             cannon.setLightColor();
             cannon.setTurret(.5);
             cannon.setActuatorPos(.53);
@@ -139,7 +139,7 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
                 if(pushDown) {
                     cannon.intake(0);
                 } else {
-                    cannon.intake(-1);
+                    cannon.intake(-.4);
                 }
             }
 
@@ -206,13 +206,13 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 
             //test launch in case break
             if(rBumperPressed && !oldRBumperPressed){
-                cannon.setGatePosition(.5);
+                cannon.setGatePosition(.38);
                 cannon.setLightColor();
                 oldRBumperPressed = true;
             }
 
             if(lBumperPressed && oldRBumperPressed){
-                cannon.setGatePosition(0);
+                cannon.setGatePosition(0.25);
                 cannon.setLightColor();
                 oldRBumperPressed = false;
             }

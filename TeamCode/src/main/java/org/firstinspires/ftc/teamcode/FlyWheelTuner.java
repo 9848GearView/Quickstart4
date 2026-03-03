@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+@TeleOp(name="FlyWheelTuner", group="Iterative OpMode")
 public class FlyWheelTuner extends OpMode {
 
     private VoltageSensor batteryVoltageSensor;
@@ -14,8 +16,8 @@ public class FlyWheelTuner extends OpMode {
     private DcMotorEx outtakeT;
     private DcMotorEx outtakeB;
 
-    private double highVel = 2700;
-    private double lowVel = 2600;
+    private double highVel = 1930;
+    private double lowVel = 1450;
 
     double f = 0;
     double p = 0;

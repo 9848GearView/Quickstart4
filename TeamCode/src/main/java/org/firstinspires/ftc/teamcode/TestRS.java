@@ -1,0 +1,331 @@
+package org.firstinspires.ftc.teamcode;
+
+
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.util.Timer;
+import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+
+import java.util.TimerTask;
+
+@Autonomous(name = "TestRedSmall", group = "Autonomous")
+@Configurable // Panels
+public class TestRS extends OpMode {
+    private TelemetryManager panelsTelemetry; // Panels Telemetry instance
+    public Follower follower; // Pedro Pathing follower instance
+    private int pathState; // Current autonomous path state (state machine)
+    private Paths paths; // Paths defined in the Paths class
+    java.util.Timer timer = new java.util.Timer();
+    IntakeV2 cannon = null;
+    private Timer pathTimer;
+    private TimerTask Timer;
+    public boolean shouldShoot = false;
+    boolean hasShot = false;
+
+    @Override
+    public void init() {
+        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(new Pose(88, 8, Math.toRadians(90)));
+
+        paths = new Paths(follower); // Build paths
+
+        cannon = new IntakeV2(hardwareMap);
+
+        pathTimer = new Timer();
+
+
+
+        panelsTelemetry.debug("Status", "Initialized");
+        panelsTelemetry.update(telemetry);
+    }
+
+    @Override
+    public void loop() {
+        follower.update(); // Update Pedro Pathing
+        pathState = autonomousPathUpdate(); // Update autonomous state machine
+
+        if (shouldShoot && !hasShot) { cannon.launchAutoFar(true);} // constantly updates launcher state machine
+        else { cannon.launchAutoFar(false);} // keeps launcher idle
+
+        // Detect when the launcher finishes its cycle
+        if (shouldShoot && !hasShot && cannon.hasFinishedShot()) {
+            hasShot = true;       // mark that we already shot
+            shouldShoot = false;  // stop shooter from cycling again
+        }
+
+        // Log values to Panels and Driver Station
+        panelsTelemetry.debug("Path State", pathState);
+        panelsTelemetry.debug("X", follower.getPose().getX());
+        panelsTelemetry.debug("Y", follower.getPose().getY());
+        panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+        panelsTelemetry.update(telemetry);
+    }
+
+    public void setPathState(int pState) {
+        pathState = pState;
+    }
+
+    public int getPathState() {
+        return pathState;
+    }
+
+    public static class Paths {
+        public PathChain shoot1;
+        public PathChain intake1;
+        public PathChain shoot2;
+        public PathChain intake2;
+        public PathChain shoot3;
+        public PathChain intake3;
+        public PathChain shoot4;
+        public PathChain humanplayer;
+        public PathChain shoothp;
+        public PathChain park;
+
+        public Paths(Follower follower) {
+            shoot1 = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(88.000, 8.000),
+                                    new Pose(85.000, 20.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(68))
+                    .build();
+
+            intake1 = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(85.000, 20.000),
+                                    new Pose(86.000, 13.000),
+                                    new Pose(134.000, 12.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .build();
+
+            shoot2 = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(134.000, 12.000),
+                                    new Pose(85.000, 20.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(68))
+                    .build();
+
+            intake2 = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(85.000, 20.000),
+                                    new Pose(91.000, 39.000),
+                                    new Pose(92.000, 34.500),
+                                    new Pose(134.000, 36.000)
+                            )
+                    )
+                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .build();
+
+            shoot3 = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(134.000, 36.000),
+                                    new Pose(85.000, 20.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(68))
+                    .build();
+
+            intake3 = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(85.000, 20.000),
+                                    new Pose(91.000, 59.000),
+                                    new Pose(76.600, 59.700),
+                                    new Pose(134.000, 59.000)
+                            )
+                    )
+                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .build();
+
+            shoot4 = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(134.000, 59.000),
+                                    new Pose(85.000, 20.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(68))
+                    .build();
+
+            humanplayer = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(85.000, 20.000),
+                                    new Pose(86.000, 13.000),
+                                    new Pose(134.000, 12.000)
+                            )
+                    )
+                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .build();
+
+            shoothp = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(134.000, 12.000),
+                                    new Pose(85.000, 20.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(68))
+                    .build();
+
+            park = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(85.000, 20.000),
+                                    new Pose(108.000, 20.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(68), Math.toRadians(90))
+                    .build();
+        }
+    }
+
+    public int autonomousPathUpdate() {
+        switch (pathState) {
+            case 0:// start to launch
+                follower.followPath(paths.shoot1, .8, true);
+
+                shouldShoot = true; // starts launching
+                hasShot = false;
+                setPathState(10);
+
+                break;
+            case 10: //reset timer
+                if (!follower.isBusy()) {
+                    if (cannon.hasFinishedShot()) {
+                        pathTimer.resetTimer();
+                        setPathState(1);
+                    }
+                }
+                break;
+            case 1: //launch to intake1
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.intake1, .8, true);
+                }
+                if (pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    setPathState(2);
+                }
+                break;
+            case 2: //intake1 to launch
+                if (!follower.isBusy()) {
+                    cannon.intake(0);
+                    shouldShoot = true; // starts launching
+                    hasShot = false;
+                    follower.followPath(paths.shoot2, .8, true);
+                    setPathState(11);
+                }
+                break;
+            case 11: //reset timer
+                if (!follower.isBusy()) {
+                    if (cannon.hasFinishedShot()) {
+                        pathTimer.resetTimer();
+                        setPathState(3);
+                    }
+                }
+                break;
+            case 3: //launch to intake2
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.intake2, .8, true);
+                }
+                cannon.intake(1);
+                if (pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    setPathState(4);
+                }
+                break;
+            case 4: //intake2 to launch
+                if (!follower.isBusy()) {
+                    shouldShoot = true; // starts launching
+                    hasShot = false;
+                    follower.followPath(paths.shoot3, .8, true);
+                    setPathState(12);
+                }
+                break;
+            case 12: //reset timer
+                if(!follower.isBusy()){
+                    if(cannon.hasFinishedShot()) {
+                        pathTimer.resetTimer();
+                        setPathState(6);
+                    }
+                }
+                break;
+            case 6: //launch to human player
+                if(!follower.isBusy()) {
+                    follower.followPath(paths.humanplayer,.8, true);
+                }
+                cannon.intake(1);
+                if(pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    setPathState(7);
+                }
+                break;
+            case 7: //human player to launch
+                if(!follower.isBusy()){
+                    shouldShoot = true; // starts launching
+                    hasShot = false;
+                    follower.followPath(paths.shoothp,.8,true);
+                    setPathState(8);
+                }
+                break;
+            case 8: //launch to park
+                if (!follower.isBusy()) {
+                    if (cannon.hasFinishedShot()) {
+                        follower.followPath(paths.park, .8, true);
+                        cannon.intake(0);
+                        setPathState(-1);
+                    }
+                }
+                break;
+
+
+        }
+        return pathState;
+
+    }
+    //classes for timer tasks
+    public class IntakeAuto extends TimerTask {
+        double power;
+
+        public IntakeAuto(double p) {
+            this.power = p;
+        }
+
+        @Override
+        public void run() {
+            cannon.intake(power);
+        }
+    }
+
+    public class GateAuto extends TimerTask {
+        double pos;
+
+        public GateAuto(double p) {
+            this.pos = p;
+        }
+
+        @Override
+        public void run() {
+            cannon.setGatePosition(pos);
+        }
+    }
+}
