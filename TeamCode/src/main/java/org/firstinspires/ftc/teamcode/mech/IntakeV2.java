@@ -76,7 +76,7 @@ public class IntakeV2 {
 
     private String launchStatus;
 
-    PIDFCoefficients Coeffs = new PIDFCoefficients(100, 0, 0, 15);
+    PIDFCoefficients Coeffs = new PIDFCoefficients(70, 0, 0, 1);
 
 
     ElapsedTime feedTimer = new ElapsedTime();
