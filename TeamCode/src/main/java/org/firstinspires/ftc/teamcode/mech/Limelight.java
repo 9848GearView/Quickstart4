@@ -7,6 +7,8 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
+
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -14,10 +16,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 public class Limelight extends OpMode {
 
     private Limelight3A limelight;
+    public LLResult llResult;
     IntakeV2 cannon = null;
     private IMU imu;
-
-
+    private double Kp;
+//    private double Kd;
+//    private double angleTolerance = 0.2;
+//    private double lastError = 0;
+//    public void setKp(double newKp){
+//        Kp = newKp;
+//    }
+//    public double getKp(){
+//        return Kp;
+//    }
+//    public void setKd(double newKd){
+//        Kd = newKd;
+//    }
+//    public double getKd(){
+//        return Kd;
+//    }
 
 
     @Override
@@ -47,7 +64,7 @@ public class Limelight extends OpMode {
     public void loop() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight.updateRobotOrientation(orientation.getYaw());
-        LLResult llResult = limelight.getLatestResult();
+        llResult = limelight.getLatestResult();
 
             if (llResult != null && llResult.isValid()) {
                 telemetry.addData("Tx", llResult.getTx());
@@ -59,10 +76,10 @@ public class Limelight extends OpMode {
 
 
             if (llResult!= null && llResult.isValid()){
-                    float Kp = -0.0002f; //proportional control constant
-                    double tx = llResult.getTx();
-                    double botCorr = (Kp * tx);
-                    cannon.setTurret(cannon.getTurretPos() + botCorr);
+                Kp = -0.0005; //proportional control constant
+                double tx = llResult.getTx();
+                double botCorr = (Kp * tx);
+                cannon.setTurret(cannon.getTurretPos() + botCorr);
 
             }
 

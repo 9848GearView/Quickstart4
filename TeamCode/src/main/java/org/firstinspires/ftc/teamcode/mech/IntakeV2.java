@@ -64,10 +64,12 @@ public class IntakeV2 {
     final double STOP_SPEED = 0.0;
     final double FULL_SPEED = 1.0;
 
-    private double voltage = batteryVoltageSensor.getVoltage();
+    /*private double voltage = batteryVoltageSensor.getVoltage();
 
     double adjustedFFar = 16 * (12/voltage);
     double adjustedFClose = 15.5 * (12/voltage);
+
+     */
 
 
     //likely change
@@ -76,8 +78,8 @@ public class IntakeV2 {
 
     private String launchStatus;
 
-    PIDFCoefficients farCoeffs = new PIDFCoefficients(40, 0, 0, 16);
-    PIDFCoefficients closeCoeffs = new PIDFCoefficients(10, 0, 0, 15.5);
+    PIDFCoefficients farCoeffs = new PIDFCoefficients(30, 0, 0, 11.5);
+    PIDFCoefficients closeCoeffs = new PIDFCoefficients(5, 0, 0, 6);
 
 
     ElapsedTime feedTimer = new ElapsedTime();

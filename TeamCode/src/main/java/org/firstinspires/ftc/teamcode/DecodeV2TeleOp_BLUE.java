@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
+import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 
 //guarantee this wont work whatsoever
 
@@ -19,6 +20,8 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
     IntakeV2 cannon = null;
+    BlueLimelightAutoAim visionAid = null;
+
 
     //LLMech camera = null;
     //ColorSensor colSens = null;
@@ -81,6 +84,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV2(hardwareMap);
+        visionAid = new BlueLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
         //camera = new LLMech(hardwareMap);
         camera.pipelineSwitch(0);
@@ -101,7 +105,8 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
     }
     @Override
     public void loop(){
-        LLResult llResult = camera.getLatestResult();
+        //LLResult llResult = camera.getLatestResult();
+        visionAid.update();
 
         dPadUpPressed = gamepad2.dpad_up;
 
@@ -194,12 +199,12 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
             tLock = !tLock; // reminder to find a way to turn this off
         }
         if (tLock) {
-            if (llResult!= null && llResult.isValid()){
-                float Kp = -0.0002f; //proportional control constant
+            if (visionAid.hasTarget()){
+                float Kp = -0.0005f; //proportional control constant
                 double feedForward = rightX* .005;
-                double tx = llResult.getTx();
+                double tx = visionAid.getTx();
                 double botCorr = (Kp * tx) - feedForward;
-                if(Math.abs(tx) > 1) {
+                if(Math.abs(tx) > .5) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);
                 }
 
@@ -288,10 +293,9 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         //colSens.getDetectedColor(telemetry);
 //
         telemetry.addData("Tlock on", tLock);
-        if (llResult != null && llResult.isValid()) {
-            telemetry.addData("Tx", llResult.getTx());
-            telemetry.addData("Ty", llResult.getTy());
-            telemetry.addData("Ta", llResult.getTa());
+        if (visionAid.hasTarget()) {
+            telemetry.addData("Tx", visionAid.getTx());
+
         } else {
             telemetry.addLine("Tag not found");
         }

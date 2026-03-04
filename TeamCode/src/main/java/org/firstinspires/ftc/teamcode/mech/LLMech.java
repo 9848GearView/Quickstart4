@@ -19,6 +19,7 @@ public class LLMech {
         limelight.setPollRateHz(90);
         // 21-23 is the obelisk patterns
         limelight.pipelineSwitch(0);
+        limelight.start();
     }
     
 
@@ -59,7 +60,7 @@ public class LLMech {
     public void targetLockdata(){
         // for now, I'll want the heading of the robot using the camera, this was a test
         if (llResult != null && llResult.isValid()){
-            float Kp = -0.f; //proportional control constant
+            //proportional control constant
 
             double tx = llResult.getTx();
             double heading_err= tx;
@@ -69,7 +70,6 @@ public class LLMech {
         }
     }
     public float botCorrection(){//this actually sends the data
-        float Kp = -0.0003f;//proportional control constant
         double tx = llResult.getTx();
         double heading_err= tx;
         double steer_adj = Kp * tx;
