@@ -64,12 +64,10 @@ public class IntakeV2 {
     final double STOP_SPEED = 0.0;
     final double FULL_SPEED = 1.0;
 
-    /*private double voltage = batteryVoltageSensor.getVoltage();
+    private double voltage = batteryVoltageSensor.getVoltage();
 
     double adjustedFFar = 16 * (12/voltage);
     double adjustedFClose = 15.5 * (12/voltage);
-
-     */
 
 
     //likely change
@@ -270,7 +268,7 @@ public class IntakeV2 {
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         switch (launchState) {
             case IDLE:
-                setGatePosition(.5);
+                setGatePosition(.38);
                 outtakeT.setVelocity(0);
                 outtakeB.setVelocity(0);
                 if(b) {
@@ -278,9 +276,9 @@ public class IntakeV2 {
                 }
                 break;
             case SPIN_UP:
-                outtakeT.setVelocity(1450);
-                outtakeB.setVelocity(1450);
-                if (getLauncherVelocity() > 1400) {
+                outtakeT.setVelocity(1310);
+                outtakeB.setVelocity(1310);
+                if (getLauncherVelocity() > 1270) {
                     launchState = LaunchState.LAUNCH;
                 }
                 break;
@@ -290,7 +288,8 @@ public class IntakeV2 {
                 break;
             case LAUNCHING: // not used, just use stopLaunch method manually
                 intake(1);
-                setGatePosition(0);
+                setActuatorPos(.75);
+                setGatePosition(0.25);
                 if (feederTimer.seconds() > FEED_TIME_SECONDS) {
                     intake(0);                    stopLaunch();
                     launchState = LaunchState.IDLE;
@@ -305,7 +304,7 @@ public class IntakeV2 {
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         switch (launchState) {
             case IDLE:
-                setGatePosition(.5);
+                setGatePosition(.38);
                 outtakeT.setVelocity(0);
                 outtakeB.setVelocity(0);
                 if(b) {
@@ -313,9 +312,9 @@ public class IntakeV2 {
                 }
                 break;
             case SPIN_UP:
-                outtakeT.setVelocity(1930);
-                outtakeB.setVelocity(1930);
-                if (getLauncherVelocity() > 1880) {
+                outtakeT.setVelocity(1700);
+                outtakeB.setVelocity(1700);
+                if (getLauncherVelocity() > 1650) {
                     launchState = LaunchState.LAUNCH;
                 }
                 break;
@@ -325,7 +324,8 @@ public class IntakeV2 {
                 break;
             case LAUNCHING: // not used, just use stopLaunch method manually
                 intake(1);
-                setGatePosition(0);
+                setActuatorPos(1);
+                setGatePosition(.25);
                 if (feederTimer.seconds() > FEED_TIME_SECONDS) {
                     intake(0);
                     stopLaunch();
@@ -335,6 +335,10 @@ public class IntakeV2 {
         }//closes switch
     }//closes method
 
+    public void setVelocity(double p){
+        outtakeT.setVelocity(p);
+        outtakeB.setVelocity(p);
+    }
     //GET AND SET METHODS
 
     //get turret position

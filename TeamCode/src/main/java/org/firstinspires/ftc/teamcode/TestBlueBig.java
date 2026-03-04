@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
-@Autonomous(name = "TestRedSmall", group = "Autonomous")
+@Autonomous(name = "TestBlueBig", group = "Autonomous")
 @Configurable // Panels
 public class TestBlueBig extends OpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance

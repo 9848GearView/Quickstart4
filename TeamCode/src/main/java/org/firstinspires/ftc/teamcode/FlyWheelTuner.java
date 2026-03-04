@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,8 +18,9 @@ public class FlyWheelTuner extends OpMode {
     private DcMotorEx outtakeT;
     private DcMotorEx outtakeB;
 
-    private double highVel = 1930;
-    private double lowVel = 1450;
+
+    private double highVel = 1650;
+    private double lowVel = 1350;
 
     double f = 0;
     double p = 0;
@@ -43,6 +46,9 @@ public class FlyWheelTuner extends OpMode {
 
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         outtakeB.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+
+        outtakeT.setZeroPowerBehavior(FLOAT);
+        outtakeB.setZeroPowerBehavior(FLOAT);
 
         telemetry.addLine("Init Complete");
     }

@@ -16,7 +16,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
-@Autonomous(name = "TestRedSmall", group = "Autonomous")
+import java.util.TimerTask;
+
+@Autonomous(name = "TestRedBig", group = "Autonomous")
 @Configurable // Panels
 public class TestRB extends OpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
@@ -187,109 +189,142 @@ public class TestRB extends OpMode {
         }
     }
 
+    //change this to big triangle auto
     public int autonomousPathUpdate() {
         switch (pathState) {
-            case 0:// start to launch
-                follower.followPath(paths.shoot1, .8, true);
-                shouldShoot = true; // starts launching
-                hasShot = false;
-                setPathState(10);
-
+            case 0:
+                timer.schedule(new LaunchAuto(1650), 0);
+                follower.followPath(paths.shoot1,  true);
+                setPathState(1);
                 break;
-            case 10: //reset timer
-                if (!follower.isBusy()) {
-                    if (cannon.hasFinishedShot()) {
-                        pathTimer.resetTimer();
-                        setPathState(1);
-                    }
-                }
-                break;
-            case 1: //launch to intake1
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.intake1, .8, true);
-                }
-                cannon.intake(1);
-                if (pathTimer.getElapsedTimeSeconds() > 2.5) {
+            case 1:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 200);
+                    pathTimer.resetTimer();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if(!follower.isBusy()){
-                    follower.followPath(paths.gate,0.8,true);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    follower.followPath(paths.intake1, true);
+                    timer.schedule(new GateAuto(0.38), 0);
                     setPathState(3);
                 }
                 break;
-            case 3: //intake1 to launch
+            case 3:
                 if (!follower.isBusy()) {
-                    shouldShoot = true; // starts launching
-                    hasShot = false;
-                    follower.followPath(paths.shoot2, .8, true);
-                    setPathState(11);
+                    pathTimer.resetTimer();
+                    follower.followPath(paths.shoot2, true);
+                    timer.schedule(new IntakeAuto(0),100);
+                    setPathState(4);
                 }
                 break;
-            case 11: //reset timer
-                if (!follower.isBusy()) {
-                    if (cannon.hasFinishedShot()) {
-                        pathTimer.resetTimer();
-                        setPathState(4);
-                    }
-                }
-                break;
-            case 4: //launch to intake2
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.intake2, .8, true);
-                }
-                cannon.intake(1);
-                if (pathTimer.getElapsedTimeSeconds() > 2.5) {
+            case 4:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 700);
+                    pathTimer.resetTimer();
                     setPathState(5);
                 }
                 break;
-            case 5: //intake2 to launch
+            case 5:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    follower.followPath(paths.intake2, true);
+                    timer.schedule(new GateAuto(0.38), 0);
+                    setPathState(6);
+                }
+                break;
+            case 6:
                 if (!follower.isBusy()) {
-                    shouldShoot = true; // starts launching
-                    hasShot = false;
-                    follower.followPath(paths.shoot3, .8, true);
-                    setPathState(12);
-                }
-                break;
-            case 12: //reset timer
-                if(!follower.isBusy()){
-                    if(cannon.hasFinishedShot()) {
-                        pathTimer.resetTimer();
-                        setPathState(6);
-                    }
-                }
-                break;
-            case 6: //launch to intake3
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.intake3,.8, true);
-                }
-                cannon.intake(1);
-                if(pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    pathTimer.resetTimer();
+                    follower.followPath(paths.shoot3, true);
+                    timer.schedule(new IntakeAuto(0), 100);
                     setPathState(7);
                 }
                 break;
-            case 7: //human player to launch
-                if(!follower.isBusy()){
-                    shouldShoot = true; // starts launching
-                    hasShot = false;
-                    follower.followPath(paths.shoot4,.8,true);
-                    setPathState(8);
+            case 7:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 700);
+                    pathTimer.resetTimer();
+                    setPathState(8); // 8 to continue to pickup 3, 11 to go to park early
                 }
                 break;
-            case 8: //launch to park
+            case 8:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    //follower.followPath(paths.humanplayer, true);
+                    timer.schedule(new GateAuto(0.38), 0);
+                    setPathState(9);
+                }
+                break;
+            case 9:
                 if (!follower.isBusy()) {
-                    if (cannon.hasFinishedShot()) {
-                        follower.followPath(paths.park, .8, true);
-                        cannon.intake(0);
-                        setPathState(-1);
-                    }
+                    pathTimer.resetTimer();
+                    //follower.followPath(paths.shoothp, true);
+                    timer.schedule(new IntakeAuto(0),100);
+                    setPathState(10);
                 }
                 break;
-
+            case 10:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 700);
+                    pathTimer.resetTimer();
+                    setPathState(11);
+                }
+                break;
+            case 11:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    follower.followPath(paths.park,true);
+                    timer.schedule(new GateAuto(0.38), 200);
+                    timer.schedule(new IntakeAuto(0), 200);
+                    timer.schedule(new LaunchAuto(0), 200);
+                    setPathState(12);
+                }
 
         }
         return pathState;
 
+    }
+
+    //classes for timer tasks
+    public class IntakeAuto extends TimerTask {
+        double power;
+
+        public IntakeAuto(double p) {
+            this.power = p;
+        }
+
+        @Override
+        public void run() {
+            cannon.intake(power);
+        }
+    }
+
+    public class GateAuto extends TimerTask {
+        double pos;
+
+        public GateAuto(double p) {
+            this.pos = p;
+        }
+
+        @Override
+        public void run() {
+            cannon.setGatePosition(pos);
+        }
+    }
+
+    public class LaunchAuto extends TimerTask {
+        double pos;
+
+        public LaunchAuto(double p) {
+            this.pos = p;
+        }
+
+        @Override
+        public void run() {
+            cannon.setVelocity(1650);
+        }
     }
 }
