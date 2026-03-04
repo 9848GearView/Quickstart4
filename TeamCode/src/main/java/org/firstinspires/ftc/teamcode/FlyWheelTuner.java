@@ -31,7 +31,7 @@ public class FlyWheelTuner extends OpMode {
     @Override
     public void init() {
         outtakeT = hardwareMap.get(DcMotorEx.class, "outtakeT");
-        outtakeB = hardwareMap.get(DcMotorEx.class, "outtakeT");
+        outtakeB = hardwareMap.get(DcMotorEx.class, "outtakeB");
 
         outtakeT.setDirection(DcMotorEx.Direction.REVERSE);
         outtakeB.setDirection(DcMotorEx.Direction.REVERSE);

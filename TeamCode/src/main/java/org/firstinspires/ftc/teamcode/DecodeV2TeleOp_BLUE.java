@@ -200,8 +200,9 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         }
         if (tLock) {
             if (visionAid.hasTarget()){
+
                 float Kp = -0.0005f; //proportional control constant
-                double feedForward = rightX* .005;
+                double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx();
                 double botCorr = (Kp * tx) - feedForward;
                 if(Math.abs(tx) > .5) {
@@ -293,12 +294,11 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         //colSens.getDetectedColor(telemetry);
 //
         telemetry.addData("Tlock on", tLock);
-        if (visionAid.hasTarget()) {
-            telemetry.addData("Tx", visionAid.getTx());
+        telemetry.addData("Tag found", visionAid.hasTarget());
+        telemetry.addData("Tx", visionAid.getTx());
 
-        } else {
-            telemetry.addLine("Tag not found");
-        }
+
+        
         telemetry.addData("Turret Position", cannon.getTurretPos());
 
         telemetry.addLine();

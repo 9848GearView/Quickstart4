@@ -78,8 +78,7 @@ public class IntakeV2 {
 
     private String launchStatus;
 
-    PIDFCoefficients farCoeffs = new PIDFCoefficients(30, 0, 0, 11.5);
-    PIDFCoefficients closeCoeffs = new PIDFCoefficients(5, 0, 0, 6);
+    PIDFCoefficients Coeffs = new PIDFCoefficients(100, 0, 0, 15);
 
 
     ElapsedTime feedTimer = new ElapsedTime();
@@ -249,8 +248,8 @@ public class IntakeV2 {
 
     //pidf coefficients and velocity for big triangle
     public void launchClose() {
-        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
-        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeT.setVelocity(1450);
         outtakeB.setVelocity(1450);
         launchStatus = "close";
@@ -258,8 +257,8 @@ public class IntakeV2 {
 
     //pidf coefficients and velocity for small triangle
     public void launchFar() {
-        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
-        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeT.setVelocity(1930);
         outtakeB.setVelocity(1930);
         launchStatus = "far";
@@ -267,8 +266,8 @@ public class IntakeV2 {
 
     //big triangle shooting during auto
     public void launchAutoClose(boolean b) {
-        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
-        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, closeCoeffs);
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         switch (launchState) {
             case IDLE:
                 setGatePosition(.5);
@@ -302,8 +301,8 @@ public class IntakeV2 {
 
     //small triangle shooting during auto
     public void launchAutoFar(boolean b) {
-        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
-        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, farCoeffs);
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         switch (launchState) {
             case IDLE:
                 setGatePosition(.5);
