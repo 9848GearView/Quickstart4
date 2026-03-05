@@ -8,25 +8,29 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.util.Timer;
 import com.pedropathing.paths.PathChain;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+
+import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.TimerTask;
 
-@Autonomous(name = "TestRedSmall", group = "Autonomous")
+@Autonomous(name = "TestRedSmall_Limelight", group = "Autonomous")
 @Configurable // Panels
-public class TestRS extends OpMode {
+public class TestRS_Limelight extends OpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
     java.util.Timer timer = new java.util.Timer();
     IntakeV2 cannon = null;
+    RedLimelightAutoAim vision = null;
+
     private Timer pathTimer;
     private TimerTask Timer;
 
@@ -40,6 +44,7 @@ public class TestRS extends OpMode {
         paths = new Paths(follower); // Build paths
 
         cannon = new IntakeV2(hardwareMap);
+        vision = new RedLimelightAutoAim(hardwareMap);
 
         cannon.setTurret(.5);
 
@@ -52,8 +57,22 @@ public class TestRS extends OpMode {
 
     @Override
     public void loop() {
+        vision.update();
+        if (vision.hasTarget()){
+            float Kp = -0.0004f; //proportional control constant
+            //double feedForward = ((rightX + leftX)/2.0) * .005;
+            double tx = vision.getTx();
+            double botCorr = (Kp * tx)/* - feedForward*/;
+            if(Math.abs(tx) > .5) {
+                cannon.setTurret(cannon.getTurretPos() + botCorr);
+            }
+
+        } else {
+            cannon.setTurret(.5);
+        }
         follower.update(); // Update Pedro Pathing
         pathState = autonomousPathUpdate(); // Update autonomous state machine
+        // Update Limelight
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);

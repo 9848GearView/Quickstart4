@@ -155,12 +155,19 @@ public class IntakeV2 {
     //intake
     public void intake(double i){
         intake.setPower(i);
+    }
+
+    public void transfer(double i){
         transfer.setPower(-i);
     }
 
     //set gate position
     public void setGatePosition(double i) {
         gate.setPosition(i);
+    }
+
+    public double getGatePosition(){
+        return gate.getPosition();
     }
 
     //set light color
@@ -257,8 +264,8 @@ public class IntakeV2 {
     public void launchFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeT.setVelocity(1600);
-        outtakeB.setVelocity(1600);
+        outtakeT.setVelocity(1620);
+        outtakeB.setVelocity(1620);
         launchStatus = "far";
     }//closes method
 

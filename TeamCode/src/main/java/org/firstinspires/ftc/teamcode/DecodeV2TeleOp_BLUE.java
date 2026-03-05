@@ -130,6 +130,14 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         rightX = gamepad1.right_stick_x;
         tInc = 0.01;
 
+        if(cannon.getGatePosition() == .38){
+            gateOn = true;
+        }
+
+        if(cannon.getGatePosition() == .25){
+            gateOn = false;
+        }
+
         if(gamepad1.x){
             chassis.setHalfPark(0.1);
         }
@@ -148,8 +156,14 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
             intakeOn = !intakeOn;
             if(intakeOn){
                 cannon.intake(0);
+                cannon.transfer(0);
             }else {
                 cannon.intake(1);
+                if(gateOn){
+                    cannon.intake(0.5);
+                } else{
+                    cannon.intake(1);
+                }
             }
         }
 
@@ -206,8 +220,15 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
                 double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx();
                 double botCorr = (Kp * tx) - feedForward;
-                if(Math.abs(tx) > .5) {
-                    cannon.setTurret(cannon.getTurretPos() + botCorr);
+                if(cannon.getLaunchStatus().equals("close")){
+                    if(Math.abs(tx) > 0.5){
+                        cannon.setTurret(cannon.getTurretPos() + botCorr);
+                    }
+                }
+                if(cannon.getLaunchStatus().equals("far")){
+                    if(Math.abs(tx) > 1.5) {
+                        cannon.setTurret(cannon.getTurretPos() + botCorr);
+                    }
                 }
 
             }
