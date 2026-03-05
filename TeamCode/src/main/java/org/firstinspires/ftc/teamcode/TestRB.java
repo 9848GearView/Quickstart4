@@ -194,6 +194,7 @@ public class TestRB extends OpMode {
         switch (pathState) {
             case 0:
                 timer.schedule(new LaunchAuto(1650), 0);
+                timer.schedule(new AutoAim(0.25),0);
                 follower.followPath(paths.shoot1,  true);
                 setPathState(1);
                 break;
@@ -211,76 +212,81 @@ public class TestRB extends OpMode {
                     timer.schedule(new GateAuto(0.38), 0);
                     setPathState(3);
                 }
-                break;
             case 3:
                 if (!follower.isBusy()) {
-                    pathTimer.resetTimer();
-                    follower.followPath(paths.shoot2, true);
+                    follower.followPath(paths.gate, true);
                     timer.schedule(new IntakeAuto(0),100);
                     setPathState(4);
                 }
                 break;
             case 4:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 700);
+                if (!follower.isBusy()) {
                     pathTimer.resetTimer();
+                    follower.followPath(paths.shoot2, true);
                     setPathState(5);
                 }
                 break;
             case 5:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
-                    follower.followPath(paths.intake2, true);
-                    timer.schedule(new GateAuto(0.38), 0);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 700);
+                    pathTimer.resetTimer();
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (!follower.isBusy()) {
-                    pathTimer.resetTimer();
-                    follower.followPath(paths.shoot3, true);
-                    timer.schedule(new IntakeAuto(0), 100);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    follower.followPath(paths.intake2, true);
+                    timer.schedule(new GateAuto(0.38), 0);
                     setPathState(7);
                 }
                 break;
             case 7:
+                if (!follower.isBusy()) {
+                    pathTimer.resetTimer();
+                    follower.followPath(paths.shoot3, true);
+                    timer.schedule(new IntakeAuto(0), 100);
+                    setPathState(8);
+                }
+                break;
+            case 8:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 700);
                     pathTimer.resetTimer();
-                    setPathState(8); // 8 to continue to pickup 3, 11 to go to park early
-                }
-                break;
-            case 8:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
-                    //follower.followPath(paths.humanplayer, true);
-                    timer.schedule(new GateAuto(0.38), 0);
-                    setPathState(9);
+                    setPathState(12); // 10 to continue to intake 3, 12 to go to park early
                 }
                 break;
             case 9:
-                if (!follower.isBusy()) {
-                    pathTimer.resetTimer();
-                    //follower.followPath(paths.shoothp, true);
-                    timer.schedule(new IntakeAuto(0),100);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    follower.followPath(paths.intake3, true);
+                    timer.schedule(new GateAuto(0.38), 0);
                     setPathState(10);
                 }
                 break;
             case 10:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 700);
+                if (!follower.isBusy()) {
                     pathTimer.resetTimer();
+                    follower.followPath(paths.shoot4, true);
+                    timer.schedule(new IntakeAuto(0),100);
                     setPathState(11);
                 }
                 break;
             case 11:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 700);
+                    pathTimer.resetTimer();
+                    setPathState(12);
+                }
+                break;
+            case 12:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
                     follower.followPath(paths.park,true);
                     timer.schedule(new GateAuto(0.38), 200);
                     timer.schedule(new IntakeAuto(0), 200);
                     timer.schedule(new LaunchAuto(0), 200);
-                    setPathState(12);
+                    setPathState(13);
                 }
 
         }
@@ -324,7 +330,19 @@ public class TestRB extends OpMode {
 
         @Override
         public void run() {
-            cannon.setVelocity(1650);
+            cannon.setVelocity(pos);
+        }
+    }
+    public class AutoAim extends TimerTask {
+        double pos;
+
+        public AutoAim(double p) {
+            this.pos = p;
+        }
+
+        @Override
+        public void run() {
+            cannon.setTurret(pos);
         }
     }
 }

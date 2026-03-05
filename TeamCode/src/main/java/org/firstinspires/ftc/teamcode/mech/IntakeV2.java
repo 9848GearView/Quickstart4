@@ -19,7 +19,7 @@ import java.util.Timer;
 public class IntakeV2 {
 
     //velocity
-    private VoltageSensor batteryVoltageSensor;
+    //private VoltageSensor batteryVoltageSensor;
 
     // intake
     private DcMotorEx intake;
@@ -64,10 +64,10 @@ public class IntakeV2 {
     final double STOP_SPEED = 0.0;
     final double FULL_SPEED = 1.0;
 
-    private double voltage = batteryVoltageSensor.getVoltage();
+    //private double voltage = batteryVoltageSensor.getVoltage();
 
-    double adjustedFFar = 16 * (12/voltage);
-    double adjustedFClose = 15.5 * (12/voltage);
+    //double adjustedFFar = 16 * (12/voltage);
+    //double adjustedFClose = 15.5 * (12/voltage);
 
 
     //likely change
@@ -76,7 +76,7 @@ public class IntakeV2 {
 
     private String launchStatus;
 
-    PIDFCoefficients Coeffs = new PIDFCoefficients(70, 0, 0, 1);
+    PIDFCoefficients Coeffs = new PIDFCoefficients(100, 0, 0, 1.1);
 
 
     ElapsedTime feedTimer = new ElapsedTime();
@@ -95,7 +95,7 @@ public class IntakeV2 {
     public IntakeV2(HardwareMap hwMap) {
         launchState = LaunchState.IDLE;
 
-        batteryVoltageSensor = hwMap.voltageSensor.iterator().next();
+        //batteryVoltageSensor = hwMap.voltageSensor.iterator().next();
 
         //intake
         intake = hwMap.get(DcMotorEx.class, "intake");
@@ -248,8 +248,8 @@ public class IntakeV2 {
     public void launchClose() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeT.setVelocity(1450);
-        outtakeB.setVelocity(1450);
+        outtakeT.setVelocity(1270);
+        outtakeB.setVelocity(1270);
         launchStatus = "close";
     }//closes method
 
@@ -257,8 +257,8 @@ public class IntakeV2 {
     public void launchFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeT.setVelocity(1930);
-        outtakeB.setVelocity(1930);
+        outtakeT.setVelocity(1600);
+        outtakeB.setVelocity(1600);
         launchStatus = "far";
     }//closes method
 
@@ -276,9 +276,9 @@ public class IntakeV2 {
                 }
                 break;
             case SPIN_UP:
-                outtakeT.setVelocity(1310);
-                outtakeB.setVelocity(1310);
-                if (getLauncherVelocity() > 1270) {
+                outtakeT.setVelocity(1270);
+                outtakeB.setVelocity(1270);
+                if (getLauncherVelocity() > 1220) {
                     launchState = LaunchState.LAUNCH;
                 }
                 break;
@@ -312,9 +312,9 @@ public class IntakeV2 {
                 }
                 break;
             case SPIN_UP:
-                outtakeT.setVelocity(1700);
-                outtakeB.setVelocity(1700);
-                if (getLauncherVelocity() > 1650) {
+                outtakeT.setVelocity(1600);
+                outtakeB.setVelocity(1600);
+                if (getLauncherVelocity() > 1550) {
                     launchState = LaunchState.LAUNCH;
                 }
                 break;

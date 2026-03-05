@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+
 @TeleOp(name="FlyWheelTuner", group="Iterative OpMode")
 public class FlyWheelTuner extends OpMode {
 
@@ -18,9 +20,14 @@ public class FlyWheelTuner extends OpMode {
     private DcMotorEx outtakeT;
     private DcMotorEx outtakeB;
 
+    private boolean aPressed;
+    private boolean oldAPressed;
+    private boolean intakeOn = true;
 
-    private double highVel = 1650;
-    private double lowVel = 1350;
+    private double highVel = 1600;
+    private double lowVel = 1270;
+
+    IntakeV2 cannon = null;
 
     double f = 0;
     double p = 0;
@@ -35,6 +42,9 @@ public class FlyWheelTuner extends OpMode {
     public void init() {
         outtakeT = hardwareMap.get(DcMotorEx.class, "outtakeT");
         outtakeB = hardwareMap.get(DcMotorEx.class, "outtakeB");
+
+        cannon = new IntakeV2(hardwareMap);
+
 
         outtakeT.setDirection(DcMotorEx.Direction.REVERSE);
         outtakeB.setDirection(DcMotorEx.Direction.REVERSE);
@@ -55,6 +65,7 @@ public class FlyWheelTuner extends OpMode {
 
     @Override
     public void loop() {
+        aPressed = gamepad2.a;
         if(gamepad1.yWasPressed()){
             if(curTargetVel == highVel) {
                 curTargetVel = lowVel;
@@ -78,6 +89,16 @@ public class FlyWheelTuner extends OpMode {
             p -= stepSizes[stepIndex];
         }
 
+        if (gamepad2.a && !oldAPressed){
+            intakeOn = !intakeOn;
+            if(intakeOn){
+                cannon.intake(0);
+            }else {
+                cannon.intake(1);
+            }
+        }
+
+
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(p, 0, 0, f);
         outtakeT.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         outtakeB.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
@@ -87,6 +108,8 @@ public class FlyWheelTuner extends OpMode {
 
         double curVel = outtakeT.getVelocity();
         double error = curTargetVel - curVel;
+
+        oldAPressed = gamepad2.a;
 
         telemetry.addData("Target Velocity: ", curTargetVel);
         telemetry.addData("Current Velocity: ", "%.2f", curVel);

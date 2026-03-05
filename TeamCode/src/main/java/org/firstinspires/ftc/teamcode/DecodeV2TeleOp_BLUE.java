@@ -89,7 +89,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         //camera = new LLMech(hardwareMap);
         camera.pipelineSwitch(0);
         camera.setPollRateHz(90);
-        chassis.setHalfPark(0.40);
+        chassis.setHalfPark(0.60);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
         cannon.setTurret(.5);
@@ -130,15 +130,16 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         rightX = gamepad1.right_stick_x;
         tInc = 0.01;
 
-        if(gamepad1.a){
-            chassis.setHalfPark(0);
+        if(gamepad1.x){
+            chassis.setHalfPark(0.1);
         }
 
-        if(gamepad1.x){
+        if(gamepad1.dpad_left){
             cannon.setLeftTurret(0.1);
         }
 
-        if(gamepad1.b){
+
+        if(gamepad1.dpad_right){
             cannon.setRightTurret(0.1);
         }
 
@@ -201,7 +202,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         if (tLock) {
             if (visionAid.hasTarget()){
 
-                float Kp = -0.0005f; //proportional control constant
+                float Kp = -0.0004f; //proportional control constant
                 double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx();
                 double botCorr = (Kp * tx) - feedForward;
@@ -217,7 +218,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         if (gamepad2.left_trigger > 0.1) {
             //shoot close
             cannon.launchClose();
-            cannon.setActuatorPos(0.75); //.53
+            cannon.setActuatorPos(1); //.53
         }
         if (gamepad2.right_trigger > 0.1) {
             // shoot far
