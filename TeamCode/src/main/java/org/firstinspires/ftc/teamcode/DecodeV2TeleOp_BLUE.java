@@ -76,6 +76,8 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
     private double leftY;
     private double rightX;
 
+    public double goalDistance;
+
     private boolean far;
     private boolean close;
 
@@ -219,6 +221,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
             follower.setY(9.186161449752879);
             follower.setHeading(180);
         }
+        goalDistance = Math.sqrt(Math.pow(follower.getPose().getX() - 4,2) + Math.pow(140 - follower.getPose().getY(),2));
 
 //        //auto-aim
         // why is ts the same button as gate bro
@@ -369,6 +372,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("X:",follower.getPose().getX());
         telemetry.addData("Y:",follower.getPose().getY());
         telemetry.addData("Heading:",follower.getPose().getHeading());
+        telemetry.addData("goalDistance", goalDistance);
         //telemetry.addData("Robot Location", ("Coords: " + follower.getPose().getX() + ", " + follower.getPose().getY() + ", Heading: " + follower.getPose().getHeading()));
 
         //telemetry.addData();

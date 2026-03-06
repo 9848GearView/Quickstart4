@@ -307,6 +307,31 @@ public class ArtemisRS extends OpMode {
                     setPathState(11);
                 }
                 break;
+            case 82:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
+                    follower.followPath(paths.humanplayer, true);
+                    timer.schedule(new TransferAuto(.5), 200);
+                    pathTimer.resetTimer();
+                    setPathState(92);
+                }
+                break;
+            case 92:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .5) {
+                    pathTimer.resetTimer();
+                    follower.followPath(paths.shoothp, true);
+                    setPathState(102);
+                }
+                break;
+            case 102:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 200);
+                    timer.schedule(new TransferAuto(1), 200);
+                    timer.schedule(new GateAuto(0.38), 3100);
+                    pathTimer.resetTimer();
+                    setPathState(11);
+                }
+                break;
             case 11:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
                     follower.followPath(paths.park,true);
