@@ -34,7 +34,7 @@ public class ArtemisBB extends OpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(20, 124, Math.toRadians(143.5)));
+        follower.setStartingPose(new Pose(20, 124, Math.toRadians(233.8)));
 
         paths = new Paths(follower); // Build paths
 
@@ -86,7 +86,7 @@ public class ArtemisBB extends OpMode {
                                     new Pose(49.000, 85.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(233.8), Math.toRadians(180))
                     .build();
 
             intake1 = follower.pathBuilder()
