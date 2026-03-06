@@ -79,6 +79,8 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
 
     private double tInc;
 
+    private double velMPS;
+
 
     @Override
     public void init(){
@@ -96,6 +98,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         cannon.setActuatorPos(.53);
 
         tLock = false;
+        velMPS = 0;
         //colSens = new ColorSensor(hardwareMap);
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
     }
@@ -301,6 +304,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         }
 
 
+        velMPS = (cannon.getLauncherVelocity() / 4) / (28 / (0.096 * Math.PI));
         // old button presses at the bottom of loop
         oldAPressed = gamepad2.a;
         oldBPressed = gamepad2.b;
@@ -319,10 +323,15 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("Tag found", visionAid.hasTarget());
         telemetry.addData("Tx", visionAid.getTx());
 
+        telemetry.addData("Velocity in Meters per Second", velMPS);
+
 
         
         telemetry.addData("Turret Position", cannon.getTurretPos());
 
+        telemetry.addLine();
+        telemetry.addData("Gate Open", gateOn);
+        telemetry.addData("Intake On", intakeOn);
         telemetry.addLine();
 
         telemetry.addData("Launcher Pos", cannon.getTurretPos());
