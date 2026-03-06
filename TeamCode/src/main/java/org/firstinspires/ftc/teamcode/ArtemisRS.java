@@ -229,7 +229,7 @@ public class ArtemisRS extends OpMode {
             case 2:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
                     follower.followPath(paths.intake1, true);
-                    timer.schedule(new TransferAuto(.5), 200);
+                    timer.schedule(new TransferAuto(.5), 0);
                     pathTimer.resetTimer();
                     setPathState(22);
                 }
@@ -335,9 +335,9 @@ public class ArtemisRS extends OpMode {
             case 11:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
                     follower.followPath(paths.park,true);
-                    timer.schedule(new IntakeAuto(0), 200);
-                    timer.schedule(new TransferAuto(0), 200);
-                    timer.schedule(new StopLaunchAuto(), 200);
+                    timer.schedule(new IntakeAuto(0), 0);
+                    timer.schedule(new TransferAuto(0), 0);
+                    timer.schedule(new StopLaunchAuto(), 0);
                     setPathState(12);
                 }
 

@@ -29,6 +29,7 @@ public class ArtemisRB extends OpMode {
     IntakeV2 cannon = null;
     private Timer pathTimer;
 
+
     @Override
     public void init() {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -106,7 +107,7 @@ public class ArtemisRB extends OpMode {
                             new BezierCurve(
                                     new Pose(126.000, 83.500),
                                     new Pose(121, 74),
-                                    new Pose(126, 70)
+                                    new Pose(125, 69)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
@@ -128,7 +129,7 @@ public class ArtemisRB extends OpMode {
                                     new Pose(95.000, 85.000),
                                     new Pose(99, 56),
                                     new Pose(89, 60),
-                                    new Pose(134, 58)
+                                    new Pose(134, 57)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
@@ -172,7 +173,7 @@ public class ArtemisRB extends OpMode {
                     .addPath(
                             new BezierLine(
                                     new Pose(95.000, 85.000),
-                                    new Pose(100.000, 78.000)
+                                    new Pose(105, 78.000)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(270))
@@ -185,27 +186,29 @@ public class ArtemisRB extends OpMode {
         switch (pathState) {
             case 0:
                 timer.schedule(new LaunchAuto(), 0);
+                timer.schedule(new IntakeAuto(1), 0);
                 timer.schedule(new ActuatorAuto(1),0);
-                timer.schedule(new AutoAim(0.75),0);
+                timer.schedule(new AutoAim(0.7),0);
                 follower.followPath(paths.shoot1,  true);
+                pathTimer.resetTimer();
                 setPathState(1);
                 break;
             case 1:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new TransferAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2800);
+                    timer.schedule(new GateAuto(0.38), 3000);
                     pathTimer.resetTimer();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3) {
                     follower.followPath(paths.intake1, true);
                     timer.schedule(new TransferAuto(.5), 0);
                     setPathState(3);
                 }
+                break;
             case 3:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .7) {
                     follower.followPath(paths.gate, true);
@@ -224,13 +227,13 @@ public class ArtemisRB extends OpMode {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new TransferAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2800);
+                    timer.schedule(new GateAuto(0.38), 3000);
                     pathTimer.resetTimer();
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3) {
                     follower.followPath(paths.intake2, true);
                     timer.schedule(new TransferAuto(.5), 0);
                     setPathState(7);
@@ -248,13 +251,13 @@ public class ArtemisRB extends OpMode {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new TransferAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2800);
+                    timer.schedule(new GateAuto(0.38), 3000);
                     pathTimer.resetTimer();
                     setPathState(12); // 10 to continue to intake 3, 12 to go to park early
                 }
                 break;
             case 9:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3) {
                     follower.followPath(paths.intake3, true);
                     timer.schedule(new TransferAuto(.5), 0);
                     setPathState(10);
@@ -272,13 +275,13 @@ public class ArtemisRB extends OpMode {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new TransferAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2800);
+                    timer.schedule(new GateAuto(0.38), 3000);
                     pathTimer.resetTimer();
                     setPathState(12);
                 }
                 break;
             case 12:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3) {
                     follower.followPath(paths.park,true);
                     timer.schedule(new IntakeAuto(0), 0);
                     timer.schedule(new TransferAuto(0), 0);
@@ -334,7 +337,7 @@ public class ArtemisRB extends OpMode {
     public class LaunchAuto extends TimerTask {
         @Override
         public void run() {
-            cannon.launchClose();
+            cannon.launchAutoClose();
         }
     }
 

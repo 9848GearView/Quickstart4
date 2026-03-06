@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 //guarantee this wont work whatsoever
 
@@ -101,6 +102,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
 
+        follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
 
         tLock = false;

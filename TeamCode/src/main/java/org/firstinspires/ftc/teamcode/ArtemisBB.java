@@ -183,7 +183,7 @@ public class ArtemisBB extends OpMode {
             case 0:
                 timer.schedule(new LaunchAuto(), 0);
                 timer.schedule(new ActuatorAuto(1),0);
-                timer.schedule(new AutoAim(0.75),0);
+                timer.schedule(new AutoAim(.3),0);
                 follower.followPath(paths.shoot1,  true);
                 setPathState(1);
                 break;

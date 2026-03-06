@@ -64,8 +64,8 @@ public class V2RedBig extends OpMode {
     public void loop() {
         follower.update(); // Update Pedro Pathing
 
-        if (shouldShoot && !hasShot) { cannon.launchAutoClose(true);} // constantly updates launcher state machine
-        else { cannon.launchAutoClose(false);} // keeps launcher idle
+        if (shouldShoot && !hasShot) { cannon.launchAutoClose();} // constantly updates launcher state machine
+        else { cannon.launchAutoClose();} // keeps launcher idle
 
         // Detect when the launcher finishes its cycle
         if (shouldShoot && !hasShot && cannon.hasFinishedShot()) {
