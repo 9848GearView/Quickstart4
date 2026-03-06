@@ -10,12 +10,14 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.util.Timer;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.TimerTask;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
+@Disabled
 @Autonomous(name = "V2BlueBig", group = "Examples")
 @Configurable
 public class V2BlueBig extends OpMode {

@@ -127,8 +127,14 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
                 intakeOn = !intakeOn;
                 if(intakeOn){
                     cannon.intake(0);
+                    cannon.transfer(0);
                 }else {
                     cannon.intake(1);
+                    if(gateOn){
+                        cannon.transfer(0.5);
+                    } else{
+                        cannon.transfer(1);
+                    }
                 }
             }
 

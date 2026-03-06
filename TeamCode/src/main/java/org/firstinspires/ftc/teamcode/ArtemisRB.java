@@ -18,9 +18,9 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
 
-@Autonomous(name = "TestRedBig", group = "Autonomous")
+@Autonomous(name = "Artemis Red Big", group = "Autonomous")
 @Configurable // Panels
-public class TestRB extends OpMode {
+public class ArtemisRB extends OpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
@@ -193,7 +193,7 @@ public class TestRB extends OpMode {
     public int autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                timer.schedule(new LaunchAuto(1650), 0);
+                timer.schedule(new LaunchAuto(), 0);
                 timer.schedule(new AutoAim(0.25),0);
                 follower.followPath(paths.shoot1,  true);
                 setPathState(1);
@@ -285,7 +285,7 @@ public class TestRB extends OpMode {
                     follower.followPath(paths.park,true);
                     timer.schedule(new GateAuto(0.38), 200);
                     timer.schedule(new IntakeAuto(0), 200);
-                    timer.schedule(new LaunchAuto(0), 200);
+                    timer.schedule(new StopLaunchAuto(), 200);
                     setPathState(13);
                 }
 
@@ -322,17 +322,33 @@ public class TestRB extends OpMode {
     }
 
     public class LaunchAuto extends TimerTask {
+        @Override
+        public void run() {
+            cannon.launchFar();
+        }
+    }
+
+    public class StopLaunchAuto extends TimerTask {
+        @Override
+        public void run() {
+            cannon.stopLaunch();
+        }
+    }
+
+
+    public class ActuatorAuto extends TimerTask {
         double pos;
 
-        public LaunchAuto(double p) {
+        public ActuatorAuto(double p) {
             this.pos = p;
         }
 
         @Override
         public void run() {
-            cannon.setVelocity(pos);
+            cannon.setActuatorPos(pos);
         }
     }
+
     public class AutoAim extends TimerTask {
         double pos;
 

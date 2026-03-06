@@ -18,9 +18,9 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
 
-@Autonomous(name = "TestBlueBig", group = "Autonomous")
+@Autonomous(name = "Artemis Blue Small", group = "Autonomous")
 @Configurable // Panels
-public class TestBlueBig extends OpMode {
+public class ArtemisBS extends OpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
@@ -36,7 +36,7 @@ public class TestBlueBig extends OpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(20, 124, Math.toRadians(143.5)));
+        follower.setStartingPose(new Pose(56, 8, Math.toRadians(90)));
 
         paths = new Paths(follower); // Build paths
 
@@ -81,63 +81,65 @@ public class TestBlueBig extends OpMode {
     public static class Paths {
         public PathChain shoot1;
         public PathChain intake1;
-        public PathChain gate;
+        public PathChain intake1End;
         public PathChain shoot2;
         public PathChain intake2;
         public PathChain shoot3;
         public PathChain intake3;
         public PathChain shoot4;
+        public PathChain humanplayer;
+        public PathChain shoothp;
         public PathChain park;
 
         public Paths(Follower follower) {
             shoot1 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(20.000, 124.000),
-                                    new Pose(49.000, 84.000)
+                                    new Pose(56.000, 8.000),
+                                    new Pose(57, 12)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(143.5), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(117.5))
                     .build();
 
             intake1 = follower.pathBuilder()
                     .addPath(
-                            new BezierLine(
-                                    new Pose(49.000, 84.000),
-                                    new Pose(18.000, 83.500)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-                    .build();
-
-            gate = follower.pathBuilder()
-                    .addPath(
                             new BezierCurve(
-                                    new Pose(18.000, 83.500),
-                                    new Pose(23.400, 73.800),
-                                    new Pose(14.800, 70.400)
+                                    new Pose(57.000, 12),
+                                    new Pose(57, 11),
+                                    new Pose(10.000, 8)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
+            intake1End = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(10, 8),
+                                    new Pose(11.000, 12.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(170))
+                    .build();
+
             shoot2 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(14.800, 70.400),
-                                    new Pose(49.000, 84.000)
+                                    new Pose(11.000, 12.000),
+                                    new Pose(57.000, 12)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(170), Math.toRadians(117.5))
                     .build();
 
             intake2 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(49.000, 84.000),
-                                    new Pose(51.000, 54.639),
-                                    new Pose(50.600, 60.237),
-                                    new Pose(7.900, 59.300)
+                                    new Pose(57.000, 12),
+                                    new Pose(53.000, 39.000),
+                                    new Pose(52.000, 34.5),
+                                    new Pose(9.5, 35.000)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -145,23 +147,21 @@ public class TestBlueBig extends OpMode {
 
             shoot3 = follower.pathBuilder()
                     .addPath(
-                            new BezierCurve(
-                                    new Pose(7.900, 59.300),
-                                    new Pose(42.700, 57.627),
-                                    new Pose(49.000, 84.000)
+                            new BezierLine(
+                                    new Pose(9.5, 35.000),
+                                    new Pose(57.000, 12)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(117.5))
                     .build();
 
             intake3 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(49.000, 84.000),
-                                    new Pose(45.500, 33.000),
-                                    new Pose(53.800, 34.500),
-                                    new Pose(42.300, 35.400),
-                                    new Pose(7.900, 35.000)
+                                    new Pose(57.000, 12),
+                                    new Pose(53.000, 59.000),
+                                    new Pose(67.400, 60),
+                                    new Pose(9.5, 59.00)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -170,21 +170,42 @@ public class TestBlueBig extends OpMode {
             shoot4 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(7.900, 35.000),
-                                    new Pose(49.000, 84.000)
+                                    new Pose(9.5, 59),
+                                    new Pose(57.000, 12)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(117.5))
+                    .build();
+
+            humanplayer = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(57.000, 12),
+                                    new Pose(10.000, 12.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(117.5), Math.toRadians(180))
+                    .build();
+
+            shoothp = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(10.000, 12.000),
+                                    new Pose(58.000, 13.000),
+                                    new Pose(57.000, 20.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(117.5))
                     .build();
 
             park = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(49.000, 84.000),
-                                    new Pose(44.000, 78.000)
+                                    new Pose(57.000, 12),
+                                    new Pose(36, 20)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(270))
+                    .setLinearHeadingInterpolation(Math.toRadians(117.5), Math.toRadians(90))
                     .build();
         }
     }
@@ -192,100 +213,107 @@ public class TestBlueBig extends OpMode {
     public int autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                timer.schedule(new LaunchAuto(1650), 0);
-                timer.schedule(new AutoAim(0.25),0);
+                timer.schedule(new LaunchAuto(), 0);
+                timer.schedule(new ActuatorAuto(1), 0);
                 follower.followPath(paths.shoot1,  true);
                 setPathState(1);
                 break;
             case 1:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 200);
+                    timer.schedule(new IntakeAuto(1), 300);
+                    timer.schedule(new GateAuto(.25), 100);
+                    timer.schedule(new GateAuto(0.38), 3000);
                     pathTimer.resetTimer();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
                     follower.followPath(paths.intake1, true);
-                    timer.schedule(new GateAuto(0.38), 0);
+                    pathTimer.resetTimer();
+                    setPathState(22);
+                }
+                break;
+            case 22:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .4) {
+                    follower.followPath(paths.intake1End, true);
+                    pathTimer.resetTimer();
                     setPathState(3);
                 }
+                break;
+
             case 3:
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.gate, true);
-                    timer.schedule(new IntakeAuto(0),100);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .7) {
+                    follower.followPath(paths.shoot2, true);
+                    timer.schedule(new IntakeAuto(0),700);
+                    timer.schedule(new ActuatorAuto(1), 0);
                     setPathState(4);
                 }
                 break;
             case 4:
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 300);
+                    timer.schedule(new GateAuto(0.38), 3000);
                     pathTimer.resetTimer();
-                    follower.followPath(paths.shoot2, true);
                     setPathState(5);
                 }
                 break;
             case 5:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 700);
-                    pathTimer.resetTimer();
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
+                    follower.followPath(paths.intake2, true);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
-                    follower.followPath(paths.intake2, true);
-                    timer.schedule(new GateAuto(0.38), 0);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .5) {
+                    pathTimer.resetTimer();
+                    follower.followPath(paths.shoot3, true);
+                    timer.schedule(new IntakeAuto(0), 700);
+                    timer.schedule(new ActuatorAuto(1), 0);
                     setPathState(7);
                 }
                 break;
             case 7:
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 300);
+                    timer.schedule(new GateAuto(0.38), 3000);
                     pathTimer.resetTimer();
-                    follower.followPath(paths.shoot3, true);
-                    timer.schedule(new IntakeAuto(0), 100);
-                    setPathState(8);
+                    setPathState(8); // 8 to continue to pickup 3, 11 to go to park early
                 }
                 break;
             case 8:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 700);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
+                    follower.followPath(paths.intake3, true);
                     pathTimer.resetTimer();
-                    setPathState(12); // 10 to continue to intake 3, 12 to go to park early
+                    setPathState(9);
                 }
                 break;
             case 9:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
-                    follower.followPath(paths.intake3, true);
-                    timer.schedule(new GateAuto(0.38), 0);
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .5) {
+                    pathTimer.resetTimer();
+                    follower.followPath(paths.shoot4, true);
+                    timer.schedule(new IntakeAuto(0),700);
+                    timer.schedule(new ActuatorAuto(1), 0);
                     setPathState(10);
                 }
                 break;
             case 10:
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new IntakeAuto(1), 63);
                     pathTimer.resetTimer();
-                    follower.followPath(paths.shoot4, true);
-                    timer.schedule(new IntakeAuto(0),100);
                     setPathState(11);
                 }
                 break;
             case 11:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 700);
-                    pathTimer.resetTimer();
-                    setPathState(12);
-                }
-                break;
-            case 12:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
                     follower.followPath(paths.park,true);
                     timer.schedule(new GateAuto(0.38), 200);
                     timer.schedule(new IntakeAuto(0), 200);
-                    timer.schedule(new LaunchAuto(0), 200);
-                    setPathState(13);
+                    timer.schedule(new StopLaunchAuto(), 200);
+                    setPathState(12);
                 }
 
         }
@@ -320,28 +348,30 @@ public class TestBlueBig extends OpMode {
     }
 
     public class LaunchAuto extends TimerTask {
-        double pos;
-
-        public LaunchAuto(double p) {
-            this.pos = p;
-        }
-
         @Override
         public void run() {
-            cannon.setVelocity(pos);
+            cannon.launchFar();
         }
     }
 
-    public class AutoAim extends TimerTask {
+    public class StopLaunchAuto extends TimerTask {
+        @Override
+        public void run() {
+            cannon.stopLaunch();
+        }
+    }
+
+
+    public class ActuatorAuto extends TimerTask {
         double pos;
 
-        public AutoAim(double p) {
+        public ActuatorAuto(double p) {
             this.pos = p;
         }
 
         @Override
         public void run() {
-            cannon.setTurret(pos);
+            cannon.setActuatorPos(pos);
         }
     }
 

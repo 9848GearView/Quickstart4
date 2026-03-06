@@ -18,9 +18,9 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
 
-@Autonomous(name = "TestRedSmall", group = "Autonomous")
+@Autonomous(name = "Artemis Red Small", group = "Autonomous")
 @Configurable // Panels
-public class TestRS extends OpMode {
+public class ArtemisRS extends OpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
@@ -155,7 +155,7 @@ public class TestRS extends OpMode {
                             new BezierCurve(
                                     new Pose(87, 12),
                                     new Pose(91.000, 59.000),
-                                    new Pose(76.600, 59.600),
+                                    new Pose(76.600, 60),
                                     new Pose(134.500, 59.000)
                             )
                     )

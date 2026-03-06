@@ -163,9 +163,9 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
             }else {
                 cannon.intake(1);
                 if(gateOn){
-                    cannon.intake(0.5);
+                    cannon.transfer(0.5);
                 } else{
-                    cannon.intake(1);
+                    cannon.transfer(1);
                 }
             }
         }
