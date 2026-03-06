@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode;
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+
 import com.qualcomm.hardware.limelightvision.LLResult;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -176,6 +178,12 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
             }
             if(gamepad2.dpad_up) {
                 cannon.setTurret(.5);
+            }
+
+            if(gamepad1.y) {
+                follower.setX(134.286655684);
+                follower.setY(9.186161449752863);
+                follower.setHeading(0);
             }
 
 //        //auto-aim

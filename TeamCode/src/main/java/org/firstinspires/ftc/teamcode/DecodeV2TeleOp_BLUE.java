@@ -52,6 +52,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
     //booleans for turret
     private boolean lBumperPressed;
     private boolean oldLBumperPressed;
+    private String LState;
     private boolean tLock;
     private boolean pushDown = true;
 
@@ -210,8 +211,21 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
             cannon.setTurret(.5);
         }
 
+        if(gamepad1.y) {
+            follower.setX(9.713344316095563);
+            follower.setY(9.186161449752879);
+            follower.setHeading(180);
+        }
+
 //        //auto-aim
         // why is ts the same button as gate bro
+        if(cannon.getLaunchStatus() == null){
+            LState = "mid";
+        } else if (cannon.getLaunchStatus().equals("close")){
+            LState = "close";
+        } else if(cannon.getLaunchStatus().equals("far")){
+            LState = "far";
+        }
 
         if( bPressed && !oldBPressed) {
             tLock = !tLock; // reminder to find a way to turn this off
@@ -223,13 +237,18 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
                 double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx();
                 double botCorr = (Kp * tx) - feedForward;
-                if(cannon.getLaunchStatus().equals("close")){
+                if(LState.equals("close")){
                     if(Math.abs(tx) > 0.5){
                         cannon.setTurret(cannon.getTurretPos() + botCorr);
                     }
                 }
-                if(cannon.getLaunchStatus().equals("far")){
+                if(LState.equals("far")){
                     if(Math.abs(tx) > 1.5) {
+                        cannon.setTurret(cannon.getTurretPos() + botCorr);
+                    }
+                }
+                if (LState == null){
+                    if(Math.abs(tx) > 1.0) {
                         cannon.setTurret(cannon.getTurretPos() + botCorr);
                     }
                 }
