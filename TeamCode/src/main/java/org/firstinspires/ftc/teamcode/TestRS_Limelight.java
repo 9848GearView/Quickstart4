@@ -59,7 +59,7 @@ public class TestRS_Limelight extends OpMode {
     public void loop() {
         vision.update();
         if (vision.hasTarget()){
-            float Kp = -0.0004f; //proportional control constant
+            float Kp = -0.0005f; //proportional control constant
             //double feedForward = ((rightX + leftX)/2.0) * .005;
             double tx = vision.getTx();
             double botCorr = (Kp * tx)/* - feedForward*/;
@@ -76,6 +76,7 @@ public class TestRS_Limelight extends OpMode {
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
+        panelsTelemetry.debug("Tx", vision.getTx());
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());

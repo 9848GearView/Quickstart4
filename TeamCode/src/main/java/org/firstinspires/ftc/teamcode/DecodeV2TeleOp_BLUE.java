@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -97,6 +98,8 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         cannon.setLightColor();
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
+
+        follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
 
         tLock = false;
         velMPS = 0;
@@ -349,7 +352,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("Turret Position", cannon.getTurretPos());
 
         telemetry.addLine();
-        telemetry.addData("Gate Open", gateOn);
+        telemetry.addData("Gate Closed", gateOn);
         telemetry.addData("Intake On", intakeOn);
         telemetry.addLine();
 
@@ -363,11 +366,14 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("launchTrigger", launchTrigger);
         telemetry.addData("Actuator Position", cannon.getActuatorPosition());
 
+        telemetry.addData("X:",follower.getPose().getX());
+        telemetry.addData("Y:",follower.getPose().getY());
+        telemetry.addData("Heading:",follower.getPose().getHeading());
         //telemetry.addData("Robot Location", ("Coords: " + follower.getPose().getX() + ", " + follower.getPose().getY() + ", Heading: " + follower.getPose().getHeading()));
 
         //telemetry.addData();
         telemetry.update();
-        //follower.update();
+        follower.update();
     }
 
 

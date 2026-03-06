@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 import com.qualcomm.hardware.limelightvision.LLResult;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 
 //guarantee this wont work whatsoever
 
+@Disabled
     @TeleOp(name="RED-DecodeV2TeleOp", group="Iterative OpMode")
     public class DecodeV2TeleOp_RED extends OpMode {
         private Limelight3A camera;
@@ -119,6 +121,14 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
             leftY = gamepad1.left_stick_y;
             rightX = gamepad1.right_stick_x;
             tInc = 0.01;
+
+            if(cannon.getGatePosition() == .38){
+                gateOn = true;
+            }
+
+            if(cannon.getGatePosition() == .25){
+                gateOn = false;
+            }
 
             if(gamepad1.x){
                 chassis.setHalfPark(0.1);
@@ -280,6 +290,9 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
             }
             telemetry.addData("Turret Position", cannon.getTurretPos());
 
+            telemetry.addLine();
+            telemetry.addData("Gate Open", gateOn);
+            telemetry.addData("Intake On", intakeOn);
             telemetry.addLine();
 
             telemetry.addData("Launcher Pos", cannon.getTurretPos());

@@ -28,8 +28,6 @@ public class ArtemisBB extends OpMode {
     java.util.Timer timer = new java.util.Timer();
     IntakeV2 cannon = null;
     private Timer pathTimer;
-    public boolean shouldShoot = false;
-    boolean hasShot = false;
 
     @Override
     public void init() {
@@ -52,15 +50,6 @@ public class ArtemisBB extends OpMode {
     public void loop() {
         follower.update(); // Update Pedro Pathing
         pathState = autonomousPathUpdate(); // Update autonomous state machine
-
-        if (shouldShoot && !hasShot) { cannon.launchAutoFar(true);} // constantly updates launcher state machine
-        else { cannon.launchAutoFar(false);} // keeps launcher idle
-
-        // Detect when the launcher finishes its cycle
-        if (shouldShoot && !hasShot && cannon.hasFinishedShot()) {
-            hasShot = true;       // mark that we already shot
-            shouldShoot = false;  // stop shooter from cycling again
-        }
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
@@ -94,16 +83,16 @@ public class ArtemisBB extends OpMode {
                     .addPath(
                             new BezierLine(
                                     new Pose(20.000, 124.000),
-                                    new Pose(49.000, 84.000)
+                                    new Pose(49.000, 85.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(143.5), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             intake1 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(49.000, 84.000),
+                                    new Pose(49.000, 85.000),
                                     new Pose(18.000, 83.500)
                             )
                     )
@@ -114,8 +103,8 @@ public class ArtemisBB extends OpMode {
                     .addPath(
                             new BezierCurve(
                                     new Pose(18.000, 83.500),
-                                    new Pose(23.400, 73.800),
-                                    new Pose(14.800, 70.400)
+                                    new Pose(23, 74.00),
+                                    new Pose(18, 70)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -124,8 +113,8 @@ public class ArtemisBB extends OpMode {
             shoot2 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(14.800, 70.400),
-                                    new Pose(49.000, 84.000)
+                                    new Pose(15, 70),
+                                    new Pose(49.000, 85)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -134,10 +123,10 @@ public class ArtemisBB extends OpMode {
             intake2 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(49.000, 84.000),
-                                    new Pose(51.000, 54.639),
-                                    new Pose(50.600, 60.237),
-                                    new Pose(7.900, 59.300)
+                                    new Pose(49.000, 85.000),
+                                    new Pose(45.000, 56),
+                                    new Pose(55, 60),
+                                    new Pose(10, 58)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -146,9 +135,9 @@ public class ArtemisBB extends OpMode {
             shoot3 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(7.900, 59.300),
-                                    new Pose(42.700, 57.627),
-                                    new Pose(49.000, 84.000)
+                                    new Pose(10, 58),
+                                    new Pose(43, 58),
+                                    new Pose(49.000, 85)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -157,11 +146,11 @@ public class ArtemisBB extends OpMode {
             intake3 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(49.000, 84.000),
+                                    new Pose(49.000, 85),
                                     new Pose(45.500, 33.000),
-                                    new Pose(53.800, 34.500),
-                                    new Pose(42.300, 35.400),
-                                    new Pose(7.900, 35.000)
+                                    new Pose(54, 35),
+                                    new Pose(43, 35),
+                                    new Pose(10, 35.500)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -170,8 +159,8 @@ public class ArtemisBB extends OpMode {
             shoot4 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(7.900, 35.000),
-                                    new Pose(49.000, 84.000)
+                                    new Pose(10, 35.000),
+                                    new Pose(49.000, 85)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -180,7 +169,7 @@ public class ArtemisBB extends OpMode {
             park = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(49.000, 84.000),
+                                    new Pose(49.000, 85),
                                     new Pose(44.000, 78.000)
                             )
                     )
@@ -193,7 +182,8 @@ public class ArtemisBB extends OpMode {
         switch (pathState) {
             case 0:
                 timer.schedule(new LaunchAuto(), 0);
-                timer.schedule(new AutoAim(0.25),0);
+                timer.schedule(new ActuatorAuto(1),0);
+                timer.schedule(new AutoAim(0.75),0);
                 follower.followPath(paths.shoot1,  true);
                 setPathState(1);
                 break;
@@ -201,20 +191,21 @@ public class ArtemisBB extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
+                    timer.schedule(new TransferAuto(1), 200);
+                    timer.schedule(new GateAuto(0.38), 2800);
                     pathTimer.resetTimer();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
                     follower.followPath(paths.intake1, true);
-                    timer.schedule(new GateAuto(0.38), 0);
+                    timer.schedule(new TransferAuto(.5), 0);
                     setPathState(3);
                 }
             case 3:
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .7) {
                     follower.followPath(paths.gate, true);
-                    timer.schedule(new IntakeAuto(0),100);
                     setPathState(4);
                 }
                 break;
@@ -228,30 +219,33 @@ public class ArtemisBB extends OpMode {
             case 5:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 700);
+                    timer.schedule(new IntakeAuto(1), 200);
+                    timer.schedule(new TransferAuto(1), 200);
+                    timer.schedule(new GateAuto(0.38), 2800);
                     pathTimer.resetTimer();
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
                     follower.followPath(paths.intake2, true);
-                    timer.schedule(new GateAuto(0.38), 0);
+                    timer.schedule(new TransferAuto(.5), 0);
                     setPathState(7);
                 }
                 break;
             case 7:
-                if (!follower.isBusy()) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .5) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoot3, true);
-                    timer.schedule(new IntakeAuto(0), 100);
                     setPathState(8);
                 }
                 break;
             case 8:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 700);
+                    timer.schedule(new IntakeAuto(1), 200);
+                    timer.schedule(new TransferAuto(1), 200);
+                    timer.schedule(new GateAuto(0.38), 2800);
                     pathTimer.resetTimer();
                     setPathState(12); // 10 to continue to intake 3, 12 to go to park early
                 }
@@ -259,7 +253,7 @@ public class ArtemisBB extends OpMode {
             case 9:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
                     follower.followPath(paths.intake3, true);
-                    timer.schedule(new GateAuto(0.38), 0);
+                    timer.schedule(new TransferAuto(.5), 0);
                     setPathState(10);
                 }
                 break;
@@ -267,14 +261,15 @@ public class ArtemisBB extends OpMode {
                 if (!follower.isBusy()) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoot4, true);
-                    timer.schedule(new IntakeAuto(0),100);
                     setPathState(11);
                 }
                 break;
             case 11:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new IntakeAuto(1), 700);
+                    timer.schedule(new IntakeAuto(1), 200);
+                    timer.schedule(new TransferAuto(1), 200);
+                    timer.schedule(new GateAuto(0.38), 2800);
                     pathTimer.resetTimer();
                     setPathState(12);
                 }
@@ -282,15 +277,14 @@ public class ArtemisBB extends OpMode {
             case 12:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
                     follower.followPath(paths.park,true);
-                    timer.schedule(new GateAuto(0.38), 200);
-                    timer.schedule(new IntakeAuto(0), 200);
-                    timer.schedule(new StopLaunchAuto(), 200);
+                    timer.schedule(new IntakeAuto(0), 0);
+                    timer.schedule(new TransferAuto(0), 0);
+                    timer.schedule(new StopLaunchAuto(), 0);
                     setPathState(13);
                 }
 
         }
         return pathState;
-
     }
     //classes for timer tasks
     public class IntakeAuto extends TimerTask {
@@ -303,6 +297,19 @@ public class ArtemisBB extends OpMode {
         @Override
         public void run() {
             cannon.intake(power);
+        }
+    }
+
+    public class TransferAuto extends TimerTask {
+        double power;
+
+        public TransferAuto(double p) {
+            this.power = p;
+        }
+
+        @Override
+        public void run() {
+            cannon.transfer(power);
         }
     }
 
