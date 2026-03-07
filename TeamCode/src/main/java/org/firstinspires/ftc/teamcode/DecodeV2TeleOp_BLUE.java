@@ -116,7 +116,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
     }
     @Override
     public void loop(){
-        //LLResult llResult = camera.getLatestResult();
+        LLResult llResult = camera.getLatestResult();
         visionAid.update();
 
         dPadUpPressed = gamepad2.dpad_up;
@@ -269,7 +269,7 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
         if (gamepad2.left_trigger > 0.1) {
             //shoot close
             cannon.launchClose();
-            cannon.setActuatorPos(1); //.53
+            cannon.setActuatorPos(.8); //.53
         }
         if (gamepad2.right_trigger > 0.1) {
             // shoot far

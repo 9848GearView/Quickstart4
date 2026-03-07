@@ -216,7 +216,7 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
             if (gamepad2.left_trigger > 0.1) {
                 //shoot close
                 cannon.launchClose();
-                cannon.setActuatorPos(1); //.53
+                cannon.setActuatorPos(.8); //.53
             }
             if (gamepad2.right_trigger > 0.1) {
                 // shoot far
