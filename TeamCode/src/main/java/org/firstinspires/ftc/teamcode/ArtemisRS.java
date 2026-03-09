@@ -13,6 +13,7 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
@@ -43,7 +44,8 @@ public class ArtemisRS extends OpMode {
 
         cannon = new IntakeV2(hardwareMap);
 
-        cannon.setTurret(.5);
+        cannon.setTurret(.835);
+        vision = new RedLimelightAutoAim(hardwareMap);
 
         pathTimer = new Timer();
 
@@ -55,16 +57,16 @@ public class ArtemisRS extends OpMode {
     public void loop() {
         vision.update();
         if (vision.hasTarget()){
-            float Kp = -0.0005f; //proportional control constant
+            float Kp = -0.0004f; //proportional control constant
             //double feedForward = ((rightX + leftX)/2.0) * .005;
             double tx = vision.getTx();
             double botCorr = (Kp * tx)/* - feedForward*/;
             if(Math.abs(tx) > .5) {
-                cannon.setTurret(cannon.getTurretPos() + botCorr);
+                //cannon.setTurret(cannon.getTurretPos() + botCorr);
             }
 
         } else {
-            cannon.setTurret(.5);
+            cannon.setTurret(.835);
         }
         follower.update(); // Update Pedro Pathing
         pathState = autonomousPathUpdate(); // Update autonomous state machine
@@ -317,7 +319,7 @@ public class ArtemisRS extends OpMode {
                 break;
             case 5:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
-                    follower.followPath(paths.intake2,.75, true);
+                    follower.followPath(paths.intake2,.85, true);
                     timer.schedule(new TransferAuto(.35), 200);
                     setPathState(6);
                 }
@@ -343,7 +345,7 @@ public class ArtemisRS extends OpMode {
                 break;
             case 8:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
-                    follower.followPath(paths.intake3,.75, true);
+                    follower.followPath(paths.intake3,.85, true);
                     timer.schedule(new TransferAuto(.35), 200);
                     pathTimer.resetTimer();
                     setPathState(9);

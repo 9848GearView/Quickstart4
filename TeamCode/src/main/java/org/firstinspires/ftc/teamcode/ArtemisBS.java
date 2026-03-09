@@ -41,7 +41,7 @@ public class ArtemisBS extends OpMode {
 
         cannon = new IntakeV2(hardwareMap);
 
-        cannon.setTurret(.105);
+        cannon.setTurret(.895);
         vision = new BlueLimelightAutoAim(hardwareMap);
 
 
@@ -55,7 +55,7 @@ public class ArtemisBS extends OpMode {
     public void loop() {
         vision.update();
         if (vision.hasTarget()){
-            float Kp = -0.0005f; //proportional control constant
+            float Kp = -0.0004f; //proportional control constant
             //double feedForward = ((rightX + leftX)/2.0) * .005;
             double tx = vision.getTx();
             double botCorr = (Kp * tx)/* - feedForward*/;
@@ -137,7 +137,7 @@ public class ArtemisBS extends OpMode {
 
             intake1End = follower.pathBuilder()
                     .addPath(
-                            new BezierCurve(
+                            new BezierLine(
                                     new Pose(18.100, 19.900),
                                     new Pose(11.400, 14.900)
                             )
@@ -224,7 +224,7 @@ public class ArtemisBS extends OpMode {
 
             humanplayerEnd = follower.pathBuilder()
                     .addPath(
-                            new BezierCurve(
+                            new BezierLine(
                                     new Pose(18.100, 19.900),
                                     new Pose(11.400, 14.900)
                             )

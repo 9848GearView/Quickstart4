@@ -17,8 +17,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 //guarantee this wont work whatsoever
 
-@TeleOp(name="BLUE-DecodeV2TeleOp", group="Iterative OpMode")
-public class DecodeV2TeleOp_BLUE extends OpMode {
+@TeleOp(name="States_BLUE-DecodeV2TeleOp", group="Iterative OpMode")
+public class States_DecodeV2TeleOp_BLUE extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
     IntakeV2 cannon = null;
@@ -227,17 +227,18 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
 
 //        //auto-aim
         // why is ts the same button as gate bro
-        if(cannon.getLaunchStatus() == null){
-            LState = "mid";
-        } else if (cannon.getLaunchStatus().equals("close")){
-            LState = "close";
-        } else if(cannon.getLaunchStatus().equals("far")){
-            LState = "far";
-        }
+//        if(cannon.getLaunchStatus() == null){
+//            LState = "mid";
+//        } else if (cannon.getLaunchStatus().equals("close")){
+//            LState = "close";
+//        } else if(cannon.getLaunchStatus().equals("far")){
+//            LState = "far";
+//        }
 
         if( bPressed && !oldBPressed) {
             tLock = !tLock; // reminder to find a way to turn this off
         }
+        visionAid.update();
         if (tLock) {
             if (visionAid.hasTarget()){
 
@@ -245,21 +246,21 @@ public class DecodeV2TeleOp_BLUE extends OpMode {
                 double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx();
                 double botCorr = (Kp * tx) - feedForward;
-                if(LState.equals("close")){
-                    if(Math.abs(tx) > 0.5){
-                        cannon.setTurret(cannon.getTurretPos() + botCorr);
-                    }
-                }
-                if(LState.equals("far")){
+//                if(LState.equals("close")){
+//                    if(Math.abs(tx) > 0.5){
+//                        cannon.setTurret(cannon.getTurretPos() + botCorr);
+//                    }
+//                }
+//                if(LState.equals("far")){
                     if(Math.abs(tx) > 1.5) {
                         cannon.setTurret(cannon.getTurretPos() + botCorr);
                     }
-                }
-                if (LState == null){
-                    if(Math.abs(tx) > 1.0) {
-                        cannon.setTurret(cannon.getTurretPos() + botCorr);
-                    }
-                }
+//                }
+//                if (LState == null){
+//                    if(Math.abs(tx) > 1.0) {
+//                        cannon.setTurret(cannon.getTurretPos() + botCorr);
+//                    }
+//                }
 
             }
         }
