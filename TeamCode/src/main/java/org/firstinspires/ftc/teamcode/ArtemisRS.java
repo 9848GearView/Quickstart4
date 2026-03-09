@@ -37,7 +37,7 @@ public class ArtemisRS extends OpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(88, 8, Math.toRadians(90)));
+        follower.setStartingPose(new Pose(88, 8, Math.toRadians(0)));
 
         paths = new Paths(follower); // Build paths
 
@@ -90,6 +90,7 @@ public class ArtemisRS extends OpMode {
     public static class Paths {
         public PathChain shoot1;
         public PathChain intake1;
+        public PathChain intake1Mid;
         public PathChain intake1End;
         public PathChain shoot2;
         public PathChain intake2;
@@ -97,6 +98,8 @@ public class ArtemisRS extends OpMode {
         public PathChain intake3;
         public PathChain shoot4;
         public PathChain humanplayer;
+        public PathChain humanplayerMid;
+        public PathChain humanplayerEnd;
         public PathChain shoothp;
         public PathChain park;
 
@@ -105,50 +108,61 @@ public class ArtemisRS extends OpMode {
                     .addPath(
                             new BezierLine(
                                     new Pose(88.000, 8.000),
-                                    new Pose(87, 12)
-                            )
-                    )
-                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(62.5))
-                    .build();
-
-            intake1 = follower.pathBuilder()
-                    .addPath(
-                            new BezierCurve(
-                                    new Pose(87, 12),
-                                    new Pose(98, 13),
-                                    new Pose(134.000, 7.5)
+                                    new Pose(85.000, 20.000)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
+            intake1 = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(85.000, 20.000),
+                                    new Pose(84.600, 9.200),
+                                    new Pose(134.900, 8.400)
+                            )
+                    )
+                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .build();
+
+            intake1Mid = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(134.900, 8.400),
+                                    new Pose(135.800, 22.400),
+                                    new Pose(125.900, 19.900)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(-15))
+                    .build();
+
             intake1End = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(134, 7.5),
-                                    new Pose(133.000, 12)
+                                    new Pose(125.900, 19.900),
+                                    new Pose(132.600, 14.900)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(10))
+                    .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(-15))
                     .build();
 
             shoot2 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(133.000, 12),
-                                    new Pose(87, 12)
+                                    new Pose(132.600, 14.900),
+                                    new Pose(85.000, 20.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(10), Math.toRadians(62.5))
+                    .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(0))
                     .build();
 
             intake2 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(87, 12),
+                                    new Pose(85.000, 20.000),
                                     new Pose(91.000, 39.000),
                                     new Pose(92.000, 34.500),
-                                    new Pose(134.500, 35.000)
+                                    new Pose(134.000, 36.000)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
@@ -157,20 +171,20 @@ public class ArtemisRS extends OpMode {
             shoot3 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(134.500, 35.000),
-                                    new Pose(87, 12)
+                                    new Pose(134.000, 36.000),
+                                    new Pose(85.000, 20.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(62.5))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
             intake3 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(87, 12),
+                                    new Pose(85.000, 20.000),
                                     new Pose(91.000, 59.000),
-                                    new Pose(76.600, 60),
-                                    new Pose(134.500, 59.000)
+                                    new Pose(76.600, 59.712),
+                                    new Pose(134.000, 59.400)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
@@ -179,46 +193,63 @@ public class ArtemisRS extends OpMode {
             shoot4 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(134.500, 59.000),
-                                    new Pose(87, 12)
+                                    new Pose(134.000, 59.400),
+                                    new Pose(85.000, 20.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(62.5))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
-            //i believe this is intake1 and shoot1 but u can change the names above idc
-            /*humanplayer = follower.pathBuilder()
+            humanplayer = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(87.000, 20.000),
-                                    new Pose(86.000, 13.000),
-                                    new Pose(134.000, 12.000)
+                                    new Pose(85.000, 20.000),
+                                    new Pose(84.600, 9.200),
+                                    new Pose(134.900, 8.400)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))
                     .build();
 
+            humanplayerMid = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(134.900, 8.400),
+                                    new Pose(135.800, 22.400),
+                                    new Pose(125.900, 19.900)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(-15))
+                    .build();
+
+            humanplayerEnd = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(125.900, 19.900),
+                                    new Pose(132.600, 14.900)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(-15))
+                    .build();
 
             shoothp = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(134.000, 12.000),
-                                    new Pose(87.000, 20.000)
+                                    new Pose(132.600, 14.900),
+                                    new Pose(85.000, 20.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(62.5))
+                    .setLinearHeadingInterpolation(Math.toRadians(-15), Math.toRadians(0))
                     .build();
-
-             */
 
             park = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(87, 12),
-                                    new Pose(108.000, 20.000)
+                                    new Pose(85.000, 20.000),
+                                    new Pose(100.000, 22.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(62.5), Math.toRadians(90))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
                     .build();
         }
     }
@@ -227,15 +258,16 @@ public class ArtemisRS extends OpMode {
         switch (pathState) {
             case 0:
                 timer.schedule(new LaunchAuto(), 0);
+                timer.schedule(new IntakeAuto(1), 0);
+                timer.schedule(new TransferAuto(.35), 0);
                 timer.schedule(new ActuatorAuto(1), 0);
                 follower.followPath(paths.shoot1,  true);
                 setPathState(1);
                 break;
             case 1:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new TransferAuto(1), 200);
                     timer.schedule(new GateAuto(.25), 100);
+                    timer.schedule(new TransferAuto(1), 200);
                     timer.schedule(new GateAuto(0.38), 3000);
                     pathTimer.resetTimer();
                     setPathState(2);
@@ -250,6 +282,13 @@ public class ArtemisRS extends OpMode {
                 }
                 break;
             case 22:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    follower.followPath(paths.intake1Mid, true);
+                    timer.schedule(new TransferAuto(.35), 200);
+                    pathTimer.resetTimer();
+                    setPathState(23);
+                }
+            case 23:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .4) {
                     follower.followPath(paths.intake1End, true);
                     timer.schedule(new TransferAuto(.35), 200);
@@ -259,10 +298,10 @@ public class ArtemisRS extends OpMode {
                 break;
 
             case 3:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .7) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
                     follower.followPath(paths.shoot2, true);
                     timer.schedule(new TransferAuto(0), 200);
-                    timer.schedule(new IntakeAuto(0), 200);
+
                     setPathState(4);
                 }
                 break;
@@ -278,7 +317,7 @@ public class ArtemisRS extends OpMode {
                 break;
             case 5:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
-                    follower.followPath(paths.intake2, true);
+                    follower.followPath(paths.intake2,.75, true);
                     timer.schedule(new TransferAuto(.35), 200);
                     setPathState(6);
                 }
@@ -288,7 +327,7 @@ public class ArtemisRS extends OpMode {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoot3, true);
                     timer.schedule(new TransferAuto(0), 200);
-                    timer.schedule(new IntakeAuto(0), 200);
+
                     setPathState(7);
                 }
                 break;
@@ -299,12 +338,12 @@ public class ArtemisRS extends OpMode {
                     timer.schedule(new TransferAuto(1), 200);
                     timer.schedule(new GateAuto(0.38), 3100);
                     pathTimer.resetTimer();
-                    setPathState(8); // 8 to continue to pickup 3, 11 to go to park early
+                    setPathState(82); // 8 to continue to pickup 3, 82 to go second human player, 11 to go to park early
                 }
                 break;
             case 8:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
-                    follower.followPath(paths.intake3, true);
+                    follower.followPath(paths.intake3,.75, true);
                     timer.schedule(new TransferAuto(.35), 200);
                     pathTimer.resetTimer();
                     setPathState(9);
@@ -315,7 +354,7 @@ public class ArtemisRS extends OpMode {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoot4, true);
                     timer.schedule(new TransferAuto(0), 200);
-                    timer.schedule(new IntakeAuto(0), 200);
+
                     setPathState(10);
                 }
                 break;
@@ -333,6 +372,21 @@ public class ArtemisRS extends OpMode {
                     follower.followPath(paths.humanplayer, true);
                     timer.schedule(new TransferAuto(.35), 200);
                     pathTimer.resetTimer();
+                    setPathState(83);
+                }
+                break;
+            case 83:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                    follower.followPath(paths.humanplayerMid, true);
+                    timer.schedule(new TransferAuto(.35), 200);
+                    pathTimer.resetTimer();
+                    setPathState(822);
+                }
+            case 822:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .4) {
+                    follower.followPath(paths.humanplayerEnd, true);
+                    timer.schedule(new TransferAuto(.35), 200);
+                    pathTimer.resetTimer();
                     setPathState(92);
                 }
                 break;
@@ -341,7 +395,7 @@ public class ArtemisRS extends OpMode {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoothp, true);
                     timer.schedule(new TransferAuto(0), 200);
-                    timer.schedule(new IntakeAuto(0), 200);
+
                     setPathState(102);
                 }
                 break;
@@ -358,14 +412,13 @@ public class ArtemisRS extends OpMode {
             case 11:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
                     follower.followPath(paths.park,true);
-                    timer.schedule(new IntakeAuto(0), 200);
+
                     timer.schedule(new TransferAuto(0), 200);
                     timer.schedule(new StopLaunchAuto(), 200);
                     setPathState(12);
                 }
 
         }
-        
         return pathState;
 
     }

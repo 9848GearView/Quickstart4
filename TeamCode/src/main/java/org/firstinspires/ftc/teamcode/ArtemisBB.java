@@ -41,6 +41,8 @@ public class ArtemisBB extends OpMode {
         paths = new Paths(follower); // Build paths
 
         cannon = new IntakeV2(hardwareMap);
+        cannon.setTurret(.25);
+        vision = new BlueLimelightAutoAim(hardwareMap);
 
         pathTimer = new Timer();
 
@@ -52,7 +54,7 @@ public class ArtemisBB extends OpMode {
     public void loop() {
         vision.update();
         if (vision.hasTarget()){
-            float Kp = -0.0005f; //proportional control constant
+            float Kp = -0.0004f; //proportional control constant
             //double feedForward = ((rightX + leftX)/2.0) * .005;
             double tx = vision.getTx();
             double botCorr = (Kp * tx)/* - feedForward*/;
@@ -61,7 +63,7 @@ public class ArtemisBB extends OpMode {
             }
 
         } else {
-            cannon.setTurret(.3);
+            cannon.setTurret(.26);
         }
         follower.update(); // Update Pedro Pathing
         pathState = autonomousPathUpdate(); // Update autonomous state machine
@@ -139,9 +141,9 @@ public class ArtemisBB extends OpMode {
                     .addPath(
                             new BezierCurve(
                                     new Pose(49.000, 85.000),
-                                    new Pose(45.000, 56),
-                                    new Pose(55, 60),
-                                    new Pose(10, 58)
+                                    new Pose(45.000, 55),
+                                    new Pose(55, 59),
+                                    new Pose(10, 57)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -196,9 +198,9 @@ public class ArtemisBB extends OpMode {
     public int autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                timer.schedule(new LaunchAuto(), 0);
+                timer.schedule(new LaunchAuto(1100), 0);
                 timer.schedule(new IntakeAuto(.8), 0);
-                timer.schedule(new ActuatorAuto(.9),0);
+                timer.schedule(new ActuatorAuto(.8),0);
                 timer.schedule(new AutoAim(0.7),0);
                 follower.followPath(paths.shoot1,  true);
                 pathTimer.resetTimer();
@@ -217,6 +219,7 @@ public class ArtemisBB extends OpMode {
             case 2:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5) {
                     follower.followPath(paths.intake1, true);
+                    pathTimer.resetTimer();
                     timer.schedule(new TransferAuto(.35), 0);
                     setPathState(3);
                 }
@@ -225,7 +228,7 @@ public class ArtemisBB extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .7) {
                     follower.followPath(paths.gate, true);
                     timer.schedule(new TransferAuto(0), 200);
-                    timer.schedule(new IntakeAuto(0), 200);
+                    timer.schedule(new IntakeAuto(0), 500);
                     setPathState(4);
                 }
                 break;
@@ -233,6 +236,7 @@ public class ArtemisBB extends OpMode {
                 if (!follower.isBusy()) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoot2, true);
+                    timer.schedule(new IntakeAuto(1), 200);
                     setPathState(5);
                 }
                 break;
@@ -258,7 +262,6 @@ public class ArtemisBB extends OpMode {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoot3, true);
                     timer.schedule(new TransferAuto(0), 0);
-                    timer.schedule(new IntakeAuto(0), 200);
                     setPathState(8);
                 }
                 break;
@@ -284,7 +287,6 @@ public class ArtemisBB extends OpMode {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoot4, true);
                     timer.schedule(new TransferAuto(0), 0);
-                    timer.schedule(new IntakeAuto(0), 200);
                     setPathState(11);
                 }
                 break;
@@ -351,11 +353,18 @@ public class ArtemisBB extends OpMode {
     }
 
     public class LaunchAuto extends TimerTask {
+        double pow;
+
+        public LaunchAuto(double p) {
+            this.pow = p;
+        }
+
         @Override
         public void run() {
-            cannon.launchFar();
+            cannon.setVelocity(pow);
         }
     }
+
 
     public class StopLaunchAuto extends TimerTask {
         @Override

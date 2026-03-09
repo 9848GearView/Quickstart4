@@ -280,40 +280,12 @@ public class IntakeV2 {
     }//closes method
 
     //small triangle shooting during auto
-    public void launchAutoFar(boolean b) {
+    public void launchAutoFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        switch (launchState) {
-            case IDLE:
-                setGatePosition(.38);
-                outtakeT.setVelocity(0);
-                outtakeB.setVelocity(0);
-                if(b) {
-                    launchState = LaunchState.SPIN_UP;
-                }
-                break;
-            case SPIN_UP:
-                outtakeT.setVelocity(1600);
-                outtakeB.setVelocity(1600);
-                if (getLauncherVelocity() > 1550) {
-                    launchState = LaunchState.LAUNCH;
-                }
-                break;
-            case LAUNCH:
-                feederTimer.reset();
-                launchState = IntakeV2.LaunchState.LAUNCHING;
-                break;
-            case LAUNCHING: // not used, just use stopLaunch method manually
-                intake(1);
-                setActuatorPos(1);
-                setGatePosition(.25);
-                if (feederTimer.seconds() > FEED_TIME_SECONDS) {
-                    intake(0);
-                    stopLaunch();
-                    launchState = LaunchState.IDLE;
-                }
-                break;
-        }//closes switch
+        outtakeT.setVelocity(1540);
+        outtakeB.setVelocity(1540);
+        launchStatus = "far";
     }//closes method
 
     public void setVelocity(double p){

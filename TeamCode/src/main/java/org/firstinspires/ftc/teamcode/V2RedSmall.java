@@ -64,8 +64,8 @@ public class V2RedSmall extends OpMode {
     public void loop() {
         follower.update(); // Update Pedro Pathing
 
-        if (shouldShoot && !hasShot) { cannon.launchAutoFar(true);} // constantly updates launcher state machine
-        else { cannon.launchAutoFar(false);} // keeps launcher idle
+        if (shouldShoot && !hasShot) { cannon.launchAutoFar();} // constantly updates launcher state machine
+        else { cannon.launchAutoFar();} // keeps launcher idle
 
         // Detect when the launcher finishes its cycle
         if (shouldShoot && !hasShot && cannon.hasFinishedShot()) {
