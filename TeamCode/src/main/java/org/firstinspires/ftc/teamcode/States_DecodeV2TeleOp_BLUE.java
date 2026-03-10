@@ -48,10 +48,11 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     private boolean dPadDownPressed;
     private boolean oldDPadDownPressed;
 
-    private boolean rBumperPressed;
-    private boolean oldRBumperPressed;
+
 
     //booleans for turret
+    private boolean rBumperPressed;
+    private boolean oldRBumperPressed;
     private boolean lBumperPressed;
     private boolean oldLBumperPressed;
     private String LState;
@@ -153,14 +154,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
             chassis.setHalfPark(0.1);
         }
 
-        if(gamepad1.dpad_left){
-            cannon.setLeftTurret(0.1);
-        }
 
-
-        if(gamepad1.dpad_right){
-            cannon.setRightTurret(0.1);
-        }
 
         //intake
         if (gamepad2.a && !oldAPressed){
@@ -204,19 +198,6 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         //detectedColor = colSens.getDetectedColor(telemetry);
         // color sensor end
         //manual aim
-        if(gamepad2.dpad_left) {
-            //if(cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
-            cannon.setTurret(cannon.getTurretPos() + tInc);
-            //}
-        }
-        if(gamepad2.dpad_right) {
-            // if (cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
-            cannon.setTurret(cannon.getTurretPos() - tInc);
-            // }
-        }
-        if(gamepad2.dpad_up) {
-            cannon.setTurret(.5);
-        }
 
         if(gamepad1.y) {
             follower.setX(9.713344316095563);
@@ -226,7 +207,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         goalDistance = Math.sqrt(Math.pow(follower.getPose().getX() - 4,2) + Math.pow(140 - follower.getPose().getY(),2));
 
 //        //auto-aim
-        // why is ts the same button as gate bro
+
 //        if(cannon.getLaunchStatus() == null){
 //            LState = "mid";
 //        } else if (cannon.getLaunchStatus().equals("close")){
@@ -244,7 +225,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 
                 float Kp = -0.0004f; //proportional control constant
                 double feedForward = ((rightX + leftX)/2.0) * .005;
-                double tx = visionAid.getTx();
+                double tx = visionAid.getTx() + .5;
                 double botCorr = (Kp * tx) - feedForward;
 //                if(LState.equals("close")){
 //                    if(Math.abs(tx) > 0.5){
@@ -252,7 +233,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 //                    }
 //                }
 //                if(LState.equals("far")){
-                    if(Math.abs(tx) > 1.5) {
+                    if(Math.abs(tx) > .5) {
                         cannon.setTurret(cannon.getTurretPos() + botCorr);
                     }
 //                }

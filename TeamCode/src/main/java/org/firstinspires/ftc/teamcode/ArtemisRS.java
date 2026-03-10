@@ -44,7 +44,7 @@ public class ArtemisRS extends OpMode {
 
         cannon = new IntakeV2(hardwareMap);
 
-        cannon.setTurret(.835);
+        cannon.setTurret(.851);
         vision = new RedLimelightAutoAim(hardwareMap);
 
         pathTimer = new Timer();
@@ -62,11 +62,11 @@ public class ArtemisRS extends OpMode {
             double tx = vision.getTx();
             double botCorr = (Kp * tx)/* - feedForward*/;
             if(Math.abs(tx) > .5) {
-                //cannon.setTurret(cannon.getTurretPos() + botCorr);
+                cannon.setTurret(cannon.getTurretPos() + botCorr);
             }
 
         } else {
-            cannon.setTurret(.835);
+            cannon.setTurret(.851);
         }
         follower.update(); // Update Pedro Pathing
         pathState = autonomousPathUpdate(); // Update autonomous state machine
@@ -104,6 +104,7 @@ public class ArtemisRS extends OpMode {
         public PathChain humanplayerEnd;
         public PathChain shoothp;
         public PathChain park;
+        public PathChain humanplayerPark;
 
         public Paths(Follower follower) {
             shoot1 = follower.pathBuilder()
@@ -253,6 +254,16 @@ public class ArtemisRS extends OpMode {
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
                     .build();
+
+            humanplayerPark = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(132.600, 14.900),
+                                    new Pose(100.000, 22.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
+                    .build();
         }
     }
 
@@ -389,7 +400,7 @@ public class ArtemisRS extends OpMode {
                     follower.followPath(paths.humanplayerEnd, true);
                     timer.schedule(new TransferAuto(.35), 200);
                     pathTimer.resetTimer();
-                    setPathState(92);
+                    setPathState(92);// 92 to continue to launch, 112 to park early after picking up human player
                 }
                 break;
             case 92:
@@ -414,11 +425,21 @@ public class ArtemisRS extends OpMode {
             case 11:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.45) {
                     follower.followPath(paths.park,true);
-
+                    timer.schedule(new IntakeAuto(0), 200);
                     timer.schedule(new TransferAuto(0), 200);
                     timer.schedule(new StopLaunchAuto(), 200);
                     setPathState(12);
                 }
+                break;
+            case 112:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .5) {
+                    follower.followPath(paths.humanplayerPark,true);
+                    timer.schedule(new IntakeAuto(0), 200);
+                    timer.schedule(new TransferAuto(0), 200);
+                    timer.schedule(new StopLaunchAuto(), 200);
+                    setPathState(12);
+                }
+                break;
 
         }
         return pathState;

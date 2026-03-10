@@ -121,6 +121,10 @@ public class MecanumDrive {
 
     }
 
+    public double getHalfPark() {
+        return halfParkL.getPosition();
+    }
+
     public void resetRobotAngle(){
         imu.resetYaw();
     }

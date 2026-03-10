@@ -41,7 +41,7 @@ public class ArtemisBS extends OpMode {
 
         cannon = new IntakeV2(hardwareMap);
 
-        cannon.setTurret(.895);
+        cannon.setTurret(.149);
         vision = new BlueLimelightAutoAim(hardwareMap);
 
 
@@ -64,7 +64,7 @@ public class ArtemisBS extends OpMode {
             }
 
         } else {
-            cannon.setTurret(.105);
+            cannon.setTurret(.149);
         }
 
         follower.update(); // Update Pedro Pathing
@@ -101,6 +101,7 @@ public class ArtemisBS extends OpMode {
         public PathChain humanplayerEnd;
         public PathChain shoothp;
         public PathChain park;
+        public PathChain humanplayerPark;
 
         public Paths(Follower follower) {
             shoot1 = follower.pathBuilder()
@@ -251,7 +252,16 @@ public class ArtemisBS extends OpMode {
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
                     .build();
-        }
+
+            humanplayerPark = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(11.400, 14.900),
+                                    new Pose(44.000, 22.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
+                    .build();        }
     }
 
 
@@ -389,7 +399,7 @@ public class ArtemisBS extends OpMode {
                     follower.followPath(paths.humanplayerEnd, true);
                     timer.schedule(new TransferAuto(.35), 200);
                     pathTimer.resetTimer();
-                    setPathState(92);
+                    setPathState(92); // 92 to continue to launch, 112 to park early after picking up human player
                 }
                 break;
             case 92:
@@ -416,10 +426,21 @@ public class ArtemisBS extends OpMode {
                     follower.followPath(paths.park,true);
                     
                     timer.schedule(new TransferAuto(0), 200);
+                    timer.schedule(new IntakeAuto(0), 200);
                     timer.schedule(new StopLaunchAuto(), 200);
                     setPathState(12);
                 }
+                break;
 
+            case 112:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .5) {
+                    follower.followPath(paths.humanplayerPark,true);
+                    timer.schedule(new IntakeAuto(0), 200);
+                    timer.schedule(new TransferAuto(0), 200);
+                    timer.schedule(new StopLaunchAuto(), 200);
+                    setPathState(12);
+                }
+                break;
         }
         return pathState;
 

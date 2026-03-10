@@ -154,15 +154,6 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
             chassis.setHalfPark(0.1);
         }
 
-        if(gamepad1.dpad_left){
-            cannon.setLeftTurret(0.1);
-        }
-
-
-        if(gamepad1.dpad_right){
-            cannon.setRightTurret(0.1);
-        }
-
         //intake
         if (gamepad2.a && !oldAPressed){
             intakeOn = !intakeOn;
@@ -244,7 +235,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
 
                 float Kp = -0.0004f; //proportional control constant
                 double feedForward = ((rightX + leftX)/2.0) * .005;
-                double tx = visionAid.getTx();
+                double tx = visionAid.getTx() +.5;
                 double botCorr = (Kp * tx) - feedForward;
 //                if(LState.equals("close")){
 //                    if(Math.abs(tx) > 0.5){
@@ -252,7 +243,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
 //                    }
 //                }
 //                if(LState.equals("far")){
-                    if(Math.abs(tx) > 1.5) {
+                    if(Math.abs(tx) > .5) {
                         cannon.setTurret(cannon.getTurretPos() + botCorr);
                     }
 //                }

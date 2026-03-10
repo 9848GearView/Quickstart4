@@ -72,7 +72,7 @@ public class TestRS_Limelight extends OpMode {
         }
         follower.update(); // Update Pedro Pathing
         pathState = autonomousPathUpdate(); // Update autonomous state machine
-        // Update Limelight
+        // Update Judging
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
