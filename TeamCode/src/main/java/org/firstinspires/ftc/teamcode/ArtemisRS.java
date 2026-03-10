@@ -65,7 +65,11 @@ public class ArtemisRS extends OpMode {
                 cannon.setTurret(cannon.getTurretPos() + botCorr);
             }
 
-        }
+        }/* else {
+            cannon.setTurret(.149);
+        }*/
+
+
         follower.update(); // Update Pedro Pathing
         pathState = autonomousPathUpdate(); // Update autonomous state machine
 
@@ -299,6 +303,7 @@ public class ArtemisRS extends OpMode {
                     pathTimer.resetTimer();
                     setPathState(23);
                 }
+                break;
             case 23:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .4) {
                     follower.followPath(paths.intake1End, true);
@@ -378,8 +383,9 @@ public class ArtemisRS extends OpMode {
                     pathTimer.resetTimer();
                     setPathState(11);
                 }
+                break;
             case 82:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3 || pathTimer.getElapsedTimeSeconds() > 3) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
                     follower.followPath(paths.humanplayer, true);
                     timer.schedule(new TransferAuto(.35), 200);
                     pathTimer.resetTimer();
@@ -393,6 +399,7 @@ public class ArtemisRS extends OpMode {
                     pathTimer.resetTimer();
                     setPathState(822);
                 }
+                break;
             case 822:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .4) {
                     follower.followPath(paths.humanplayerEnd, true);
@@ -402,7 +409,7 @@ public class ArtemisRS extends OpMode {
                 }
                 break;
             case 92:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1 || pathTimer.getElapsedTimeSeconds() > 3) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoothp, true);
                     timer.schedule(new TransferAuto(0), 200);
