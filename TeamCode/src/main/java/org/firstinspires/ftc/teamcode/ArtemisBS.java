@@ -63,8 +63,6 @@ public class ArtemisBS extends OpMode {
                 cannon.setTurret(cannon.getTurretPos() + botCorr);
             }
 
-        } else {
-            cannon.setTurret(.149);
         }
 
         follower.update(); // Update Pedro Pathing
@@ -227,7 +225,7 @@ public class ArtemisBS extends OpMode {
                     .addPath(
                             new BezierLine(
                                     new Pose(18.100, 19.900),
-                                    new Pose(11.400, 14.900)
+                                    new Pose(12, 14.900)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(195))
@@ -236,7 +234,7 @@ public class ArtemisBS extends OpMode {
             shoothp = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(11.400, 14.900),
+                                    new Pose(12, 14.900),
                                     new Pose(59.000, 20.000)
                             )
                     )

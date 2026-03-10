@@ -61,8 +61,6 @@ public class ArtemisRB extends OpMode {
                 cannon.setTurret(cannon.getTurretPos() + botCorr);
             }
 
-        } else {
-            cannon.setTurret(.7);
         }
         follower.update(); // Update Pedro Pathing
         pathState = autonomousPathUpdate(); // Update autonomous state machine
