@@ -326,7 +326,7 @@ public class ArtemisRS extends OpMode {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new TransferAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 3100);
+                    timer.schedule(new GateAuto(0.38), 2950);
                     pathTimer.resetTimer();
                     setPathState(5);
                 }
@@ -352,7 +352,7 @@ public class ArtemisRS extends OpMode {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new TransferAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 3100);
+                    timer.schedule(new GateAuto(0.38), 2950);
                     pathTimer.resetTimer();
                     setPathState(82); // 8 to continue to pickup 3, 82 to go second human player, 11 to go to park early
                 }
@@ -379,7 +379,7 @@ public class ArtemisRS extends OpMode {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new TransferAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 3100);
+                    timer.schedule(new GateAuto(0.38), 2950);
                     pathTimer.resetTimer();
                     setPathState(11);
                 }
@@ -422,7 +422,7 @@ public class ArtemisRS extends OpMode {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new TransferAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 3100);
+                    timer.schedule(new GateAuto(0.38), 2950);
                     pathTimer.resetTimer();
                     setPathState(11);
                 }
