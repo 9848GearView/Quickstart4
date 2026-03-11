@@ -264,8 +264,8 @@ public class IntakeV2 {
     public void launchFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeT.setVelocity(1620);
-        outtakeB.setVelocity(1620);
+        outtakeT.setVelocity(1645);
+        outtakeB.setVelocity(1645);
         launchStatus = "far";
     }//closes method
 
@@ -283,8 +283,8 @@ public class IntakeV2 {
     public void launchAutoFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeT.setVelocity(1540);
-        outtakeB.setVelocity(1540);
+        outtakeT.setVelocity(1580);
+        outtakeB.setVelocity(1580);
         launchStatus = "far";
     }//closes method
 

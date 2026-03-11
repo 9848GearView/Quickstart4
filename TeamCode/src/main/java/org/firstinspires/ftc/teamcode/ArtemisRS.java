@@ -44,7 +44,7 @@ public class ArtemisRS extends OpMode {
 
         cannon = new IntakeV2(hardwareMap);
 
-        cannon.setTurret(.851);
+        cannon.setTurret(.831);
         vision = new RedLimelightAutoAim(hardwareMap);
 
         pathTimer = new Timer();
@@ -409,7 +409,7 @@ public class ArtemisRS extends OpMode {
                 }
                 break;
             case 92:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1 || pathTimer.getElapsedTimeSeconds() > 3) {
+                if (pathTimer.getElapsedTimeSeconds() > 3 || !follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoothp, true);
                     timer.schedule(new TransferAuto(0), 200);

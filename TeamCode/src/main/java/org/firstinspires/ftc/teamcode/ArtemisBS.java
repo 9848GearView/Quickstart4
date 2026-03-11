@@ -406,7 +406,7 @@ public class ArtemisBS extends OpMode {
                 }
                 break;
             case 92:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1 || pathTimer.getElapsedTimeSeconds() > 3) {
+                if (pathTimer.getElapsedTimeSeconds() > 3 || !follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoothp, true);
                     timer.schedule(new TransferAuto(0), 200);
