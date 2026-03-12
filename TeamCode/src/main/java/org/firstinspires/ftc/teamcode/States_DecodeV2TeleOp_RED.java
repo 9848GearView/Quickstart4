@@ -25,8 +25,6 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
     IntakeV2 cannon = null;
     RedLimelightAutoAim visionAid = null;
 
-
-    //LLMech camera = null;
     //ColorSensor colSens = null;
 
 
@@ -94,10 +92,10 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
         cannon = new IntakeV2(hardwareMap);
         visionAid = new RedLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
-        //camera = new LLMech(hardwareMap);
+
         camera.pipelineSwitch(1);
         camera.setPollRateHz(90);
-        chassis.setHalfPark(0.60);
+        chassis.setHalfPark(0.45);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
         cannon.setTurret(.5);
@@ -117,7 +115,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
     }
     @Override
     public void loop(){
-        LLResult llResult = camera.getLatestResult();
+
         visionAid.update();
 
         dPadUpPressed = gamepad2.dpad_up;
@@ -151,7 +149,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
         }
 
         if(gamepad1.x){
-            chassis.setHalfPark(0.1);
+            chassis.setHalfPark(0.10);
         }
 
         //intake
@@ -181,21 +179,19 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
             }
         }
 
-
-            //intake wheel end
-
-       /* if(gamepad2.dpad_right){
-            cannon.launchSmarter(true);
-        }
-        */
-
-
-        //angle recognition end
-
+        //intake wheel end
         // (FI) color sensor begin
         //detectedColor = colSens.getDetectedColor(telemetry);
         // color sensor end
         //manual aim
+
+        if(gamepad1.y) {
+            follower.setX(9.713344316095563);
+            follower.setY(9.186161449752879);
+            follower.setHeading(180);
+        }
+        goalDistance = Math.sqrt(Math.pow(follower.getPose().getX() - 4,2) + Math.pow(140 - follower.getPose().getY(),2));
+
         if(gamepad2.dpad_left) {
             //if(cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
             cannon.setTurret(cannon.getTurretPos() + tInc);
@@ -210,12 +206,6 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
             cannon.setTurret(.5);
         }
 
-        if(gamepad1.y) {
-            follower.setX(9.713344316095563);
-            follower.setY(9.186161449752879);
-            follower.setHeading(180);
-        }
-        goalDistance = Math.sqrt(Math.pow(follower.getPose().getX() - 4,2) + Math.pow(140 - follower.getPose().getY(),2));
 
 //        //auto-aim
         // why is ts the same button as gate bro
@@ -237,22 +227,9 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
                 double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx() +.5;
                 double botCorr = (Kp * tx) - feedForward;
-//                if(LState.equals("close")){
-//                    if(Math.abs(tx) > 0.5){
-//                        cannon.setTurret(cannon.getTurretPos() + botCorr);
-//                    }
-//                }
-//                if(LState.equals("far")){
-                    if(Math.abs(tx) > .5) {
-                        cannon.setTurret(cannon.getTurretPos() + botCorr);
-                    }
-//                }
-//                if (LState == null){
-//                    if(Math.abs(tx) > 1.0) {
-//                        cannon.setTurret(cannon.getTurretPos() + botCorr);
-//                    }
-//                }
-
+                if(Math.abs(tx) > .5) {
+                    cannon.setTurret(cannon.getTurretPos() + botCorr);
+                }
             }
         }
         //end auto aim

@@ -37,7 +37,8 @@ public class Judging extends OpMode {
         cannon = new IntakeV2(hardwareMap);
 
         cannon.setTurret(.5);
-        cannon.setActuatorPos(0);
+        // we want jonah to be able to move it
+        //cannon.setActuatorPos(0);
         chassis.setHalfPark(0.60);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
@@ -45,7 +46,7 @@ public class Judging extends OpMode {
         // 0 = #20, 1 = #24, 2 = #21, #22, #23
         // 21-23 is the obelisk patterns
         // 20 is blue, 24 is red
-        limelight.pipelineSwitch(0);//should be the pipeline for the april tag search you want
+       // limelight.pipelineSwitch(0);//should be the pipeline for the april tag search you want
     }
 
     @Override
@@ -61,7 +62,6 @@ public class Judging extends OpMode {
         lBumperPressed = gamepad2.left_bumper;
         rBumperPressed = gamepad2.right_bumper;
 
-
         //begin auto aim
         vision.update();
         if (vision.hasTarget()) {
@@ -70,25 +70,25 @@ public class Judging extends OpMode {
                 telemetry.addLine("Tag not found");
         }
         if (vision.hasTarget()){
-            /* this is not the Kp in TeleOp, its higher because the robot is stationary*/
-            Kp = -0.0008;
+            Kp = -0.0004;
             double tx = llResult.getTx();
             double botCorr = (Kp * tx);
-            cannon.setTurret(cannon.getTurretPos() + botCorr);
-
+            if(Math.abs(tx) > .5) {
+                cannon.setTurret(cannon.getTurretPos() + botCorr);
+            }
         }
         //end auto aim
 
         //begin launcher (alt. actuator, gate, manual aim, ind. light)
-        // alt. actuator
-        if (gamepad2.left_trigger > 0.1) {
-            //shoot close
-            cannon.setActuatorPos(.8); //.53
-        }
-        if (gamepad2.right_trigger > 0.1) {
-            // shoot far
-            cannon.setActuatorPos(1);
-        }
+        // alt. actuator (not used atm)
+//        if (gamepad2.left_trigger > 0.1) {
+//            //shoot close
+//            cannon.setActuatorPos(.8); //.53
+//        }
+//        if (gamepad2.right_trigger > 0.1) {
+//            // shoot far
+//            cannon.setActuatorPos(1);
+//        }
         // gate + ind. light
         if(rBumperPressed && !oldRBumperPressed){
             cannon.setGatePosition(.38);
@@ -118,18 +118,18 @@ public class Judging extends OpMode {
 
         // end launcher
         //begin tilt park (ON GAMEPAD 2, NOT THE NORMAL CONTROLS)
-        if(gamepad2.x && !tiltOn){
-            chassis.setHalfPark(0.1);
-            tiltOn = true;
-        }
-        if (gamepad2.dpad_down){
-            if (chassis.getHalfPark() < .6){
-                chassis.setHalfPark(chassis.getHalfPark() + .05);
-            }
-            if (chassis.getHalfPark() ==.6){
-                tiltOn = false;
-            }
-        }
+//        if(gamepad2.x && !tiltOn){
+//            chassis.setHalfPark(0.1);
+//            tiltOn = true;
+//        }
+//        if (gamepad2.dpad_down){
+//            if (chassis.getHalfPark() < .6){
+//                chassis.setHalfPark(chassis.getHalfPark() + .05);
+//            }
+//            if (chassis.getHalfPark() ==.6){
+//                tiltOn = false;
+//            }
+//        }
 
 
 

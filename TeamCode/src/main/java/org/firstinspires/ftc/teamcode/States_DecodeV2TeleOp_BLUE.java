@@ -24,8 +24,6 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     IntakeV2 cannon = null;
     BlueLimelightAutoAim visionAid = null;
 
-
-    //LLMech camera = null;
     //ColorSensor colSens = null;
 
 
@@ -94,10 +92,10 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         cannon = new IntakeV2(hardwareMap);
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
-        //camera = new LLMech(hardwareMap);
+
         camera.pipelineSwitch(0);
         camera.setPollRateHz(90);
-        chassis.setHalfPark(0.60);
+        chassis.setHalfPark(0.45);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
         cannon.setTurret(.5);
@@ -117,7 +115,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     }
     @Override
     public void loop(){
-        LLResult llResult = camera.getLatestResult();
+
         visionAid.update();
 
         dPadUpPressed = gamepad2.dpad_up;
@@ -151,10 +149,8 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         }
 
         if(gamepad1.x){
-            chassis.setHalfPark(0.1);
+            chassis.setHalfPark(0.10);
         }
-
-
 
         //intake
         if (gamepad2.a && !oldAPressed){
@@ -183,17 +179,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
             }
         }
 
-
-            //intake wheel end
-
-       /* if(gamepad2.dpad_right){
-            cannon.launchSmarter(true);
-        }
-        */
-
-
-        //angle recognition end
-
+        //intake wheel end
         // (FI) color sensor begin
         //detectedColor = colSens.getDetectedColor(telemetry);
         // color sensor end
@@ -222,27 +208,14 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         visionAid.update();
         if (tLock) {
             if (visionAid.hasTarget()){
-
                 float Kp = -0.0004f; //proportional control constant
                 double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx() + .5;
                 double botCorr = (Kp * tx) - feedForward;
-//                if(LState.equals("close")){
-//                    if(Math.abs(tx) > 0.5){
-//                        cannon.setTurret(cannon.getTurretPos() + botCorr);
-//                    }
-//                }
-//                if(LState.equals("far")){
-                    if(Math.abs(tx) > .5) {
-                        cannon.setTurret(cannon.getTurretPos() + botCorr);
-                    }
-//                }
-//                if (LState == null){
-//                    if(Math.abs(tx) > 1.0) {
-//                        cannon.setTurret(cannon.getTurretPos() + botCorr);
-//                    }
-//                }
-
+//
+                if(Math.abs(tx) > .5) {
+                    cannon.setTurret(cannon.getTurretPos() + botCorr);
+                }
             }
         }
         //end auto aim
