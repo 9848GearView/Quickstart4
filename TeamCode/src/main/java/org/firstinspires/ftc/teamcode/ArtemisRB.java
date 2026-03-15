@@ -72,6 +72,8 @@ public class ArtemisRB extends OpMode {
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+        panelsTelemetry.debug("Velocity", cannon.getLauncherVelocity());
+
         panelsTelemetry.update(telemetry);
     }
 

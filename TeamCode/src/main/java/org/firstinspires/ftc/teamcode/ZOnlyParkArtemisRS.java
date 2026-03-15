@@ -37,7 +37,7 @@ public class ZOnlyParkArtemisRS extends OpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(56, 8, Math.toRadians(180)));
+        follower.setStartingPose(new Pose(88, 8, Math.toRadians(0)));
 
         paths = new Paths(follower); // Build paths
 
@@ -85,7 +85,7 @@ public class ZOnlyParkArtemisRS extends OpMode {
             park = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(85.000, 20.000),
+                                    new Pose(88.000, 8.000),
                                     new Pose(100.000, 22.000)
                             )
                     )

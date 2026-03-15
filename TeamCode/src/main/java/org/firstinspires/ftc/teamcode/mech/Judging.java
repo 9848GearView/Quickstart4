@@ -18,10 +18,10 @@ public class Judging extends OpMode {
     private Limelight3A limelight;
     public LLResult llResult;
     public BlueLimelightAutoAim vision = null;
-    public MecanumDrive chassis = null;
+    //public MecanumDrive chassis = null;
     IntakeV2 cannon = null;
     private IMU imu;
-    private double Kp;
+    private float Kp;
 
     //GP2 booleans
     private boolean rBumperPressed;
@@ -39,7 +39,7 @@ public class Judging extends OpMode {
         cannon.setTurret(.5);
         // we want jonah to be able to move it
         //cannon.setActuatorPos(0);
-        chassis.setHalfPark(0.60);
+        //chassis.setHalfPark(0.60);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
 
@@ -49,11 +49,11 @@ public class Judging extends OpMode {
        // limelight.pipelineSwitch(0);//should be the pipeline for the april tag search you want
     }
 
-    @Override
-    public void start() { //we want limelight to engage when the button is pressed
-        limelight.start();
-
-    }
+//    @Override
+//    public void start() { //we want limelight to engage when the button is pressed
+//        limelight.start();
+//
+//    }
 
     @Override
     public void loop() {
@@ -61,6 +61,7 @@ public class Judging extends OpMode {
         //GP2 booleans
         lBumperPressed = gamepad2.left_bumper;
         rBumperPressed = gamepad2.right_bumper;
+
 
         //begin auto aim
         vision.update();
@@ -70,8 +71,8 @@ public class Judging extends OpMode {
                 telemetry.addLine("Tag not found");
         }
         if (vision.hasTarget()){
-            Kp = -0.0004;
-            double tx = llResult.getTx();
+            Kp = -0.0004f;
+            double tx = vision.getTx();
             double botCorr = (Kp * tx);
             if(Math.abs(tx) > .5) {
                 cannon.setTurret(cannon.getTurretPos() + botCorr);

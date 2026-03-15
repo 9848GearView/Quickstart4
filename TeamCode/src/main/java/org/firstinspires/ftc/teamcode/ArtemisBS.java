@@ -57,7 +57,7 @@ public class ArtemisBS extends OpMode {
         if (vision.hasTarget()){
             float Kp = -0.0004f; //proportional control constant
             //double feedForward = ((rightX + leftX)/2.0) * .005;
-            double tx = vision.getTx();
+            double tx = vision.getTx() - 0.2;
             double botCorr = (Kp * tx)/* - feedForward*/;
             if(Math.abs(tx) > .5) {
                 cannon.setTurret(cannon.getTurretPos() + botCorr);
@@ -75,6 +75,8 @@ public class ArtemisBS extends OpMode {
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+        panelsTelemetry.debug("Velocity", cannon.getLauncherVelocity());
+
         panelsTelemetry.update(telemetry);
     }
 
@@ -271,7 +273,7 @@ public class ArtemisBS extends OpMode {
             case 0:
                 timer.schedule(new LaunchAuto(), 0);
                 timer.schedule(new IntakeAuto(1), 0);
-                timer.schedule(new TransferAuto(.35), 0);
+                timer.schedule(new TransferAuto(.55), 0);
                 timer.schedule(new ActuatorAuto(1), 0);
                 follower.followPath(paths.shoot1,  true);
                 setPathState(1);
@@ -288,7 +290,7 @@ public class ArtemisBS extends OpMode {
             case 2:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.2) {
                     follower.followPath(paths.intake1, true);
-                    timer.schedule(new TransferAuto(.35), 200);
+                    timer.schedule(new TransferAuto(.55), 200);
                     pathTimer.resetTimer();
                     setPathState(22);
                 }
@@ -296,22 +298,22 @@ public class ArtemisBS extends OpMode {
             case 22:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     follower.followPath(paths.intake1Mid, true);
-                    timer.schedule(new TransferAuto(.35), 200);
+                    timer.schedule(new TransferAuto(.55), 200);
                     pathTimer.resetTimer();
                     setPathState(23);
                 }
                 break;
             case 23:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .4) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1) {
                     follower.followPath(paths.intake1End, true);
-                    timer.schedule(new TransferAuto(.35), 200);
+                    timer.schedule(new TransferAuto(.55), 200);
                     pathTimer.resetTimer();
                     setPathState(3);
                 }
                 break;
 
             case 3:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
+                if (pathTimer.getElapsedTimeSeconds() > 3 || !follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
                     follower.followPath(paths.shoot2, true);
                     timer.schedule(new TransferAuto(0), 200);
 
@@ -331,12 +333,12 @@ public class ArtemisBS extends OpMode {
             case 5:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.2) {
                     follower.followPath(paths.intake2,.85, true);
-                    timer.schedule(new TransferAuto(.35), 200);
+                    timer.schedule(new TransferAuto(.55), 200);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .2) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoot3, true);
                     timer.schedule(new TransferAuto(0), 200);
@@ -355,9 +357,9 @@ public class ArtemisBS extends OpMode {
                 }
                 break;
             case 8:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.2) {
                     follower.followPath(paths.intake3,.85, true);
-                    timer.schedule(new TransferAuto(.35), 200);
+                    timer.schedule(new TransferAuto(.55), 200);
                     pathTimer.resetTimer();
                     setPathState(9);
                 }
@@ -382,17 +384,17 @@ public class ArtemisBS extends OpMode {
                 }
                 break;
             case 82:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.2) {
                     follower.followPath(paths.humanplayer, true);
-                    timer.schedule(new TransferAuto(.35), 200);
+                    timer.schedule(new TransferAuto(.55), 200);
                     pathTimer.resetTimer();
                     setPathState(92); // 83 to do loop tech, 92 to just launch immediately
                 }
                 break;
             case 83:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
+                if (pathTimer.getElapsedTimeSeconds() > 2.5 || !follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     follower.followPath(paths.humanplayerMid, true);
-                    timer.schedule(new TransferAuto(.35), 200);
+                    timer.schedule(new TransferAuto(.55), 200);
                     pathTimer.resetTimer();
                     setPathState(822);
                 }
@@ -400,7 +402,7 @@ public class ArtemisBS extends OpMode {
             case 822:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .4) {
                     follower.followPath(paths.humanplayerEnd, true);
-                    timer.schedule(new TransferAuto(.35), 200);
+                    timer.schedule(new TransferAuto(.55), 200);
                     pathTimer.resetTimer();
                     setPathState(112);// 92 to continue to launch, 112 to park early after picking up human player
                 }
@@ -415,7 +417,7 @@ public class ArtemisBS extends OpMode {
                 }
                 break;
             case 102:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.2) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new TransferAuto(1), 200);

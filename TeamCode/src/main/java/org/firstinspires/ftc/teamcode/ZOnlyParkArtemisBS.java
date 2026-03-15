@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
 
-@Autonomous(name = "Artemis Blue Small", group = "Autonomous")
+@Autonomous(name = "Only Park Blue Small", group = "Autonomous")
 @Disabled
 @Configurable // Panels
 public class ZOnlyParkArtemisBS extends OpMode {
@@ -85,7 +85,7 @@ public class ZOnlyParkArtemisBS extends OpMode {
             park = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(59.000, 20.000),
+                                    new Pose(56.000, 8.000),
                                     new Pose(44.000, 22.000)
                             )
                     )

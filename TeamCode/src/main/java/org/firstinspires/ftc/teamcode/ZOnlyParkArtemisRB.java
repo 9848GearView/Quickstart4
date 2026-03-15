@@ -19,10 +19,10 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
 
-@Autonomous(name = "Only Park Blue Big", group = "Autonomous")
+@Autonomous(name = "Artemis Blue Small", group = "Autonomous")
 @Disabled
 @Configurable // Panels
-public class ZOnlyParkArtemisBB extends OpMode {
+public class ZOnlyParkArtemisRB extends OpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
@@ -37,7 +37,7 @@ public class ZOnlyParkArtemisBB extends OpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(20, 124, Math.toRadians(233.8)));
+        follower.setStartingPose(new Pose(124, 124, Math.toRadians(306.2)));
 
         paths = new Paths(follower); // Build paths
 
@@ -85,11 +85,11 @@ public class ZOnlyParkArtemisBB extends OpMode {
             park = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(20.000, 124),
-                                    new Pose(44.000, 78.000)
+                                    new Pose(124.000, 124.000),
+                                    new Pose(105, 78.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(233.8), Math.toRadians(270))
+                    .setLinearHeadingInterpolation(Math.toRadians(306.2), Math.toRadians(270))
                     .build();
         }
     }

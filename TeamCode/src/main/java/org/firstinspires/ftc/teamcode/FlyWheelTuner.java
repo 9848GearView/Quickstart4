@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -47,7 +48,7 @@ public class FlyWheelTuner extends OpMode {
 
 
         outtakeT.setDirection(DcMotorEx.Direction.REVERSE);
-        outtakeB.setDirection(DcMotorEx.Direction.REVERSE);
+        outtakeB.setDirection(DcMotorEx.Direction.FORWARD);
 
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);

@@ -76,7 +76,7 @@ public class IntakeV2 {
 
     private String launchStatus;
 
-    PIDFCoefficients Coeffs = new PIDFCoefficients(100, 0, 0, 1.1);
+    PIDFCoefficients Coeffs = new PIDFCoefficients(100, 0, 0, 12.5);//possible values: 100p 12.917 f good?, 15.917 little overshoot//60.917
 
 
     ElapsedTime feedTimer = new ElapsedTime();
@@ -126,13 +126,13 @@ public class IntakeV2 {
 
         intake.setDirection(DcMotorEx.Direction.REVERSE);
         outtakeT.setDirection(DcMotorEx.Direction.REVERSE);
-        outtakeB.setDirection(DcMotorEx.Direction.REVERSE);
+        outtakeB.setDirection(DcMotorEx.Direction.FORWARD);
 
         /*
          * Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to
          * slow down much faster when it is coasting
          */
-        outtakeT.setZeroPowerBehavior(FLOAT);
+        outtakeT.setZeroPowerBehavior(FLOAT); //these were float if brake makes it cry
         outtakeB.setZeroPowerBehavior(FLOAT);
 
         /*Likely the most niche concept we'll use in this example is closed-loop motor velocity control.
@@ -264,8 +264,8 @@ public class IntakeV2 {
     public void launchFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeT.setVelocity(1645);
-        outtakeB.setVelocity(1645);
+        outtakeT.setVelocity(1620);// before adjustments velocity was 1620
+        outtakeB.setVelocity(1620);//
         launchStatus = "far";
     }//closes method
 
@@ -283,8 +283,8 @@ public class IntakeV2 {
     public void launchAutoFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeT.setVelocity(1580);
-        outtakeB.setVelocity(1580);
+        outtakeT.setVelocity(1460);
+        outtakeB.setVelocity(1460);
         launchStatus = "far";
     }//closes method
 

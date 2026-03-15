@@ -225,7 +225,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
 
                 float Kp = -0.0004f; //proportional control constant
                 double feedForward = ((rightX + leftX)/2.0) * .005;
-                double tx = visionAid.getTx() +.5;
+                double tx = visionAid.getTx() -.5;
                 double botCorr = (Kp * tx) - feedForward;
                 if(Math.abs(tx) > .5) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);

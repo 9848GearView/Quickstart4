@@ -202,6 +202,20 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 //            LState = "far";
 //        }
 
+        if(gamepad2.dpad_left) {
+            //if(cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
+            cannon.setTurret(cannon.getTurretPos() + tInc);
+            //}
+        }
+        if(gamepad2.dpad_right) {
+            // if (cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
+            cannon.setTurret(cannon.getTurretPos() - tInc);
+            // }
+        }
+        if(gamepad2.dpad_up) {
+            cannon.setTurret(.5);
+        }
+
         if( bPressed && !oldBPressed) {
             tLock = !tLock; // reminder to find a way to turn this off
         }
@@ -210,7 +224,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
             if (visionAid.hasTarget()){
                 float Kp = -0.0004f; //proportional control constant
                 double feedForward = ((rightX + leftX)/2.0) * .005;
-                double tx = visionAid.getTx() + .5;
+                double tx = visionAid.getTx() - 3;
                 double botCorr = (Kp * tx) - feedForward;
 //
                 if(Math.abs(tx) > .5) {
