@@ -1,17 +1,16 @@
 package org.firstinspires.ftc.teamcode.mech;
 
 
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
 
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Timer;
 
@@ -37,7 +36,7 @@ public class IntakeV2 {
     private Servo blinky;
     private boolean shot;
 
-
+    private DistanceSensor distanceSensor;
 
     //turret
     private Servo turretL;
@@ -104,7 +103,6 @@ public class IntakeV2 {
         //outtake
         outtakeT = hwMap.get(DcMotorEx.class, "outtakeT");
         outtakeB = hwMap.get(DcMotorEx.class, "outtakeB");
-
         
         //angle
         angle = hwMap.get(Servo.class, "angle");
@@ -113,7 +111,8 @@ public class IntakeV2 {
         gate = hwMap.get(Servo.class, "gate");
         blinky = hwMap.get(Servo.class, "blinky");
 
-
+        //distance
+        distanceSensor = hwMap.get(DistanceSensor.class, "distance");
 
         //turret
         turretL = hwMap.get(Servo.class, "turretL");
@@ -330,6 +329,8 @@ public class IntakeV2 {
     }
 
     public String getLaunchStatus() {return launchStatus;}
+
+    public double getDistance() {return distanceSensor.getDistance(DistanceUnit.CM);}
 
     public boolean hasFinishedShot() {
         return launchState == LaunchState.IDLE && feederTimer.seconds() > 0.1;
