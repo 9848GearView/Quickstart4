@@ -2,7 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.limelightvision.LLResult;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -15,6 +20,8 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
+import java.util.function.Supplier;
+
 //guarantee this wont work whatsoever
 
 @TeleOp(name="States_BLUE-DecodeV2TeleOp", group="Iterative OpMode")
@@ -22,6 +29,9 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
     IntakeV2 cannon = null;
+    private Paths paths;
+    private PathChain shootPos;
+    public Follower follower;
     BlueLimelightAutoAim visionAid = null;
 
     //ColorSensor colSens = null;
@@ -70,13 +80,24 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     //booleans for y
     private boolean yPressed;
     private boolean oldYPressed;
+    private boolean oldGP1Y;
     private boolean actuatorIsDown;
 
     private double leftX;
     private double leftY;
     private double rightX;
 
+    public double shootX;
+    public double shootY;
+    public double shootH;
+    public double headingDegrees = 0;
+    public double correctionX = 0;
+    public double correctionY = 0;
+    public double correctionH = 0;
+    public boolean posLock = false;
+    public boolean needsCorrection = false;
     public double goalDistance;
+    public double goalAngle;
 
     private boolean far;
     private boolean close;
@@ -101,8 +122,14 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
 
+
+
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
+        shootX = 56;
+        shootY = 8;
+        shootH = 90;
+        paths = new Paths(follower);
 
         tLock = false;
         velMPS = 0;
@@ -111,12 +138,20 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     }
     @Override
     public void start(){
+        //shootPos = new Path(new BezierLine(new Pose(follower.getPose().getX(),follower.getPose().getY()), new Pose(shootX, shootY)));
+//        shootPos = follower.pathBuilder()
+//                .setGlobalDeceleration()
+//                .addPath(new BezierLine(new Pose(72,72), new Pose( 72,72)))
+//                .setConstantHeadingInterpolation(0)
+//                .build();
+
         camera.start();
     }
     @Override
     public void loop(){
-
+        follower.update();
         visionAid.update();
+        headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
 
         dPadUpPressed = gamepad2.dpad_up;
 
@@ -146,10 +181,6 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 
         if(cannon.getGatePosition() == .25){
             gateOn = false;
-        }
-
-        if(gamepad1.x){
-            chassis.setHalfPark(0.10);
         }
 
         //intake
@@ -190,7 +221,13 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
             follower.setY(9.186161449752879);
             follower.setHeading(180);
         }
+
+        //paths = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
+        //shootpos = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
+
         goalDistance = Math.sqrt(Math.pow(follower.getPose().getX() - 4,2) + Math.pow(140 - follower.getPose().getY(),2));
+        goalAngle = Math.atan((140 - follower.getPose().getY()) / (follower.getPose().getX() - 4)) + 90;
+
 
 //        //auto-aim
 
@@ -230,6 +267,8 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
                 if(Math.abs(tx) > .5) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);
                 }
+            } else {
+                cannon.setTurret(0);
             }
         }
         //end auto aim
@@ -274,6 +313,79 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         else {
             chassis.drive(-leftY, leftX, rightX);
         }
+        //chassis
+        if(gamepad1.x){
+            chassis.setHalfPark(0.10);
+        }
+
+        if(gamepad1.a){
+            if(!posLock) {
+                shootX = follower.getPose().getX();
+                shootY = follower.getPose().getY();
+                //shootH = headingDegrees; // sets heading to 0-360 degree range
+                shootH = (follower.getPose().getHeading() * 180 / Math.PI) % 360; // sets heading to -180-180 degree range, default for pedro pathing
+                posLock = true;
+            } else {
+                posLock = false;
+            }
+        }
+
+        if(posLock){
+            if(follower.getPose().getX() - shootX > 0.5){
+                correctionX = -0.4;
+                needsCorrection = true;
+            } else if(follower.getPose().getX() - shootX < -0.5){
+                correctionX = 0.4;
+                needsCorrection = true;
+            } else {
+                correctionX = 0;
+            }
+
+            if(follower.getPose().getY() - shootY > 0.5){
+                correctionY = -0.6;
+                needsCorrection = true;
+            } else if(follower.getPose().getY() - shootY < -0.5){
+                correctionY = 0.6;
+                needsCorrection = true;
+            } else {
+                correctionY = 0;
+            }
+
+            if(Math.abs(headingDegrees - shootH) > 0.5) {
+                if (shootH - headingDegrees < 0 && shootH - headingDegrees > -180) {
+                    correctionH = -0.4;
+                    needsCorrection = true;
+                } else if (shootH - headingDegrees > 180 || shootH - headingDegrees < -180) {
+                    correctionH = 0.4;
+                    needsCorrection = true;
+                }
+            }  else {
+                correctionH = 0;
+            }
+
+            if(needsCorrection && !gamepad1.left_bumper && !gamepad1.right_bumper && leftX == 0 && leftY == 0 && rightX == 0){
+                chassis.drive(correctionY,correctionX,/*correctionH*/ 0);
+            } else  {
+                chassis.drive(-leftY, leftX, rightX);
+            }
+            needsCorrection = false;
+        }
+
+//        if(posLock){
+//            if(!follower.isBusy() && ((Math.abs(shootX - follower.getPose().getX()) > 2) || (Math.abs(shootY - follower.getPose().getY()) > 2) || (Math.abs(headingDegrees - shootH) > 0.5))) {
+//                shootPos = follower.pathBuilder()
+//                        .setGlobalDeceleration()
+//                        .addPath(new BezierLine(new Pose(follower.getPose().getX(), follower.getPose().getY()), new Pose(shootX, shootY)))
+//                        .setConstantHeadingInterpolation(shootH)
+//                        .build();
+//                follower.followPath(shootPos, true);
+//            } else {
+//                follower.breakFollowing();
+//            }
+//        } else {
+//            follower.breakFollowing();
+//        }
+
 
 //        if (Math.abs(gamepad2.left_stick_y) > 0.1) {
 //            if (cannon.getActuatorPos() < .5) {
@@ -342,13 +454,49 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 
         telemetry.addData("X:",follower.getPose().getX());
         telemetry.addData("Y:",follower.getPose().getY());
-        telemetry.addData("Heading:",follower.getPose().getHeading());
+        telemetry.addData("Total Heading:",follower.getPose().getHeading());
+        telemetry.addData("Heading:",(follower.getPose().getHeading() * 180 / Math.PI) % 360);
+        telemetry.addData("test Heading", headingDegrees);
+        telemetry.addData("shoot X:",shootX);
+        telemetry.addData("shoot Y:",shootY);
+        telemetry.addData("shoot Heading:",shootH);
+        telemetry.addData("locked in pos:",posLock);
         telemetry.addData("goalDistance", goalDistance);
+        telemetry.addData("left joystick x:",leftX);
+        telemetry.addData("left joystick y:",leftY);
+        telemetry.addData("right joystick x", rightX);
         //telemetry.addData("Robot Location", ("Coords: " + follower.getPose().getX() + ", " + follower.getPose().getY() + ", Heading: " + follower.getPose().getHeading()));
 
         //telemetry.addData();
         telemetry.update();
-        follower.update();
+    }
+
+    public static class Paths {
+        public PathChain shootPos;
+
+        public Paths(Follower follower) {
+            shootPos = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    new Pose(56.000, 8.000),
+                                    new Pose(59.000, 20.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .build();}
+
+        public Paths(Follower follower, double startX, double startY, double startH, double endX, double endY, double endH){
+            {
+                shootPos = follower.pathBuilder()
+                        .addPath(
+                                new BezierLine(
+                                        new Pose(startX, startY),
+                                        new Pose(endX, endY)
+                                )
+                        )
+                        .setLinearHeadingInterpolation(Math.toRadians(startH), Math.toRadians(endH))
+                        .build();}
+        }
     }
 
 
