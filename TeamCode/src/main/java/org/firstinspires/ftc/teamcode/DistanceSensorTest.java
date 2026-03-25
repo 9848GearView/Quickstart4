@@ -18,7 +18,7 @@ public class DistanceSensorTest extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("Distance", thing.getDistance());
+        //telemetry.addData("Distance", thing.getDistance());
     }
 }
 
