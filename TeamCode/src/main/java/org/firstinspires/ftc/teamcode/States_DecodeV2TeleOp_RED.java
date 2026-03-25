@@ -340,11 +340,14 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
         telemetry.addData("launchTrigger", launchTrigger);
         telemetry.addData("Actuator Position", cannon.getActuatorPosition());
 
+        /*telemetry.addData("Gate Distance", cannon.getDistanceGate());
+        telemetry.addData("Intake Distance", cannon.getDistanceIntake());
+         */
+
         telemetry.addData("X:",follower.getPose().getX());
         telemetry.addData("Y:",follower.getPose().getY());
         telemetry.addData("Heading:",follower.getPose().getHeading());
         telemetry.addData("goalDistance", goalDistance);
-        //telemetry.addData("Robot Location", ("Coords: " + follower.getPose().getX() + ", " + follower.getPose().getY() + ", Heading: " + follower.getPose().getHeading()));
 
         //telemetry.addData();
         telemetry.update();

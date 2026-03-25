@@ -272,9 +272,11 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
                 float Kp = -0.0004f; //proportional control constant
                 double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx() - 3;
+                double ta = visionAid.getTa();
+                double deadband = visionAid.getDeadband();
                 double botCorr = (Kp * tx) - feedForward;
 //
-                if(Math.abs(tx) > .5) {
+                if(Math.abs(tx) > deadband) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);
                 }
             } else {
@@ -439,6 +441,8 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 //
         telemetry.addData("Tlock on", tLock);
         telemetry.addData("Tag found", visionAid.hasTarget());
+        telemetry.addData("Deadband", visionAid.getDeadband());
+        telemetry.addData("Ta", visionAid.getTa());
         telemetry.addData("Tx", visionAid.getTx());
 
         telemetry.addData("Velocity in Meters per Second", velMPS);
@@ -462,6 +466,10 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("launchTrigger", launchTrigger);
         telemetry.addData("Actuator Position", cannon.getActuatorPosition());
 
+        /*telemetry.addData("Gate Distance", cannon.getDistanceGate());
+        telemetry.addData("Intake Distance", cannon.getDistanceIntake());
+         */
+
         telemetry.addData("X:",follower.getPose().getX());
         telemetry.addData("Y:",follower.getPose().getY());
         telemetry.addData("Total Heading:",follower.getPose().getHeading());
@@ -475,7 +483,6 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("left joystick x:",leftX);
         telemetry.addData("left joystick y:",leftY);
         telemetry.addData("right joystick x", rightX);
-        //telemetry.addData("Robot Location", ("Coords: " + follower.getPose().getX() + ", " + follower.getPose().getY() + ", Heading: " + follower.getPose().getHeading()));
 
         //telemetry.addData();
         telemetry.update();

@@ -36,7 +36,9 @@ public class IntakeV2 {
     private Servo blinky;
     private boolean shot;
 
-    private DistanceSensor distanceSensor;
+    //distance sensor
+    private DistanceSensor distanceSensorGate;
+    private DistanceSensor distanceSensorIntake;
 
     //turret
     private Servo turretL;
@@ -112,7 +114,9 @@ public class IntakeV2 {
         blinky = hwMap.get(Servo.class, "blinky");
 
         //distance
-        distanceSensor = hwMap.get(DistanceSensor.class, "distance");
+        /*distanceSensorGate = hwMap.get(DistanceSensor.class, "distanceGate");
+        distanceSensorIntake = hwMap.get(DistanceSensor.class, "distanceIntake");
+         */
 
         //turret
         turretL = hwMap.get(Servo.class, "turretL");
@@ -330,7 +334,10 @@ public class IntakeV2 {
 
     public String getLaunchStatus() {return launchStatus;}
 
-    public double getDistance() {return distanceSensor.getDistance(DistanceUnit.CM);}
+    /*public double getDistanceGate() {return distanceSensorGate.getDistance(DistanceUnit.CM);}
+    public double getDistanceIntake() {return distanceSensorIntake.getDistance(DistanceUnit.CM);}
+
+     */
 
     public boolean hasFinishedShot() {
         return launchState == LaunchState.IDLE && feederTimer.seconds() > 0.1;

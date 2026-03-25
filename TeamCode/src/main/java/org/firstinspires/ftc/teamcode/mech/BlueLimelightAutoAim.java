@@ -37,7 +37,18 @@ public class BlueLimelightAutoAim {
 
         return result.getTx();
     }
-
+    public double getTa(){
+        if (result == null){
+            return 0;
+        }
+        return result.getTa();
+    }
+    public double getDeadband(){
+        if (result == null){
+            return .5;
+        }
+        return (.3 * getTa())+ .44;
+    }
     //to track distance
     public double getDistanceMeters() {
 
