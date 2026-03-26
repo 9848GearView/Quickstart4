@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import java.util.Timer;
 
 
-public class IntakeV2 {
+public class IntakeV3 {
 
     //velocity
     //private VoltageSensor batteryVoltageSensor;
@@ -44,8 +44,8 @@ public class IntakeV2 {
     private DistanceSensor distanceSensorIntake;
 
     //turret
-    private Servo turretL;
-    private Servo turretR;
+    private CRServo turretL;
+    private CRServo turretR;
     private AnalogInput encoder;
     //private RTPAxon axon;
     private double tInc = .001;
@@ -77,7 +77,7 @@ public class IntakeV2 {
 
 
     //likely change
-    final double LAUNCHER_TARGET_VELOCITY= 1600;//started at 1125//was725//Mrs.b changed to 850
+    final double LAUNCHER_TARGET_VELOCITY = 1600;//started at 1125//was725//Mrs.b changed to 850
     final double LAUNCHER_MIN_VELOCITY = 1550;//started at 1075//was 675//mrs B changed to 800
 
     private String launchStatus;
@@ -91,14 +91,14 @@ public class IntakeV2 {
     private LaunchState launchState;
 
 
-    public enum  LaunchState {
+    public enum LaunchState {
         IDLE,
         SPIN_UP,
         LAUNCH,
         LAUNCHING
     }
 
-    public IntakeV2(HardwareMap hwMap) {
+    public IntakeV3(HardwareMap hwMap) {
         launchState = LaunchState.IDLE;
 
         //batteryVoltageSensor = hwMap.voltageSensor.iterator().next();
@@ -110,10 +110,10 @@ public class IntakeV2 {
         //outtake
         outtakeT = hwMap.get(DcMotorEx.class, "outtakeT");
         outtakeB = hwMap.get(DcMotorEx.class, "outtakeB");
-        
+
         //angle
         angle = hwMap.get(Servo.class, "angle");
-        
+
         //gate
         gate = hwMap.get(Servo.class, "gate");
         blinky = hwMap.get(Servo.class, "blinky");
@@ -124,9 +124,10 @@ public class IntakeV2 {
          */
 
         //turret
-        turretL = hwMap.get(Servo.class, "turretL");
-        turretR = hwMap.get(Servo.class, "turretR");
+        turretL = hwMap.get(CRServo.class, "turretL");
+        turretR = hwMap.get(CRServo.class, "turretR");
         encoder = hwMap.get(AnalogInput.class, "encoder");
+        //axon = hwMap.get(RTPAxon.class, "something");
 
 
         shot = false;
@@ -163,11 +164,11 @@ public class IntakeV2 {
     }
 
     //intake
-    public void intake(double i){
+    public void intake(double i) {
         intake.setPower(i);
     }
 
-    public void transfer(double i){
+    public void transfer(double i) {
         transfer.setPower(-i);
     }
 
@@ -176,59 +177,55 @@ public class IntakeV2 {
         gate.setPosition(i);
     }
 
-    public double getGatePosition(){
+    public double getGatePosition() {
         return gate.getPosition();
     }
 
     //set light color
-    public void setLightColor(){
-        if (gate.getPosition() ==.25){
+    public void setLightColor() {
+        if (gate.getPosition() == .25) {
             blinky.setPosition(.500); //open, green
         }
-        if (gate.getPosition() == .38){
+        if (gate.getPosition() == .38) {
             blinky.setPosition(.28); //closed, red
         }
     }
 
     //set actuator position
-    public void setActuatorPos(double i){ angle.setPosition(i); }
+    public void setActuatorPos(double i) {
+        angle.setPosition(i);
+    }
 
     //set turret position
     public void setTurret(double i) {
-        turretL.setPosition(i);
+        /*turretL.setPosition(i);
         turretR.setPosition(i);
-    }
 
-    public void setLeftTurret(double i){
-        turretL.setPosition(i);
-    }
-
-    public void setRightTurret(double i){
-        turretR.setPosition(i);
+         */
     }
 
     //limelight scanning
-    public void scanTurret(){
+    public void scanTurret() {
         //update if I've reached right or left limit
         leftLimReached = getTurretPos() > leftLim;
         rightLimReached = getTurretPos() < rightLim;
 
         //scan right (towards 0.35 right limit)
-        if(movingRight){
-            if(rightLimReached){
+        if (movingRight) {
+            if (rightLimReached) {
                 setTurret(getTurretPos() + tInc);
                 movingRight = false;
-            }else {
+            } else {
                 setTurret(getTurretPos() - tInc);
                 movingRight = true;
             }
         }
-            //scan left (towards 0.65 right limit)
-        if(!movingRight){
-            if(leftLimReached){
+        //scan left (towards 0.65 right limit)
+        if (!movingRight) {
+            if (leftLimReached) {
                 setTurret(getTurretPos() - tInc);
                 movingRight = true;
-            }else{
+            } else {
                 setTurret(getTurretPos() + tInc);
                 movingRight = false;
             }
@@ -236,7 +233,7 @@ public class IntakeV2 {
     }
 
     //stop launch motors
-    public void stopLaunch(){
+    public void stopLaunch() {
         launchState = LaunchState.IDLE;
         outtakeT.setVelocity(0);
         outtakeB.setVelocity(0);
@@ -298,15 +295,21 @@ public class IntakeV2 {
         launchStatus = "far";
     }//closes method
 
-    public void setVelocity(double p){
+    //GET AND SET METHODS
+    public void setVelocity(double p) {
         outtakeT.setVelocity(p);
         outtakeB.setVelocity(p);
     }
-    //GET AND SET METHODS
+
+    /*public void setMaxPowerAxon(double p) {
+        axon.setMaxPower(p);
+    }
+     */
 
     //get turret position
-    public double getTurretPos(){
-        return turretL.getPosition();
+    public double getTurretPos() {
+        //return turretL.getPosition();
+        return 0;
     }
 
     //checks if the turret has reached the rightmost limit

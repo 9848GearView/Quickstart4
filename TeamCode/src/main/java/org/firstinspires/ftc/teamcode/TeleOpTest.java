@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
-import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -24,11 +24,11 @@ import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
 
-@TeleOp(name="States_BLUE-DecodeV2TeleOp", group="Iterative OpMode")
-public class States_DecodeV2TeleOp_BLUE extends OpMode {
+@TeleOp(name="funny test yayyy", group="Iterative OpMode")
+public class TeleOpTest extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
-    IntakeV2 cannon = null;
+    IntakeV3 cannon = null;
     private Paths paths;
     private PathChain shootPos;
     public Follower follower;
@@ -114,7 +114,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     @Override
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
-        cannon = new IntakeV2(hardwareMap);
+        cannon = new IntakeV3(hardwareMap);
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
 
@@ -125,8 +125,6 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         cannon.setLightColor();
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
-
-
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
@@ -155,6 +153,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     public void loop(){
         follower.update();
         visionAid.update();
+        //axon.update();
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
 
         dPadUpPressed = gamepad2.dpad_up;
@@ -167,7 +166,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 
         aPressed = gamepad2.a;
         bPressed = gamepad2.b;
-        
+
         xPressed = gamepad2.x;
 
         lBumperPressed = gamepad2.left_bumper;
@@ -269,7 +268,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         visionAid.update();
         if (tLock) {
             if (visionAid.hasTarget()){
-                float Kp = -0.000405f; //proportional control constant
+                float Kp = -0.0004f; //proportional control constant
                 double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx() - 3;
                 double ta = visionAid.getTa();
@@ -279,6 +278,8 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
                 if(Math.abs(tx) > deadband) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);
                 }
+            } else {
+                cannon.setTurret(0);
             }
         }
         //end auto aim
@@ -402,7 +403,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 //                cannon.setActuatorPos(cannon.getActuatorPos() + 0.05);
 //            }
 //        }
-            //cannon.setActuatorPos(0.25);
+        //cannon.setActuatorPos(0.25);
 
 
 //        if (Math.abs(gamepad2.right_stick_y) > 0.1){
@@ -446,7 +447,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("Velocity in Meters per Second", velMPS);
 
 
-        
+
         telemetry.addData("Turret Position", cannon.getTurretPos());
 
         telemetry.addLine();
