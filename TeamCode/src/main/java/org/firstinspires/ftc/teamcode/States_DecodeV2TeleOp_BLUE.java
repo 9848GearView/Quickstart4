@@ -6,6 +6,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
+
 import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
@@ -30,7 +32,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     MecanumDrive chassis = null;
     IntakeV2 cannon = null;
     private Paths paths;
-    private PathChain shootPos;
+    private Supplier<PathChain> shootPos;
     public Follower follower;
     BlueLimelightAutoAim visionAid = null;
 
@@ -95,6 +97,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     public double correctionY = 0;
     public double correctionH = 0;
     public boolean posLock = false;
+    public boolean automatedDrive = false;
     public boolean needsCorrection = false;
     public double goalDistance;
     public double goalAngle;
@@ -130,10 +133,15 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
+        follower.update();
         shootX = 56;
         shootY = 8;
         shootH = 90;
         paths = new Paths(follower);
+        shootPos = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(shootX, shootY))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(shootH), 0.8))
+                .build();
 
         tLock = false;
         velMPS = 0;
@@ -340,46 +348,58 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
             }
         }
 
-        if(posLock){
-            if(follower.getPose().getX() - shootX > 0.5){
-                correctionX = -0.4;
-                needsCorrection = true;
-            } else if(follower.getPose().getX() - shootX < -0.5){
-                correctionX = 0.4;
-                needsCorrection = true;
-            } else {
-                correctionX = 0;
-            }
-
-            if(follower.getPose().getY() - shootY > 0.5){
-                correctionY = -0.6;
-                needsCorrection = true;
-            } else if(follower.getPose().getY() - shootY < -0.5){
-                correctionY = 0.6;
-                needsCorrection = true;
-            } else {
-                correctionY = 0;
-            }
-
-            if(Math.abs(headingDegrees - shootH) > 0.5) {
-                if (shootH - headingDegrees < 0 && shootH - headingDegrees > -180) {
-                    correctionH = -0.4;
-                    needsCorrection = true;
-                } else if (shootH - headingDegrees > 180 || shootH - headingDegrees < -180) {
-                    correctionH = 0.4;
-                    needsCorrection = true;
-                }
-            }  else {
-                correctionH = 0;
-            }
-
-            if(needsCorrection && !gamepad1.left_bumper && !gamepad1.right_bumper && leftX == 0 && leftY == 0 && rightX == 0){
-                chassis.drive(correctionY,correctionX,/*correctionH*/ 0);
-            } else  {
-                chassis.drive(-leftY, leftX, rightX);
-            }
-            needsCorrection = false;
+        if(posLock && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
+            follower.followPath(shootPos.get());
+            automatedDrive = true;
         }
+
+        if(!posLock && !follower.isBusy()){
+            follower.breakFollowing();
+            follower.update();
+            automatedDrive = false;
+        }
+        if(follower.isBusy())automatedDrive = false;
+
+//        if(posLock){
+//            if(follower.getPose().getX() - shootX > 0.5){
+//                correctionX = -0.4;
+//                needsCorrection = true;
+//            } else if(follower.getPose().getX() - shootX < -0.5){
+//                correctionX = 0.4;
+//                needsCorrection = true;
+//            } else {
+//                correctionX = 0;
+//            }
+//
+//            if(follower.getPose().getY() - shootY > 0.5){
+//                correctionY = -0.6;
+//                needsCorrection = true;
+//            } else if(follower.getPose().getY() - shootY < -0.5){
+//                correctionY = 0.6;
+//                needsCorrection = true;
+//            } else {
+//                correctionY = 0;
+//            }
+//
+//            if(Math.abs(headingDegrees - shootH) > 0.5) {
+//                if (shootH - headingDegrees < 0 && shootH - headingDegrees > -180) {
+//                    correctionH = -0.4;
+//                    needsCorrection = true;
+//                } else if (shootH - headingDegrees > 180 || shootH - headingDegrees < -180) {
+//                    correctionH = 0.4;
+//                    needsCorrection = true;
+//                }
+//            }  else {
+//                correctionH = 0;
+//            }
+//
+//            if(needsCorrection && !gamepad1.left_bumper && !gamepad1.right_bumper && leftX == 0 && leftY == 0 && rightX == 0){
+//                chassis.drive(correctionY,correctionX,/*correctionH*/ 0);
+//            } else  {
+//                chassis.drive(-leftY, leftX, rightX);
+//            }
+//            needsCorrection = false;
+//        }
 
 //        if(posLock){
 //            if(!follower.isBusy() && ((Math.abs(shootX - follower.getPose().getX()) > 2) || (Math.abs(shootY - follower.getPose().getY()) > 2) || (Math.abs(headingDegrees - shootH) > 0.5))) {

@@ -104,5 +104,8 @@ public class testPedroOpmode extends OpMode {
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
         telemetryM.debug("automatedDrive", automatedDrive);
+        telemetry.addData("position", follower.getPose());
+        telemetry.addData("velocity", follower.getVelocity());
+        telemetry.addData("automatedDrive", automatedDrive);
     }
 }
