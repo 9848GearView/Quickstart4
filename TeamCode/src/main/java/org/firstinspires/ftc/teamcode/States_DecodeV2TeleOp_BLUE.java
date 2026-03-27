@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
+import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
@@ -35,6 +36,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     private Supplier<PathChain> shootPos;
     public Follower follower;
     BlueLimelightAutoAim visionAid = null;
+    RTPAxon axon = null;
 
     //ColorSensor colSens = null;
 

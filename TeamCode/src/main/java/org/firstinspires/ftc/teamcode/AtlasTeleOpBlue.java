@@ -6,6 +6,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -13,28 +14,33 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
-import org.firstinspires.ftc.teamcode.mech.IntakeV3;
+import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
+
 import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
 
-@TeleOp(name="funny test yayyy", group="Iterative OpMode")
-public class TeleOpTest extends OpMode {
+@TeleOp(name="Atlas yay", group="Iterative OpMode")
+public class AtlasTeleOpBlue extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
-    IntakeV3 cannon = null;
+    IntakeV2 cannon = null;
     private Paths paths;
-    private PathChain shootPos;
+    private Supplier<PathChain> shootPos;
     public Follower follower;
     BlueLimelightAutoAim visionAid = null;
     RTPAxon axon = null;
+
+
     //ColorSensor colSens = null;
 
 
@@ -96,6 +102,7 @@ public class TeleOpTest extends OpMode {
     public double correctionY = 0;
     public double correctionH = 0;
     public boolean posLock = false;
+    public boolean automatedDrive = false;
     public boolean needsCorrection = false;
     public double goalDistance;
     public double goalAngle;
@@ -115,7 +122,7 @@ public class TeleOpTest extends OpMode {
     @Override
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
-        cannon = new IntakeV3(hardwareMap);
+        cannon = new IntakeV2(hardwareMap);
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
 
@@ -127,12 +134,23 @@ public class TeleOpTest extends OpMode {
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
 
+        CRServo servo = hardwareMap.get(CRServo.class, "servo");
+        AnalogInput encoder = hardwareMap.get(AnalogInput.class, "encoder");
+        axon = new RTPAxon(servo, encoder);
+        axon.setMaxPower(0.5);  // Limit max power to 50%
+        axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // Set PID coefficients
+
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
+        follower.update();
         shootX = 56;
         shootY = 8;
         shootH = 90;
         paths = new Paths(follower);
+        shootPos = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(shootX, shootY))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(shootH), 0.8))
+                .build();
 
         tLock = false;
         velMPS = 0;
@@ -154,7 +172,6 @@ public class TeleOpTest extends OpMode {
     public void loop(){
         follower.update();
         visionAid.update();
-        //axon.update();
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
 
         dPadUpPressed = gamepad2.dpad_up;
@@ -269,7 +286,7 @@ public class TeleOpTest extends OpMode {
         visionAid.update();
         if (tLock) {
             if (visionAid.hasTarget()){
-                float Kp = -0.0004f; //proportional control constant
+                float Kp = -0.000405f; //proportional control constant
                 double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx() - 3;
                 double ta = visionAid.getTa();
@@ -279,8 +296,6 @@ public class TeleOpTest extends OpMode {
                 if(Math.abs(tx) > deadband) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);
                 }
-            } else {
-                cannon.setTurret(0);
             }
         }
         //end auto aim
@@ -342,46 +357,58 @@ public class TeleOpTest extends OpMode {
             }
         }
 
-        if(posLock){
-            if(follower.getPose().getX() - shootX > 0.5){
-                correctionX = -0.4;
-                needsCorrection = true;
-            } else if(follower.getPose().getX() - shootX < -0.5){
-                correctionX = 0.4;
-                needsCorrection = true;
-            } else {
-                correctionX = 0;
-            }
-
-            if(follower.getPose().getY() - shootY > 0.5){
-                correctionY = -0.6;
-                needsCorrection = true;
-            } else if(follower.getPose().getY() - shootY < -0.5){
-                correctionY = 0.6;
-                needsCorrection = true;
-            } else {
-                correctionY = 0;
-            }
-
-            if(Math.abs(headingDegrees - shootH) > 0.5) {
-                if (shootH - headingDegrees < 0 && shootH - headingDegrees > -180) {
-                    correctionH = -0.4;
-                    needsCorrection = true;
-                } else if (shootH - headingDegrees > 180 || shootH - headingDegrees < -180) {
-                    correctionH = 0.4;
-                    needsCorrection = true;
-                }
-            }  else {
-                correctionH = 0;
-            }
-
-            if(needsCorrection && !gamepad1.left_bumper && !gamepad1.right_bumper && leftX == 0 && leftY == 0 && rightX == 0){
-                chassis.drive(correctionY,correctionX,/*correctionH*/ 0);
-            } else  {
-                chassis.drive(-leftY, leftX, rightX);
-            }
-            needsCorrection = false;
+        if(posLock && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
+            follower.followPath(shootPos.get());
+            automatedDrive = true;
         }
+
+        if(!posLock && !follower.isBusy()){
+            follower.breakFollowing();
+            follower.update();
+            automatedDrive = false;
+        }
+        if(follower.isBusy())automatedDrive = false;
+
+//        if(posLock){
+//            if(follower.getPose().getX() - shootX > 0.5){
+//                correctionX = -0.4;
+//                needsCorrection = true;
+//            } else if(follower.getPose().getX() - shootX < -0.5){
+//                correctionX = 0.4;
+//                needsCorrection = true;
+//            } else {
+//                correctionX = 0;
+//            }
+//
+//            if(follower.getPose().getY() - shootY > 0.5){
+//                correctionY = -0.6;
+//                needsCorrection = true;
+//            } else if(follower.getPose().getY() - shootY < -0.5){
+//                correctionY = 0.6;
+//                needsCorrection = true;
+//            } else {
+//                correctionY = 0;
+//            }
+//
+//            if(Math.abs(headingDegrees - shootH) > 0.5) {
+//                if (shootH - headingDegrees < 0 && shootH - headingDegrees > -180) {
+//                    correctionH = -0.4;
+//                    needsCorrection = true;
+//                } else if (shootH - headingDegrees > 180 || shootH - headingDegrees < -180) {
+//                    correctionH = 0.4;
+//                    needsCorrection = true;
+//                }
+//            }  else {
+//                correctionH = 0;
+//            }
+//
+//            if(needsCorrection && !gamepad1.left_bumper && !gamepad1.right_bumper && leftX == 0 && leftY == 0 && rightX == 0){
+//                chassis.drive(correctionY,correctionX,/*correctionH*/ 0);
+//            } else  {
+//                chassis.drive(-leftY, leftX, rightX);
+//            }
+//            needsCorrection = false;
+//        }
 
 //        if(posLock){
 //            if(!follower.isBusy() && ((Math.abs(shootX - follower.getPose().getX()) > 2) || (Math.abs(shootY - follower.getPose().getY()) > 2) || (Math.abs(headingDegrees - shootH) > 0.5))) {

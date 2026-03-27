@@ -47,7 +47,7 @@ public class IntakeV2 implements Subsystem{
     //turret
     private Servo turretL;
     private Servo turretR;
-    private AnalogInput encoder;
+    //private AnalogInput encoder;
     //private RTPAxon axon;
     private double tInc = .001;
     private double leftLim = .65;
@@ -127,7 +127,7 @@ public class IntakeV2 implements Subsystem{
         //turret
         turretL = hwMap.get(Servo.class, "turretL");
         turretR = hwMap.get(Servo.class, "turretR");
-        encoder = hwMap.get(AnalogInput.class, "encoder");
+        //encoder = hwMap.get(AnalogInput.class, "encoder");
 
 
         shot = false;

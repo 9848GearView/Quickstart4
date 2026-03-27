@@ -46,8 +46,6 @@ public class IntakeV3 {
     //turret
     private CRServo turretL;
     private CRServo turretR;
-    private AnalogInput encoder;
-    //private RTPAxon axon;
     private double tInc = .001;
     private double leftLim = .65;
     private boolean leftLimReached = false;
@@ -126,7 +124,6 @@ public class IntakeV3 {
         //turret
         turretL = hwMap.get(CRServo.class, "turretL");
         turretR = hwMap.get(CRServo.class, "turretR");
-        encoder = hwMap.get(AnalogInput.class, "encoder");
         //axon = hwMap.get(RTPAxon.class, "something");
 
 
