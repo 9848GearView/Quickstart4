@@ -103,6 +103,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     public boolean needsCorrection = false;
     public double goalDistance;
     public double goalAngle;
+    public double turretAngle = 0;
     public double launchAngleL = 60;
     public double launchAngleS = 45;
 
@@ -134,7 +135,8 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
+        //follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
+        follower.setStartingPose(new Pose(56, 8, Math.toRadians(180)));
         follower.update();
         shootX = 56;
         shootY = 8;
@@ -240,13 +242,30 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         //shootpos = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
 
         goalDistance = Math.sqrt(Math.pow(follower.getPose().getX() - 4,2) + Math.pow(140 - follower.getPose().getY(),2));
-        goalAngle = Math.atan((140 - follower.getPose().getY()) / (follower.getPose().getX() - 4)) + 90;
+        goalAngle = Math.atan((follower.getPose().getX() - 4 ) / (140 - follower.getPose().getY()));
+
+        if(follower.getPose().getHeading() - goalAngle < 0){
+            turretAngle = Math.abs(follower.getPose().getHeading() - goalAngle);
+        } else if (follower.getPose().getHeading() - goalAngle > 0 && follower.getPose().getHeading() - goalAngle <= 180){
+            turretAngle = follower.getPose().getHeading() - goalAngle;
+        } else if(follower.getPose().getHeading() - goalAngle > 180){
+            turretAngle = (360 - follower.getPose().getHeading()) + goalAngle;
+        } else {
+            turretAngle = 0;
+        }
+        if(turretAngle <= -90) cannon.setTurret(1);
+        else if (turretAngle >= 90) cannon.setTurret(0);
+        else if (turretAngle > 0 && turretAngle < 90){
+            cannon.setTurret(0); // wrong right now
+        }
+
         launchAngleL = Math.max(Math.atan((Math.pow(velMPS,2) + Math.sqrt(Math.pow(velMPS,4) - (GRAVITY*(GRAVITY*Math.pow(goalDistance,2) + 2*Math.pow(velMPS,2)*.7)))) / GRAVITY*goalDistance ),
                 Math.atan((Math.pow(velMPS,2) - Math.sqrt(Math.pow(velMPS,4) - (GRAVITY*(GRAVITY*Math.pow(goalDistance,2) + 2*Math.pow(velMPS,2)*.7)))) / GRAVITY*goalDistance
                 ));
         launchAngleS = Math.min(Math.atan((Math.pow(velMPS,2) + Math.sqrt(Math.pow(velMPS,4) - (GRAVITY*(GRAVITY*Math.pow(goalDistance,2) + 2*Math.pow(velMPS,2)*.7)))) / GRAVITY*goalDistance ),
                 Math.atan((Math.pow(velMPS,2) - Math.sqrt(Math.pow(velMPS,4) - (GRAVITY*(GRAVITY*Math.pow(goalDistance,2) + 2*Math.pow(velMPS,2)*.7)))) / GRAVITY*goalDistance
                 ));
+
 
 
 //        //auto-aim
@@ -350,12 +369,12 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
             }
         }
 
-        if(posLock && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
+        if(posLock && !follower.isBusy() && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
             follower.followPath(shootPos.get());
             automatedDrive = true;
         }
 
-        if(!posLock && !follower.isBusy()){
+        if(!posLock && follower.isBusy()){
             follower.breakFollowing();
             follower.update();
             automatedDrive = false;
