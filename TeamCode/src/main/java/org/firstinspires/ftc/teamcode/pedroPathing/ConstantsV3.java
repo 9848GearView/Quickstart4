@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class Constants {
+public class ConstantsV3 {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(12.4)
             .forwardZeroPowerAcceleration(-32.5)
