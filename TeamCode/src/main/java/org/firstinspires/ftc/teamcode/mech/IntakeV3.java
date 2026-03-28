@@ -36,7 +36,6 @@ public class IntakeV3 {
     //gate
     private Servo gate;
     private Servo blinky;
-    private boolean shot;
 
     //distance sensor
     private DistanceSensor distanceSensorGate;
@@ -45,6 +44,8 @@ public class IntakeV3 {
     //turret
     private CRServo turretL;
     private CRServo turretR;
+    private AnalogInput encoder;
+    private RTPAxon axon;
     private double tInc = .001;
     private double leftLim = .65;
     private boolean leftLimReached = false;
@@ -121,10 +122,11 @@ public class IntakeV3 {
         //turret
         turretL = hwMap.get(CRServo.class, "turretL");
         turretR = hwMap.get(CRServo.class, "turretR");
-        //axon = hwMap.get(RTPAxon.class, "something");
+        encoder = hwMap.get(AnalogInput.class, "encoder");
 
-
-        shot = false;
+        axon = new RTPAxon(turretL, turretR, encoder);
+        axon.setMaxPower(.7);
+        axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // change
 
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);

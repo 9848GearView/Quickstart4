@@ -64,6 +64,16 @@ public class RTPAxon {
         initialize();
     }
 
+    public RTPAxon(CRServo servo1, CRServo servo2, AnalogInput encoder) {
+        rtp = true;
+        this.turretL = servo1;
+        this.turretR = servo2;
+        servoEncoder = encoder;
+        direction = Direction.FORWARD;
+        initialize();
+    }
+
+
     // Constructor with explicit direction
     public RTPAxon(CRServo servo, AnalogInput encoder, Direction direction) {
         this(servo, encoder);

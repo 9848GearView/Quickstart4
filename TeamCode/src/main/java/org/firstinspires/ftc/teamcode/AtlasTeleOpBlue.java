@@ -34,11 +34,11 @@ public class AtlasTeleOpBlue extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
     IntakeV2 cannon = null;
+    RTPAxon axon = null;
     private Paths paths;
     private Supplier<PathChain> shootPos;
     public Follower follower;
     BlueLimelightAutoAim visionAid = null;
-    RTPAxon axon = null;
 
 
     //ColorSensor colSens = null;
@@ -123,6 +123,7 @@ public class AtlasTeleOpBlue extends OpMode {
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV2(hardwareMap);
+        axon.update(); // Must be called every loop
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
 
@@ -133,12 +134,6 @@ public class AtlasTeleOpBlue extends OpMode {
         cannon.setLightColor();
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
-
-        CRServo servo = hardwareMap.get(CRServo.class, "servo");
-        AnalogInput encoder = hardwareMap.get(AnalogInput.class, "encoder");
-        axon = new RTPAxon(servo, encoder);
-        axon.setMaxPower(0.5);  // Limit max power to 50%
-        axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // Set PID coefficients
 
         follower = ConstantsV3.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
@@ -172,6 +167,7 @@ public class AtlasTeleOpBlue extends OpMode {
     public void loop(){
         follower.update();
         visionAid.update();
+        axon.update();
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
 
         dPadUpPressed = gamepad2.dpad_up;
