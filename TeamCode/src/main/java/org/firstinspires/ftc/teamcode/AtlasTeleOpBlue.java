@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
 
 
 import java.util.function.Supplier;
@@ -140,7 +140,7 @@ public class AtlasTeleOpBlue extends OpMode {
         axon.setMaxPower(0.5);  // Limit max power to 50%
         axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // Set PID coefficients
 
-        follower = Constants.createFollower(hardwareMap);
+        follower = ConstantsV3.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
         follower.update();
         shootX = 56;

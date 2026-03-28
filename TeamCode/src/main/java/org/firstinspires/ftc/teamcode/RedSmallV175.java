@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV175;
 import java.util.TimerTask;
 import org.firstinspires.ftc.teamcode.mech.IntakeV175;
 
@@ -35,7 +35,7 @@ public class RedSmallV175 extends OpMode {
     public void init() {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
-        follower = Constants.createFollower(hardwareMap);
+        follower = ConstantsV175.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(90, 8, Math.toRadians(90)));
 
         follower.setMaxPowerScaling(.6);

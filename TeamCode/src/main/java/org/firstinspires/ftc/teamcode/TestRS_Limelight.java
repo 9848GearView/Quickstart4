@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
 
 import java.util.TimerTask;
 
@@ -38,7 +38,7 @@ public class TestRS_Limelight extends OpMode {
     public void init() {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
-        follower = Constants.createFollower(hardwareMap);
+        follower = ConstantsV3.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(88, 8, Math.toRadians(90)));
 
         paths = new Paths(follower); // Build paths
