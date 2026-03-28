@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
 
 
 import java.util.function.Supplier;
@@ -134,7 +134,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 
 
 
-        follower = Constants.createFollower(hardwareMap);
+        follower = ConstantsV2.createFollower(hardwareMap);
         //follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
         follower.setStartingPose(new Pose(56, 8, Math.toRadians(180)));
         follower.update();

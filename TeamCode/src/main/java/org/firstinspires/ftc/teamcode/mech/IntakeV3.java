@@ -25,7 +25,6 @@ public class IntakeV3 {
 
     // intake
     private DcMotorEx intake;
-    private DcMotorEx transfer;
 
     //outtake
     private DcMotorEx outtakeT;
@@ -103,7 +102,6 @@ public class IntakeV3 {
 
         //intake
         intake = hwMap.get(DcMotorEx.class, "intake");
-        transfer = hwMap.get(DcMotorEx.class, "transfer");
 
         //outtake
         outtakeT = hwMap.get(DcMotorEx.class, "outtakeT");
@@ -117,9 +115,8 @@ public class IntakeV3 {
         blinky = hwMap.get(Servo.class, "blinky");
 
         //distance
-        /*distanceSensorGate = hwMap.get(DistanceSensor.class, "distanceGate");
+        distanceSensorGate = hwMap.get(DistanceSensor.class, "distanceGate");
         distanceSensorIntake = hwMap.get(DistanceSensor.class, "distanceIntake");
-         */
 
         //turret
         turretL = hwMap.get(CRServo.class, "turretL");
@@ -163,10 +160,6 @@ public class IntakeV3 {
     //intake
     public void intake(double i) {
         intake.setPower(i);
-    }
-
-    public void transfer(double i) {
-        transfer.setPower(-i);
     }
 
     //set gate position
@@ -341,10 +334,8 @@ public class IntakeV3 {
 
     public String getLaunchStatus() {return launchStatus;}
 
-    /*public double getDistanceGate() {return distanceSensorGate.getDistance(DistanceUnit.CM);}
+    public double getDistanceGate() {return distanceSensorGate.getDistance(DistanceUnit.CM);}
     public double getDistanceIntake() {return distanceSensorIntake.getDistance(DistanceUnit.CM);}
-
-     */
 
     public boolean hasFinishedShot() {
         return launchState == LaunchState.IDLE && feederTimer.seconds() > 0.1;

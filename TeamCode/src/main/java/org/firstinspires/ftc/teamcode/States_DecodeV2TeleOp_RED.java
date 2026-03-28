@@ -74,7 +74,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
 
     private double leftX;
     private double leftY;
-    private double rightX;
+    private double ConstantsV2X;
 
     public double goalDistance;
 
@@ -137,7 +137,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
 
         leftX = gamepad1.left_stick_x;
         leftY = gamepad1.left_stick_y;
-        rightX = gamepad1.right_stick_x;
+        ConstantsV2X = gamepad1.right_stick_x;
         tInc = 0.01;
 
         if(cannon.getGatePosition() == .38){
@@ -224,7 +224,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
             if (visionAid.hasTarget()){
 
                 float Kp = -0.0004f; //proportional control constant
-                double feedForward = ((rightX + leftX)/2.0) * .005;
+                double feedForward = ((ConstantsV2X + leftX)/2.0) * .005;
                 double tx = visionAid.getTx() -.5;
                 double botCorr = (Kp * tx) - feedForward;
                 if(Math.abs(tx) > .5) {
@@ -272,7 +272,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
             chassis.slowTurn(-0.1);
         }
         else {
-            chassis.drive(-leftY, leftX, rightX);
+            chassis.drive(-leftY, leftX, ConstantsV2X);
         }
 
 //        if (Math.abs(gamepad2.left_stick_y) > 0.1) {
@@ -283,7 +283,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
             //cannon.setActuatorPos(0.25);
 
 
-//        if (Math.abs(gamepad2.right_stick_y) > 0.1){
+//        if (Math.abs(gamepad2.ConstantsV2_stick_y) > 0.1){
 //            if (cannon.getActuatorPos() < .25) {
 //                cannon.setActuatorPos(cannon.getActuatorPos() - 0.05);
 //            }
@@ -311,7 +311,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
 
         //chassis.setLightColor();
 
-        //cannon.launchSmarter(gamepad2.right_bumper);
+        //cannon.launchSmarter(gamepad2.ConstantsV2_bumper);
 
         //colSens.getDetectedColor(telemetry);
 //
