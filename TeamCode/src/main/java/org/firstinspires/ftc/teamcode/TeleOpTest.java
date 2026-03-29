@@ -15,11 +15,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
-import org.firstinspires.ftc.teamcode.mech.IntakeV3;
+import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
 
 import java.util.function.Supplier;
 
@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 public class TeleOpTest extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
-    IntakeV3 cannon = null;
+    IntakeV2 cannon = null;
     private Paths paths;
     private PathChain shootPos;
     public Follower follower;
@@ -115,7 +115,7 @@ public class TeleOpTest extends OpMode {
     @Override
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
-        cannon = new IntakeV3(hardwareMap);
+        cannon = new IntakeV2(hardwareMap);
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
 
@@ -127,7 +127,7 @@ public class TeleOpTest extends OpMode {
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
 
-        follower = Constants.createFollower(hardwareMap);
+        follower = ConstantsV2.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
         shootX = 56;
         shootY = 8;

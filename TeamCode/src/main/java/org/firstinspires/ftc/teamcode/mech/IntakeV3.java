@@ -109,7 +109,7 @@ public class IntakeV3 {
         outtakeB = hwMap.get(DcMotorEx.class, "outtakeB");
 
         //angle
-        angle = hwMap.get(Servo.class, "angle");
+        angle = hwMap.get(Servo.class, "actuator");
 
         //gate
         gate = hwMap.get(Servo.class, "gate");
@@ -125,7 +125,7 @@ public class IntakeV3 {
         encoder = hwMap.get(AnalogInput.class, "encoder");
 
         axon = new RTPAxon(turretL, turretR, encoder);
-        axon.setMaxPower(.7);
+        axon.setMaxPower(.5);
         axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // change
 
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);

@@ -485,14 +485,19 @@ public class AtlasTeleOpBlue extends OpMode {
         telemetry.addData("Launcher Velocity", cannon.getLauncherVelocity());
         telemetry.addData("Launch Status", cannon.getLaunchStatus());
 
-
         telemetry.addData("launchTrigger", launchTrigger);
         telemetry.addData("Actuator Position", cannon.getActuatorPosition());
+
+        telemetry.addLine();
+        telemetry.addData("Servo Position", axon.getCurrentAngle());
+        telemetry.addData("Total Rotation", axon.getTotalRotation());
+        telemetry.addData("Target Rotation", axon.getTargetRotation());
+
 
         /*telemetry.addData("Gate Distance", cannon.getDistanceGate());
         telemetry.addData("Intake Distance", cannon.getDistanceIntake());
          */
-
+        telemetry.addLine();
         telemetry.addData("X:",follower.getPose().getX());
         telemetry.addData("Y:",follower.getPose().getY());
         telemetry.addData("Total Heading:",follower.getPose().getHeading());
