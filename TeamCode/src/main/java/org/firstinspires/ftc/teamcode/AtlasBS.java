@@ -315,7 +315,7 @@ public class AtlasBS extends OpMode {
 //                break;
 
             case 3:
-                if (pathTimer.getElapsedTimeSeconds() > 3 || !follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
+                if (pathTimer.getElapsedTimeSeconds() > 3 || (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1)) {
                     follower.followPath(paths.shoot2, true);
                     timer.schedule(new TransferAuto(0), 200);
 
