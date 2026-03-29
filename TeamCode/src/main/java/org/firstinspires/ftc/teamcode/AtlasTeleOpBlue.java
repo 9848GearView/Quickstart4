@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
-import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 public class AtlasTeleOpBlue extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
-    IntakeV2 cannon = null;
+    IntakeV3 cannon = null;
     RTPAxon axon = null;
     private Paths paths;
     private Supplier<PathChain> shootPos;
@@ -122,7 +122,7 @@ public class AtlasTeleOpBlue extends OpMode {
     @Override
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
-        cannon = new IntakeV2(hardwareMap);
+        cannon = new IntakeV3(hardwareMap);
         axon.update(); // Must be called every loop
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
@@ -205,14 +205,8 @@ public class AtlasTeleOpBlue extends OpMode {
             intakeOn = !intakeOn;
             if(intakeOn){
                 cannon.intake(0);
-                cannon.transfer(0);
             }else {
                 cannon.intake(1);
-                if(gateOn){
-                    cannon.transfer(0.5);
-                } else{
-                    cannon.transfer(1);
-                }
             }
         }
 

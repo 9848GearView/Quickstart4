@@ -12,13 +12,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 //import org.firstinspires.ftc.teamcode.subsystems.RTPAxon;
+import com.arcrobotics.ftclib.command.Subsystem;
+
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Timer;
 
 
-public class IntakeV3 {
+public class IntakeV3 implements Subsystem{
 
     //velocity
     //private VoltageSensor batteryVoltageSensor;
@@ -40,6 +42,9 @@ public class IntakeV3 {
     //distance sensor
     private DistanceSensor distanceSensorGate;
     private DistanceSensor distanceSensorIntake;
+
+    //tiltpark
+    private DcMotorEx tilt;
 
     //turret
     private CRServo turretL;
@@ -115,9 +120,12 @@ public class IntakeV3 {
         gate = hwMap.get(Servo.class, "gate");
         blinky = hwMap.get(Servo.class, "blinky");
 
-        //distance
+        //distance sensor
         distanceSensorGate = hwMap.get(DistanceSensor.class, "distanceGate");
         distanceSensorIntake = hwMap.get(DistanceSensor.class, "distanceIntake");
+
+        //tilt
+        tilt = hwMap.get(DcMotorEx.class, "tilt");
 
         //turret
         turretL = hwMap.get(CRServo.class, "turretL");
