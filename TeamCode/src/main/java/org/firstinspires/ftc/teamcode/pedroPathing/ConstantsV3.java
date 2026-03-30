@@ -26,9 +26,9 @@ public class ConstantsV3 {
             .useSecondaryTranslationalPIDF(true)
             .useSecondaryHeadingPIDF(true)
             .useSecondaryDrivePIDF(true)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0.03))
-            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.15,0,0.02,0.015))
-            .headingPIDFCoefficients(new PIDFCoefficients(3, 0, 0.08, 0.03))
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.15, 0, 0.01, 0.03))
+            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.25,0,0.02,0.015))
+            .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.05, 0.03))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(3,0,0.1,0.02))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.015,0.0,0.0005,0.6,0.01))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.02,0,0.000005,0.6,0.01))
@@ -42,8 +42,8 @@ public class ConstantsV3 {
             1);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-7.1)
-            .strafePodX(-7.21) // old is -7.6, inward adjusted is -7.21
+            .forwardPodY(-5.75492126)
+            .strafePodX(6.6417323) // old is -7.6, inward adjusted is -7.21
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

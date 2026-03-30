@@ -12,13 +12,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 //import org.firstinspires.ftc.teamcode.subsystems.RTPAxon;
+import com.arcrobotics.ftclib.command.Subsystem;
+
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Timer;
 
 
-public class IntakeV3 {
+public class IntakeV3 implements Subsystem{
 
     //velocity
     //private VoltageSensor batteryVoltageSensor;
@@ -36,7 +38,6 @@ public class IntakeV3 {
     //gate
     private Servo gate;
     private Servo blinky;
-    private boolean shot;
 
     //distance sensor
     private DistanceSensor distanceSensorGate;
@@ -45,6 +46,9 @@ public class IntakeV3 {
     //turret
     private CRServo turretL;
     private CRServo turretR;
+    private AnalogInput encoderL;
+    private AnalogInput encoderR;
+    private RTPAxon axon;
     private double tInc = .001;
     private double leftLim = .65;
     private boolean leftLimReached = false;
@@ -108,23 +112,27 @@ public class IntakeV3 {
         outtakeB = hwMap.get(DcMotorEx.class, "outtakeB");
 
         //angle
-        angle = hwMap.get(Servo.class, "angle");
+        angle = hwMap.get(Servo.class, "actuator");
 
         //gate
         gate = hwMap.get(Servo.class, "gate");
-        blinky = hwMap.get(Servo.class, "blinky");
+        //blinky = hwMap.get(Servo.class, "blinky");
 
-        //distance
+        //distance sensor
         distanceSensorGate = hwMap.get(DistanceSensor.class, "distanceGate");
         distanceSensorIntake = hwMap.get(DistanceSensor.class, "distanceIntake");
+
 
         //turret
         turretL = hwMap.get(CRServo.class, "turretL");
         turretR = hwMap.get(CRServo.class, "turretR");
-        //axon = hwMap.get(RTPAxon.class, "something");
+        encoderL = hwMap.get(AnalogInput.class, "encoderL");
+        encoderR = hwMap.get(AnalogInput.class, "encoderR");
 
 
-        shot = false;
+        axon = new RTPAxon(turretL, turretR, encoderL, encoderR);
+        axon.setMaxPower(.5);
+        axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // change
 
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -174,10 +182,10 @@ public class IntakeV3 {
     //set light color
     public void setLightColor() {
         if (gate.getPosition() == .25) {
-            blinky.setPosition(.500); //open, green
+            //blinky.setPosition(.500); //open, green
         }
         if (gate.getPosition() == .38) {
-            blinky.setPosition(.28); //closed, red
+            //blinky.setPosition(.28); //closed, red
         }
     }
 

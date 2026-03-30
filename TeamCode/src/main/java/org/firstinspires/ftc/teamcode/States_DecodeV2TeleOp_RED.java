@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
 
 //guarantee this wont work whatsoever
 
@@ -101,7 +101,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
 
-        follower = Constants.createFollower(hardwareMap);
+        follower = ConstantsV2.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
 
         tLock = false;

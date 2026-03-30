@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
-import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
@@ -29,16 +29,16 @@ import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
 
-@TeleOp(name="Atlas yay", group="Iterative OpMode")
+@TeleOp(name="Atlas thing", group="Iterative OpMode")
 public class AtlasTeleOpBlue extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
-    IntakeV2 cannon = null;
+    IntakeV3 cannon = null;
+    RTPAxon axon = null;
     private Paths paths;
     private Supplier<PathChain> shootPos;
     public Follower follower;
     BlueLimelightAutoAim visionAid = null;
-    RTPAxon axon = null;
 
 
     //ColorSensor colSens = null;
@@ -122,23 +122,18 @@ public class AtlasTeleOpBlue extends OpMode {
     @Override
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
-        cannon = new IntakeV2(hardwareMap);
+        cannon = new IntakeV3(hardwareMap);
+        axon.update(); // Must be called every loop
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
 
         camera.pipelineSwitch(0);
         camera.setPollRateHz(90);
-        chassis.setHalfPark(0.45);
+        //chassis.setHalfPark(0.45);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
         cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
-
-        CRServo servo = hardwareMap.get(CRServo.class, "servo");
-        AnalogInput encoder = hardwareMap.get(AnalogInput.class, "encoder");
-        axon = new RTPAxon(servo, encoder);
-        axon.setMaxPower(0.5);  // Limit max power to 50%
-        axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // Set PID coefficients
 
         follower = ConstantsV3.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
@@ -172,6 +167,7 @@ public class AtlasTeleOpBlue extends OpMode {
     public void loop(){
         follower.update();
         visionAid.update();
+        axon.update();
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
 
         dPadUpPressed = gamepad2.dpad_up;
@@ -209,14 +205,8 @@ public class AtlasTeleOpBlue extends OpMode {
             intakeOn = !intakeOn;
             if(intakeOn){
                 cannon.intake(0);
-                cannon.transfer(0);
             }else {
                 cannon.intake(1);
-                if(gateOn){
-                    cannon.transfer(0.5);
-                } else{
-                    cannon.transfer(1);
-                }
             }
         }
 
@@ -489,14 +479,19 @@ public class AtlasTeleOpBlue extends OpMode {
         telemetry.addData("Launcher Velocity", cannon.getLauncherVelocity());
         telemetry.addData("Launch Status", cannon.getLaunchStatus());
 
-
         telemetry.addData("launchTrigger", launchTrigger);
         telemetry.addData("Actuator Position", cannon.getActuatorPosition());
+
+        telemetry.addLine();
+        telemetry.addData("Servo Position", axon.getCurrentAngle());
+        telemetry.addData("Total Rotation", axon.getTotalRotation());
+        telemetry.addData("Target Rotation", axon.getTargetRotation());
+
 
         /*telemetry.addData("Gate Distance", cannon.getDistanceGate());
         telemetry.addData("Intake Distance", cannon.getDistanceIntake());
          */
-
+        telemetry.addLine();
         telemetry.addData("X:",follower.getPose().getX());
         telemetry.addData("Y:",follower.getPose().getY());
         telemetry.addData("Total Heading:",follower.getPose().getHeading());
