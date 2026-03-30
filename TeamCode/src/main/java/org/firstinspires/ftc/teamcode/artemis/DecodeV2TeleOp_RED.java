@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.artemis;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
-import org.firstinspires.ftc.teamcode.mech.LLMech;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 
 //guarantee this wont work whatsoever

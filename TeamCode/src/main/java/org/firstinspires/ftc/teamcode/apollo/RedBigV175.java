@@ -1,8 +1,5 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.apollo;
 
-import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -13,17 +10,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-//import org.firstinspires.ftc.teamcode.mech.Launcher;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV175;
 import java.util.TimerTask;
 import org.firstinspires.ftc.teamcode.mech.IntakeV175;
 
 @Disabled
 @Autonomous(name = "dont use", group = "Examples")
-@Configurable
-public class BlueBigV175 extends OpMode {
+public class RedBigV175 extends OpMode {
 
-    private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
@@ -31,29 +25,24 @@ public class BlueBigV175 extends OpMode {
     IntakeV175 cannon = null;
     private int dbm = 100;
     private Timer pathTimer;
-    //private Launcher launcher;
 
 
     @Override
     public void init() {
-        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = ConstantsV175.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(20, 124, Math.toRadians(323)));
+        follower.setStartingPose(new Pose(124, 124, Math.toRadians(222)));
 
         follower.setMaxPowerScaling(.8);
 
         paths = new Paths(follower); // Build paths
 
-        panelsTelemetry.debug("Status", "Initialized");
-        panelsTelemetry.update(telemetry);
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
 
         pathTimer = new Timer();
 
         cannon = new IntakeV175(hardwareMap);
-
-        //launcher = new Launcher(hardwareMap);
-
     }
 
     @Override
@@ -66,21 +55,12 @@ public class BlueBigV175 extends OpMode {
         follower.update(); // Update Pedro Pathing
         pathState = autonomousPathUpdate(); // Update autonomous state machine
 
-        /*boolean shotRequested = false;
-        launcher.launch(shotRequested);
-
-        if (shotRequested && launcher.getLaunchState() != Launcher.LaunchState.IDLE) {
-            shotRequested = false;
-        }
-
-         */
-
         // Log values to Panels and Driver Station
-        panelsTelemetry.debug("Path State", pathState);
-        panelsTelemetry.debug("X", follower.getPose().getX());
-        panelsTelemetry.debug("Y", follower.getPose().getY());
-        panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-        panelsTelemetry.update(telemetry);
+        telemetry.addData("Path State", pathState);
+        telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("Y", follower.getPose().getY());
+        telemetry.addData("Heading", follower.getPose().getHeading());
+        telemetry.update();
     }
 
     public void setPathState(int pState) {
@@ -107,24 +87,24 @@ public class BlueBigV175 extends OpMode {
         public PathChain launch4;
         public PathChain bonuspt;
 
-        private Pose startPosition = new Pose(20,124, Math.toRadians(323) );//need real angle
-        private Pose launchPosition = new Pose(53, 90, Math.toRadians(320.5));//need real angle
-        private Pose intake1Curve1 = new Pose(50, 81);//need real x & y
-        private Pose intake1Curve2 = new Pose(59, 84);//need real x & y
-        //private Pose intake1Start = new Pose(91, 67, Math.toRadians(0));
-        private Pose intake1End = new Pose(20, 83.5, Math.toRadians(180));//need real x & y
-        private Pose intake2Curve1 = new Pose(50, 55);//need real x & y
-        private Pose intake2Curve2 = new Pose(64, 60);//need real x & y
+        private Pose startPosition = new Pose(124,124, Math.toRadians(222) );//need real angle
+        private Pose launchPosition = new Pose(91, 90, Math.toRadians(224.5));//need real angle
+        private Pose intake1Curve1 = new Pose(94, 81);//need real x & y
+        private Pose intake1Curve2 = new Pose(85, 84);//need real x & y
+        //private Pose intake1Start = new Pose(91, 67, Math.tRadians(0));
+        private Pose intake1End = new Pose(124.5, 83.5, Math.toRadians(0));//need real x & y
+        private Pose intake2Curve1 = new Pose(94, 55);//need real x & y
+        private Pose intake2Curve2 = new Pose(80, 60);//need real x & y
         //private Pose intake2Start = new Pose(91, 41, Math.toRadians(0));//need real x & y
-        private Pose intake2End = new Pose(11, 57, Math.toRadians(180));//need real x & y
-        private Pose intake2Curve = new Pose(50, 60);//need real x & y
+        private Pose intake2End = new Pose(135, 57, Math.toRadians(0));//need real x & y
+        private Pose intake2Curve = new Pose(94, 60);//need real x & y
 
         //dont use for 1.75
         private Pose intake3Start = new Pose(91, 21, Math.toRadians(0));//need real x & y
         private Pose intake3End = new Pose(124, 21, Math.toRadians(0));//need real x & y
 
-        //DO use for 1.75
-        private Pose park = new Pose(34, 85, Math.toRadians(270));
+        //DO USE for 1.75
+        private Pose park = new Pose(110, 85, Math.toRadians(270));
 
 
         public Paths(Follower follower) {
@@ -189,16 +169,16 @@ public class BlueBigV175 extends OpMode {
 
 
     public int autonomousPathUpdate() {
-        switch(pathState) {
-            case 0:// Starting Pos to Launch 1
-                timer.schedule(new BlueBigV175.ShootAuto(.59), 0);
-                timer.schedule(new BlueBigV175.GateAuto(-1), 3500);
-                timer.schedule(new BlueBigV175.GateAuto(0), 6800);
-                timer.schedule(new BlueBigV175.ShootAuto(0), 5900);
-                follower.followPath(paths.launch1, true);
-                setPathState(1);
+            switch(pathState) {
+                case 0:// Starting Pos to Launch 1
+                    timer.schedule(new ShootAuto(.59), 0);
+                    timer.schedule(new GateAuto(1), 3500);
+                    timer.schedule(new GateAuto(0), 7100);
+                    timer.schedule(new ShootAuto(0), 6200);
+                    follower.followPath(paths.launch1, true);
+                    setPathState(1);
 
-                break;
+                    break;
                 /*case 1: //launch 1 to intake 1 start
                     if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 6.85){
                         pathTimer.resetTimer();
@@ -208,47 +188,56 @@ public class BlueBigV175 extends OpMode {
                     break;
 
                  */
-            case 1: //launch 1 to intake 1
-                if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 6.9) {
-                    timer.schedule(new BlueBigV175.IntakeAuto(1.0), 500);
-                    timer.schedule(new BlueBigV175.IntakeAuto(0), 3600);
-                    follower.followPath(paths.intake1, .35, true);
-                    setPathState(2);
-                    pathTimer.resetTimer();
-                }
-                break;
-            case 2: //intake 1 to launch 2
-                if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.15) {
-                    pathTimer.resetTimer();
-                    timer.schedule(new BlueBigV175.ShootAuto(.59), 0);
-                    timer.schedule(new BlueBigV175.GateAuto(-1), 3500);
-                    timer.schedule(new BlueBigV175.GateAuto(0), 6800);
-                    timer.schedule(new BlueBigV175.ShootAuto(0), 5900);
-                    follower.followPath(paths.launch2,true);
-                    setPathState(10);
-                    pathTimer.resetTimer();
-                }
-                break;
-            case 3: //launch 2 to intake 2
-                if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 6.85) {
-                    pathTimer.resetTimer();
-                    timer.schedule(new BlueBigV175.IntakeAuto(1.0), 1600);
-                    timer.schedule(new BlueBigV175.IntakeAuto(0), 4700);
-                    follower.followPath(paths.intake2, .45,true);
-                    setPathState(4);
-                }
-                break;
-            case 4: //intake 2 to launch 3
-                if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.1) {
-                    pathTimer.resetTimer();
-                    timer.schedule(new BlueBigV175.ShootAuto(.59), 0);
-                    timer.schedule(new BlueBigV175.GateAuto(-1), 3500);
-                    timer.schedule(new BlueBigV175.GateAuto(0), 6800);
-                    timer.schedule(new BlueBigV175.ShootAuto(0), 5900);
-                    follower.followPath(paths.launch3,true);
-                    setPathState(10);
-                }
-                break;
+                case 1: //launch 1 to intake 1
+                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 6.9) {
+                        timer.schedule(new IntakeAuto(1.0), 500);
+                        timer.schedule(new IntakeAuto(0), 3600);
+                        follower.followPath(paths.intake1, .4, true);
+                        setPathState(2);
+                        pathTimer.resetTimer();
+                    }
+                    break;
+                case 2: //intake 1 to launch 2
+                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.15) {
+                        pathTimer.resetTimer();
+                        timer.schedule(new ShootAuto(.59), 0);
+                        timer.schedule(new GateAuto(1), 3500);
+                        timer.schedule(new GateAuto(0), 6800);
+                        timer.schedule(new ShootAuto(0), 5900);
+                        follower.followPath(paths.launch2,true);
+                        setPathState(3);
+                        pathTimer.resetTimer();
+                    }
+                    break;
+                /*case 4: //launch 2 to intake 2 start
+                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 6.85) {
+                        follower.followPath(paths.intake2S,true);
+                        setPathState(5);
+                        pathTimer.resetTimer();
+                    }
+                    break;
+
+                 */
+                case 3: //launch 2 to intake 2
+                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 6.85) {
+                        pathTimer.resetTimer();
+                        timer.schedule(new IntakeAuto(1.0), 1600);
+                        timer.schedule(new IntakeAuto(0), 4700);
+                        follower.followPath(paths.intake2, .45,true);
+                        setPathState(4);
+                    }
+                    break;
+                case 4: //intake 2 to launch 3
+                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.1) {
+                        pathTimer.resetTimer();
+                        timer.schedule(new ShootAuto(.59), 0);
+                        timer.schedule(new GateAuto(1), 3500);
+                        timer.schedule(new GateAuto(0), 6800);
+                        timer.schedule(new ShootAuto(0), 5900);
+                        follower.followPath(paths.launch3,true);
+                        setPathState(10);
+                    }
+                    break;
                 /*case 7: //launch 3 to intake start 3
                     if(!follower.isBusy()) {
                         follower.followPath(paths.intake3S,true);
@@ -272,14 +261,15 @@ public class BlueBigV175 extends OpMode {
                     break;
 
                  */
-            case 10: //launch 4 to off launch line for movement pts
-                if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 6.9) {
-                    pathTimer.resetTimer();
-                    follower.followPath(paths.bonuspt,true);
-                    setPathState(-1);
-                }
-                break;
-        }
+                case 10: //launch 4 to off launch line for movement pts
+                    if(!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 6.9) {
+                        pathTimer.resetTimer();
+                        follower.followPath(paths.bonuspt,true);
+                        setPathState(-1);
+                    }
+                    break;
+            }
+
         // Add your state machine Here
         // Access paths with paths.pathName
         // Refer to the Pedro Pathing Docs (Auto Example) for an example state machine
@@ -321,7 +311,7 @@ public class BlueBigV175 extends OpMode {
 
         @Override
         public void run() {
-            cannon.intake(power, power, power);
+            cannon.intake(power, power, -power);
         }
     }
 

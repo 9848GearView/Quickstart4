@@ -195,11 +195,9 @@ public class IntakeV3 implements Subsystem{
     }
 
     //set turret position
-    public void setTurret(double i) {
-        /*turretL.setPosition(i);
+    /*public void setTurret(double i) {
+        turretL.setPosition(i);
         turretR.setPosition(i);
-
-         */
     }
 
     //limelight scanning
@@ -228,7 +226,10 @@ public class IntakeV3 implements Subsystem{
                 movingRight = false;
             }
         }
+
     }
+    
+     */
 
     //stop launch motors
     public void stopLaunch() {

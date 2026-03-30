@@ -1,42 +1,39 @@
-package org.firstinspires.ftc.teamcode;
-
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+package org.firstinspires.ftc.teamcode.atlas;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.hardware.limelightvision.LLResult;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
-import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
-import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
+import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
 
 
 import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
 
-@TeleOp(name="States_BLUE-DecodeV2TeleOp", group="Iterative OpMode")
-public class States_DecodeV2TeleOp_BLUE extends OpMode {
+@TeleOp(name="Atlas thing", group="Iterative OpMode")
+public class AtlasTeleOpBlue extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
-    IntakeV2 cannon = null;
+    IntakeV3 cannon = null;
+    RTPAxon axon = null;
     private Paths paths;
     private Supplier<PathChain> shootPos;
     public Follower follower;
     BlueLimelightAutoAim visionAid = null;
-    RTPAxon axon = null;
+
 
     //ColorSensor colSens = null;
 
@@ -103,7 +100,6 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     public boolean needsCorrection = false;
     public double goalDistance;
     public double goalAngle;
-    public double turretAngle = 0;
     public double launchAngleL = 60;
     public double launchAngleS = 45;
 
@@ -120,23 +116,19 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     @Override
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
-        cannon = new IntakeV2(hardwareMap);
+        cannon = new IntakeV3(hardwareMap);
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         camera = hardwareMap.get(Limelight3A.class,"limabean");
 
         camera.pipelineSwitch(0);
         camera.setPollRateHz(90);
-        chassis.setHalfPark(0.45);
+        //chassis.setHalfPark(0.45);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
-        cannon.setTurret(.5);
         cannon.setActuatorPos(.53);
 
-
-
-        follower = ConstantsV2.createFollower(hardwareMap);
-        //follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
-        follower.setStartingPose(new Pose(56, 8, Math.toRadians(180)));
+        follower = ConstantsV3.createFollower(hardwareMap);
+        follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
         follower.update();
         shootX = 56;
         shootY = 8;
@@ -167,6 +159,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
     public void loop(){
         follower.update();
         visionAid.update();
+        axon.update();
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
 
         dPadUpPressed = gamepad2.dpad_up;
@@ -179,7 +172,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 
         aPressed = gamepad2.a;
         bPressed = gamepad2.b;
-        
+
         xPressed = gamepad2.x;
 
         lBumperPressed = gamepad2.left_bumper;
@@ -204,14 +197,8 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
             intakeOn = !intakeOn;
             if(intakeOn){
                 cannon.intake(0);
-                cannon.transfer(0);
             }else {
                 cannon.intake(1);
-                if(gateOn){
-                    cannon.transfer(0.5);
-                } else{
-                    cannon.transfer(1);
-                }
             }
         }
 
@@ -242,30 +229,13 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         //shootpos = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
 
         goalDistance = Math.sqrt(Math.pow(follower.getPose().getX() - 4,2) + Math.pow(140 - follower.getPose().getY(),2));
-        goalAngle = Math.atan((follower.getPose().getX() - 4 ) / (140 - follower.getPose().getY()));
-
-        if(follower.getPose().getHeading() - goalAngle < 0){
-            turretAngle = Math.abs(follower.getPose().getHeading() - goalAngle);
-        } else if (follower.getPose().getHeading() - goalAngle > 0 && follower.getPose().getHeading() - goalAngle <= 180){
-            turretAngle = follower.getPose().getHeading() - goalAngle;
-        } else if(follower.getPose().getHeading() - goalAngle > 180){
-            turretAngle = (360 - follower.getPose().getHeading()) + goalAngle;
-        } else {
-            turretAngle = 0;
-        }
-        if(turretAngle <= -90) cannon.setTurret(1);
-        else if (turretAngle >= 90) cannon.setTurret(0);
-        else if (turretAngle > 0 && turretAngle < 90){
-            cannon.setTurret(0); // wrong right now
-        }
-
+        goalAngle = Math.atan((140 - follower.getPose().getY()) / (follower.getPose().getX() - 4)) + 90;
         launchAngleL = Math.max(Math.atan((Math.pow(velMPS,2) + Math.sqrt(Math.pow(velMPS,4) - (GRAVITY*(GRAVITY*Math.pow(goalDistance,2) + 2*Math.pow(velMPS,2)*.7)))) / GRAVITY*goalDistance ),
                 Math.atan((Math.pow(velMPS,2) - Math.sqrt(Math.pow(velMPS,4) - (GRAVITY*(GRAVITY*Math.pow(goalDistance,2) + 2*Math.pow(velMPS,2)*.7)))) / GRAVITY*goalDistance
                 ));
         launchAngleS = Math.min(Math.atan((Math.pow(velMPS,2) + Math.sqrt(Math.pow(velMPS,4) - (GRAVITY*(GRAVITY*Math.pow(goalDistance,2) + 2*Math.pow(velMPS,2)*.7)))) / GRAVITY*goalDistance ),
                 Math.atan((Math.pow(velMPS,2) - Math.sqrt(Math.pow(velMPS,4) - (GRAVITY*(GRAVITY*Math.pow(goalDistance,2) + 2*Math.pow(velMPS,2)*.7)))) / GRAVITY*goalDistance
                 ));
-
 
 
 //        //auto-aim
@@ -280,16 +250,16 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 
         if(gamepad2.dpad_left) {
             //if(cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
-            cannon.setTurret(cannon.getTurretPos() + tInc);
+            //cannon.setTurret(cannon.getTurretPos() + tInc);
             //}
         }
         if(gamepad2.dpad_right) {
             // if (cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
-            cannon.setTurret(cannon.getTurretPos() - tInc);
+            //cannon.setTurret(cannon.getTurretPos() - tInc);
             // }
         }
         if(gamepad2.dpad_up) {
-            cannon.setTurret(.5);
+            //cannon.setTurret(.5);
         }
 
         if( bPressed && !oldBPressed) {
@@ -306,7 +276,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
                 double botCorr = (Kp * tx) - feedForward;
 //
                 if(Math.abs(tx) > deadband) {
-                    cannon.setTurret(cannon.getTurretPos() + botCorr);
+                    //cannon.setTurret(cannon.getTurretPos() + botCorr);
                 }
             }
         }
@@ -369,12 +339,12 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
             }
         }
 
-        if(posLock && !follower.isBusy() && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
+        if(posLock && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
             follower.followPath(shootPos.get());
             automatedDrive = true;
         }
 
-        if(!posLock && follower.isBusy()){
+        if(!posLock && !follower.isBusy()){
             follower.breakFollowing();
             follower.update();
             automatedDrive = false;
@@ -443,7 +413,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
 //                cannon.setActuatorPos(cannon.getActuatorPos() + 0.05);
 //            }
 //        }
-            //cannon.setActuatorPos(0.25);
+        //cannon.setActuatorPos(0.25);
 
 
 //        if (Math.abs(gamepad2.right_stick_y) > 0.1){
@@ -487,7 +457,7 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("Velocity in Meters per Second", velMPS);
 
 
-        
+
         telemetry.addData("Turret Position", cannon.getTurretPos());
 
         telemetry.addLine();
@@ -501,14 +471,20 @@ public class States_DecodeV2TeleOp_BLUE extends OpMode {
         telemetry.addData("Launcher Velocity", cannon.getLauncherVelocity());
         telemetry.addData("Launch Status", cannon.getLaunchStatus());
 
-
         telemetry.addData("launchTrigger", launchTrigger);
         telemetry.addData("Actuator Position", cannon.getActuatorPosition());
+
+        telemetry.addLine();
+        telemetry.addData("Servo Position", axon.getCurrentAngle());
+        telemetry.addData("Total Rotation", axon.getTotalRotation());
+        telemetry.addData("Target Rotation", axon.getTargetRotation());
+        telemetry.addLine(axon.log());
+
 
         /*telemetry.addData("Gate Distance", cannon.getDistanceGate());
         telemetry.addData("Intake Distance", cannon.getDistanceIntake());
          */
-
+        telemetry.addLine();
         telemetry.addData("X:",follower.getPose().getX());
         telemetry.addData("Y:",follower.getPose().getY());
         telemetry.addData("Total Heading:",follower.getPose().getHeading());

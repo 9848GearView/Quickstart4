@@ -1,9 +1,5 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.artemis;
 
-
-import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -11,6 +7,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.util.Timer;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
@@ -19,10 +16,9 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
 
+@Disabled
 @Autonomous(name = "Artemis Red Big", group = "Autonomous")
-@Configurable // Panels
 public class ArtemisRB extends OpMode {
-    private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
@@ -34,8 +30,6 @@ public class ArtemisRB extends OpMode {
 
     @Override
     public void init() {
-        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-
         follower = ConstantsV2.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(124, 124, Math.toRadians(306.2)));
 
@@ -45,8 +39,8 @@ public class ArtemisRB extends OpMode {
 
         pathTimer = new Timer();
 
-        panelsTelemetry.debug("Status", "Initialized");
-        panelsTelemetry.update(telemetry);
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
 
     @Override
@@ -68,13 +62,13 @@ public class ArtemisRB extends OpMode {
 
 
         // Log values to Panels and Driver Station
-        panelsTelemetry.debug("Path State", pathState);
-        panelsTelemetry.debug("X", follower.getPose().getX());
-        panelsTelemetry.debug("Y", follower.getPose().getY());
-        panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-        panelsTelemetry.debug("Velocity", cannon.getLauncherVelocity());
+        telemetry.addData("Path State", pathState);
+        telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("Y", follower.getPose().getY());
+        telemetry.addData("Heading", follower.getPose().getHeading());
+        telemetry.addData("Velocity", cannon.getLauncherVelocity());
 
-        panelsTelemetry.update(telemetry);
+        telemetry.update();
     }
 
     public void setPathState(int pState) {

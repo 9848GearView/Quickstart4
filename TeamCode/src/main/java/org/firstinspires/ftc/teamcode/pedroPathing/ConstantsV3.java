@@ -20,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class ConstantsV3 {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(12.4)
+            .mass(15.4)
             .forwardZeroPowerAcceleration(-32.5)
             .lateralZeroPowerAcceleration(-69)
             .useSecondaryTranslationalPIDF(true)
@@ -62,8 +62,8 @@ public class ConstantsV3 {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(69)
-            .yVelocity(56)
+            .xVelocity(70)
+            .yVelocity(52.5)
             ;
 
 

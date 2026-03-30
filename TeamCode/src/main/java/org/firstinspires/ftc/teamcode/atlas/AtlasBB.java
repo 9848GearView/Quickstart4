@@ -1,9 +1,5 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.atlas;
 
-
-import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -20,9 +16,7 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import java.util.TimerTask;
 
 @Autonomous(name = "Artemis Blue Big", group = "Autonomous")
-@Configurable // Panels
-public class AtlasRB extends OpMode {
-    private TelemetryManager panelsTelemetry; // Panels Telemetry instance
+public class AtlasBB extends OpMode {
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
@@ -34,10 +28,8 @@ public class AtlasRB extends OpMode {
 
     @Override
     public void init() {
-        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-
         follower = ConstantsV2.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(124, 124, Math.toRadians(45.5)));
+        follower.setStartingPose(new Pose(20, 124, Math.toRadians(233.8)));
 
         paths = new Paths(follower); // Build paths
 
@@ -48,8 +40,8 @@ public class AtlasRB extends OpMode {
         pathTimer = new Timer();
         globalTimer = new Timer();
 
-        panelsTelemetry.debug("Status", "Initialized");
-        panelsTelemetry.update(telemetry);
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
 
     @Override
@@ -69,13 +61,13 @@ public class AtlasRB extends OpMode {
         pathState = autonomousPathUpdate(); // Update autonomous state machine
 
         // Log values to Panels and Driver Station
-        panelsTelemetry.debug("Path State", pathState);
-        panelsTelemetry.debug("X", follower.getPose().getX());
-        panelsTelemetry.debug("Y", follower.getPose().getY());
-        panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-        panelsTelemetry.debug("Velocity", cannon.getLauncherVelocity());
+        telemetry.addData("Path State", pathState);
+        telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("Y", follower.getPose().getY());
+        telemetry.addData("Heading", follower.getPose().getHeading());
+        telemetry.addData("Velocity", cannon.getLauncherVelocity());
 
-        panelsTelemetry.update(telemetry);
+        telemetry.update();
     }
 
     public void setPathState(int pState) {
@@ -100,87 +92,87 @@ public class AtlasRB extends OpMode {
             shoot1 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(124.000, 124.000),
-                                    new Pose(95.000, 84.000)
+                                    new Pose(20.000, 124.000),
+                                    new Pose(49.000, 84.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(45.5), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(143.5), Math.toRadians(180))
                     .build();
 
             intake1 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(95.000, 84.000),
-                                    new Pose(93.000, 54.600),
-                                    new Pose(93.400, 60.200),
-                                    new Pose(136.100, 59.300)
+                                    new Pose(49.000, 84.000),
+                                    new Pose(51.000, 54.600),
+                                    new Pose(50.600, 60.200),
+                                    new Pose(7.900, 59.300)
                             )
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
             gate = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(136.100, 59.300),
-                                    new Pose(120.800, 58.617),
-                                    new Pose(127.300, 67.100)
+                                    new Pose(7.900, 59.300),
+                                    new Pose(23.163, 58.617),
+                                    new Pose(16.700, 67.100)
                             )
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(0))
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
                     .build();
 
             shoot2 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(127.300, 67.100),
-                                    new Pose(96.800, 69.500),
-                                    new Pose(95.000, 84.000)
+                                    new Pose(16.700, 67.100),
+                                    new Pose(47.200, 69.500),
+                                    new Pose(49.000, 84.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             intakeGate = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(95.000, 84.000),
-                                    new Pose(105.000, 62.700),
-                                    new Pose(131.700, 59.800)
+                                    new Pose(49.000, 84.000),
+                                    new Pose(39.000, 62.700),
+                                    new Pose(12.300, 59.800)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(30))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(150))
                     .build();
 
             shootGate = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(131.700, 59.800),
-                                    new Pose(105.300, 67.300),
-                                    new Pose(95.000, 84.000)
+                                    new Pose(12.300, 59.800),
+                                    new Pose(38.700, 67.300),
+                                    new Pose(49.000, 84.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(30), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(150), Math.toRadians(180))
                     .build();
 
             intakeFinal = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(95.000, 84.000),
-                                    new Pose(126.000, 83.500)
+                                    new Pose(49.000, 84.000),
+                                    new Pose(18.000, 83.500)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             parkShoot = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(126.000, 83.500),
-                                    new Pose(83.500, 106.100)
+                                    new Pose(18.000, 83.500),
+                                    new Pose(60.500, 106.100)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
         }
     }
@@ -302,7 +294,7 @@ public class AtlasRB extends OpMode {
                     timer.schedule(new StopLaunchAuto(), 0);
                     setPathState(13);
                 }
-                break;
+            break;
         }
         return pathState;
     }

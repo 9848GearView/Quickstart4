@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.mech.GamepadPair;
 
 
 // TeleOp test class for manual tuning and testing
-@TeleOp(name = "Cont. Rotation Axon Test", group = "test")
+@TeleOp(name = "yay test yayyy", group = "test")
 public class RTPTest extends LinearOpMode {
 
     @Override

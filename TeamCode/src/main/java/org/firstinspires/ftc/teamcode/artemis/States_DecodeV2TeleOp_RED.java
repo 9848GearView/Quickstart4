@@ -1,15 +1,13 @@
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.artemis;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
