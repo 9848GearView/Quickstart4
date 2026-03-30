@@ -12,7 +12,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class RTPAxon {
     // Encoder for servo position feedback
-    private final AnalogInput servoEncoder;
+    private final AnalogInput servoEncoderL;
+    private final AnalogInput servoEncoderR;
     // Continuous rotation servo
     private final CRServo turretL;
     private final CRServo turretR;
@@ -59,16 +60,18 @@ public class RTPAxon {
         rtp = true;
         this.turretL = servo;
         this.turretR = servo;
-        servoEncoder = encoder;
+        servoEncoderL = encoder;
+        servoEncoderR = encoder;
         direction = Direction.FORWARD;
         initialize();
     }
 
-    public RTPAxon(CRServo servo1, CRServo servo2, AnalogInput encoder) {
+    public RTPAxon(CRServo servo1, CRServo servo2, AnalogInput encoder1, AnalogInput encoder2) {
         rtp = true;
         this.turretL = servo1;
         this.turretR = servo2;
-        servoEncoder = encoder;
+        servoEncoderL = encoder1;
+        servoEncoderR = encoder2;
         direction = Direction.FORWARD;
         initialize();
     }
@@ -244,8 +247,8 @@ public class RTPAxon {
 
     // Get current angle from encoder (in degrees)
     public double getCurrentAngle() {
-        if (servoEncoder == null) return 0;
-        return (servoEncoder.getVoltage() / 3.3) * (direction.equals(Direction.REVERSE) ? -360 : 360);
+        if (servoEncoderL == null) return 0;
+        return (servoEncoderL.getVoltage() / 3.3) * (direction.equals(Direction.REVERSE) ? -360 : 360);
     }
 
     // Check if servo is at target (default tolerance)
@@ -349,7 +352,7 @@ public class RTPAxon {
                         "Current Power: %.3f\n" +
                         "PID Values: P=%.3f I=%.3f D=%.3f\n" +
                         "PID Terms: Error=%.2f Integral=%.2f",
-                servoEncoder.getVoltage(),
+                servoEncoderL.getVoltage(),
                 getCurrentAngle(),
                 totalRotation,
                 targetRotation,

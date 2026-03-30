@@ -43,13 +43,11 @@ public class IntakeV3 implements Subsystem{
     private DistanceSensor distanceSensorGate;
     private DistanceSensor distanceSensorIntake;
 
-    //tiltpark
-    private DcMotorEx tilt;
-
     //turret
     private CRServo turretL;
     private CRServo turretR;
-    private AnalogInput encoder;
+    private AnalogInput encoderL;
+    private AnalogInput encoderR;
     private RTPAxon axon;
     private double tInc = .001;
     private double leftLim = .65;
@@ -118,21 +116,21 @@ public class IntakeV3 implements Subsystem{
 
         //gate
         gate = hwMap.get(Servo.class, "gate");
-        blinky = hwMap.get(Servo.class, "blinky");
+        //blinky = hwMap.get(Servo.class, "blinky");
 
         //distance sensor
         distanceSensorGate = hwMap.get(DistanceSensor.class, "distanceGate");
         distanceSensorIntake = hwMap.get(DistanceSensor.class, "distanceIntake");
 
-        //tilt
-        tilt = hwMap.get(DcMotorEx.class, "tilt");
 
         //turret
         turretL = hwMap.get(CRServo.class, "turretL");
         turretR = hwMap.get(CRServo.class, "turretR");
-        encoder = hwMap.get(AnalogInput.class, "encoder");
+        encoderL = hwMap.get(AnalogInput.class, "encoderL");
+        encoderR = hwMap.get(AnalogInput.class, "encoderR");
 
-        axon = new RTPAxon(turretL, turretR, encoder);
+
+        axon = new RTPAxon(turretL, turretR, encoderL, encoderR);
         axon.setMaxPower(.5);
         axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // change
 
@@ -184,10 +182,10 @@ public class IntakeV3 implements Subsystem{
     //set light color
     public void setLightColor() {
         if (gate.getPosition() == .25) {
-            blinky.setPosition(.500); //open, green
+            //blinky.setPosition(.500); //open, green
         }
         if (gate.getPosition() == .38) {
-            blinky.setPosition(.28); //closed, red
+            //blinky.setPosition(.28); //closed, red
         }
     }
 

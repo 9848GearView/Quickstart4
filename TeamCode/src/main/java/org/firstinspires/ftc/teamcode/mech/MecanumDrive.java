@@ -24,9 +24,7 @@ public class MecanumDrive {
     private DcMotor brMotor = null;
 
     //half park
-    private Servo halfParkL;
-    private Servo halfParkR;
-    private Servo halfParkM;
+    private DcMotor tilt;
 
     private IMU imu;
 
@@ -42,10 +40,8 @@ public class MecanumDrive {
         blMotor = hwMap.get(DcMotor.class, "BL");
         brMotor = hwMap.get(DcMotor.class, "BR");
 
-        //half park
-        halfParkL = hwMap.get(Servo.class, "halfParkL");
-        halfParkR = hwMap.get(Servo.class, "halfParkR");
-        halfParkM = hwMap.get(Servo.class, "halfParkM");
+        //tilt park
+        tilt = hwMap.get(DcMotor.class, "tilt");
 
         imu = hwMap.get(IMU.class,"imu");
 
@@ -115,14 +111,12 @@ public class MecanumDrive {
     }
 
     public void setHalfPark(double i){
-        halfParkL.setPosition(i);
-        halfParkR.setPosition(i);
-        halfParkM.setPosition(i);
-
+        //tilt.setPosition(i);
     }
 
     public double getHalfPark() {
-        return halfParkL.getPosition();
+        //return tilt.getPosition();
+        return 0;
     }
 
     public void resetRobotAngle(){

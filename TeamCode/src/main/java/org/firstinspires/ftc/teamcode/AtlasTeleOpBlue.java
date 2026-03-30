@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
 
-@TeleOp(name="Atlas yay", group="Iterative OpMode")
+@TeleOp(name="Atlas thing", group="Iterative OpMode")
 public class AtlasTeleOpBlue extends OpMode {
     private Limelight3A camera;
     MecanumDrive chassis = null;
@@ -129,7 +129,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
         camera.pipelineSwitch(0);
         camera.setPollRateHz(90);
-        chassis.setHalfPark(0.45);
+        //chassis.setHalfPark(0.45);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
         cannon.setTurret(.5);
