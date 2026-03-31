@@ -48,7 +48,7 @@ public class IntakeV3 implements Subsystem{
     private CRServo turretR;
     private AnalogInput encoderL;
     private AnalogInput encoderR;
-    private RTPAxon axon;
+    private static RTPAxon axon;
     private double tInc = .001;
     private double leftLim = .65;
     private boolean leftLimReached = false;
@@ -134,6 +134,7 @@ public class IntakeV3 implements Subsystem{
         axon.setMaxPower(.5);
         axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // change
 
+
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
@@ -163,6 +164,29 @@ public class IntakeV3 implements Subsystem{
         /*
          * We set the left feeder servo to reverse so that they both work to feed the ball into the robot.
          */
+    }
+
+    // Wrapper to update the PID and encoder logic
+    public void updateTurret() {
+        axon.update();
+    }
+
+    // Wrapper to set the position
+    public void setTurretAngle(double degrees) {
+        axon.setTargetRotation(degrees);
+    }
+
+    // Wrapper for incremental movement (e.g. for manual tuning)
+    public void adjustTurretAngle(double delta) {
+        axon.changeTargetRotation(delta);
+    }
+
+    public double getTurretAngle() {
+        return axon.getTotalRotation();
+    }
+
+    public static RTPAxon getRTPAxon(){
+        return axon;
     }
 
     //intake

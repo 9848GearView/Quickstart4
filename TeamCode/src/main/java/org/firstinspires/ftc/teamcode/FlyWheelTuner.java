@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.teamcode.mech.IntakeV2;
+import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 
 @TeleOp(name="FlyWheelTuner", group="Iterative OpMode")
 public class FlyWheelTuner extends OpMode {
@@ -28,7 +28,7 @@ public class FlyWheelTuner extends OpMode {
     private double highVel = 1600;
     private double lowVel = 1270;
 
-    IntakeV2 cannon = null;
+    IntakeV3 cannon = null;
 
     double f = 0;
     double p = 0;
@@ -44,7 +44,7 @@ public class FlyWheelTuner extends OpMode {
         outtakeT = hardwareMap.get(DcMotorEx.class, "outtakeT");
         outtakeB = hardwareMap.get(DcMotorEx.class, "outtakeB");
 
-        cannon = new IntakeV2(hardwareMap);
+        cannon = new IntakeV3(hardwareMap);
 
 
         outtakeT.setDirection(DcMotorEx.Direction.REVERSE);

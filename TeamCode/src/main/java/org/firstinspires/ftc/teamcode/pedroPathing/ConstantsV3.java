@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.PredictiveBrakingCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -20,19 +21,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class ConstantsV3 {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(15.4)
-            .forwardZeroPowerAcceleration(-32.5)
-            .lateralZeroPowerAcceleration(-69)
+            .mass(15.7)
+            .forwardZeroPowerAcceleration(-57)
+            .lateralZeroPowerAcceleration(-76)
             .useSecondaryTranslationalPIDF(true)
             .useSecondaryHeadingPIDF(true)
             .useSecondaryDrivePIDF(true)
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(0.2, 0.072, 0.0023))
             .translationalPIDFCoefficients(new PIDFCoefficients(0.15, 0, 0.01, 0.03))
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.25,0,0.02,0.015))
             .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.05, 0.03))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(3,0,0.1,0.02))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.015,0.0,0.0005,0.6,0.01))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.02,0,0.000005,0.6,0.01))
-            .centripetalScaling(0.0005)
+            .centripetalScaling(0)
             ;
 
     public static PathConstraints pathConstraints = new PathConstraints(
@@ -42,8 +44,8 @@ public class ConstantsV3 {
             1);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-5.75492126)
-            .strafePodX(6.6417323) // old is -7.6, inward adjusted is -7.21
+            .forwardPodY(6.6417323) //-.5868
+            .strafePodX(-5.75492126) //-.867
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
@@ -62,8 +64,8 @@ public class ConstantsV3 {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(70)
-            .yVelocity(52.5)
+            .xVelocity(60)
+            .yVelocity(43.5)
             ;
 
 

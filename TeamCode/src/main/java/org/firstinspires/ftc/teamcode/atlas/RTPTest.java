@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.atlas;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -10,10 +10,13 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.mech.GamepadPair;
 
+import org.firstinspires.ftc.teamcode.mech.IntakeV3;
+
 
 // TeleOp test class for manual tuning and testing
 @TeleOp(name = "yay test yayyy", group = "test")
 public class RTPTest extends LinearOpMode {
+    IntakeV3 cannon = null;
 
     @Override
     public void runOpMode() throws InterruptedException {

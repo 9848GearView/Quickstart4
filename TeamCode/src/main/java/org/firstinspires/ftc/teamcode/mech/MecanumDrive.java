@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.mech;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -41,7 +42,7 @@ public class MecanumDrive {
         brMotor = hwMap.get(DcMotor.class, "BR");
 
         //tilt park
-        tilt = hwMap.get(DcMotor.class, "tilt");
+        tilt = hwMap.get(DcMotorEx.class, "tilt");
 
         imu = hwMap.get(IMU.class,"imu");
 
@@ -56,6 +57,7 @@ public class MecanumDrive {
         frMotor.setDirection(DcMotor.Direction.FORWARD);
         blMotor.setDirection(DcMotor.Direction.REVERSE);
         brMotor.setDirection(DcMotor.Direction.FORWARD);
+        tilt.setDirection(DcMotorSimple.Direction.REVERSE);
 
         flMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -110,13 +112,13 @@ public class MecanumDrive {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
-    public void setHalfPark(double i){
-        //tilt.setPosition(i);
+    public void setHalfPark(int i){
+        tilt.setTargetPosition(i);
     }
 
     public double getHalfPark() {
-        //return tilt.getPosition();
-        return 0;
+        return tilt.getTargetPosition();
+        //return 0;
     }
 
     public void resetRobotAngle(){

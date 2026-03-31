@@ -25,10 +25,10 @@ import java.util.function.Supplier;
 
 @TeleOp(name="Atlas thing", group="Iterative OpMode")
 public class AtlasTeleOpBlue extends OpMode {
-    private Limelight3A camera;
+    //private Limelight3A camera;
     MecanumDrive chassis = null;
     IntakeV3 cannon = null;
-    RTPAxon axon = null;
+    RTPAxon axon = IntakeV3.getRTPAxon();
     private Paths paths;
     private Supplier<PathChain> shootPos;
     public Follower follower;
@@ -118,10 +118,10 @@ public class AtlasTeleOpBlue extends OpMode {
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV3(hardwareMap);
         visionAid = new BlueLimelightAutoAim(hardwareMap);
-        camera = hardwareMap.get(Limelight3A.class,"limabean");
+        //camera = hardwareMap.get(Limelight3A.class,"limabean");
 
-        camera.pipelineSwitch(0);
-        camera.setPollRateHz(90);
+        //camera.pipelineSwitch(0);
+        //camera.setPollRateHz(90);
         //chassis.setHalfPark(0.45);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
@@ -153,7 +153,7 @@ public class AtlasTeleOpBlue extends OpMode {
 //                .setConstantHeadingInterpolation(0)
 //                .build();
 
-        camera.start();
+        //camera.start();
     }
     @Override
     public void loop(){
@@ -249,17 +249,13 @@ public class AtlasTeleOpBlue extends OpMode {
 //        }
 
         if(gamepad2.dpad_left) {
-            //if(cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
-            //cannon.setTurret(cannon.getTurretPos() + tInc);
-            //}
-        }
+            axon.setTargetRotation(-90);
+         }
         if(gamepad2.dpad_right) {
-            // if (cannon.getTurretPos() < 1 && cannon.getTurretPos() > 0) {
-            //cannon.setTurret(cannon.getTurretPos() - tInc);
-            // }
+            axon.setTargetRotation(90);
         }
         if(gamepad2.dpad_up) {
-            //cannon.setTurret(.5);
+            axon.setTargetRotation(0);
         }
 
         if( bPressed && !oldBPressed) {
@@ -324,7 +320,7 @@ public class AtlasTeleOpBlue extends OpMode {
         }
         //chassis
         if(gamepad1.x){
-            chassis.setHalfPark(0.10);
+            chassis.setHalfPark(1000);
         }
 
         if(gamepad1.a){
@@ -473,6 +469,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
         telemetry.addData("launchTrigger", launchTrigger);
         telemetry.addData("Actuator Position", cannon.getActuatorPosition());
+        telemetry.addData("Tilt Park Position:",chassis.getHalfPark());
 
         telemetry.addLine();
         telemetry.addData("Servo Position", axon.getCurrentAngle());

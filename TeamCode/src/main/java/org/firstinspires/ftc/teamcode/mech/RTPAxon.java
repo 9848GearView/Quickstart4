@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class RTPAxon {
@@ -56,9 +58,18 @@ public class RTPAxon {
     // region constructors
 
     // Basic constructor, defaults to FORWARD direction
+    public RTPAxon(HardwareMap hwMap){
+        rtp = true;
+        this.turretL = hwMap.get(CRServo.class,"turretL");
+        servoEncoderL = null;
+        servoEncoderR = null;
+
+        turretR = null;
+    }
+
     public RTPAxon(CRServo servo, AnalogInput encoder) {
         rtp = true;
-        this.turretL = servo;
+        this.turretL = null;
         this.turretR = servo;
         servoEncoderL = encoder;
         servoEncoderR = encoder;
