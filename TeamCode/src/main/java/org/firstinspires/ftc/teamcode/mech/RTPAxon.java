@@ -58,14 +58,16 @@ public class RTPAxon {
     // region constructors
 
     // Basic constructor, defaults to FORWARD direction
-    public RTPAxon(HardwareMap hwMap){
+    /*public RTPAxon(HardwareMap hwMap){
         rtp = true;
-        this.turretL = hwMap.get(CRServo.class,"turretL");
         servoEncoderL = null;
         servoEncoderR = null;
 
         turretR = null;
+        turretL = null;
     }
+
+     */
 
     public RTPAxon(CRServo servo, AnalogInput encoder) {
         rtp = true;
@@ -77,7 +79,7 @@ public class RTPAxon {
         initialize();
     }
 
-    public RTPAxon(CRServo servo1, CRServo servo2, AnalogInput encoder1, AnalogInput encoder2) {
+    public RTPAxon(HardwareMap hwMap, CRServo servo1, CRServo servo2, AnalogInput encoder1, AnalogInput encoder2) {
         rtp = true;
         this.turretL = servo1;
         this.turretR = servo2;

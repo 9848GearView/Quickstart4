@@ -116,7 +116,7 @@ public class MecanumDrive {
         tilt.setTargetPosition(i);
     }
 
-    public double getHalfPark() {
+    public double getTiltPark() {
         return tilt.getTargetPosition();
         //return 0;
     }
@@ -157,8 +157,6 @@ public class MecanumDrive {
      public double getLaunchAngle(){
         return LA;
      }
-
-
 
 
 }

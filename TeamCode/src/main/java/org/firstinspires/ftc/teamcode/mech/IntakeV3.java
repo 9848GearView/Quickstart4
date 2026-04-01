@@ -5,13 +5,13 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
-//import org.firstinspires.ftc.teamcode.subsystems.RTPAxon;
 import com.arcrobotics.ftclib.command.Subsystem;
 
 
@@ -130,7 +130,7 @@ public class IntakeV3 implements Subsystem{
         encoderR = hwMap.get(AnalogInput.class, "encoderR");
 
 
-        axon = new RTPAxon(turretL, turretR, encoderL, encoderR);
+        axon = new RTPAxon(hwMap, turretL, turretR, encoderL, encoderR);
         axon.setMaxPower(.5);
         axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // change
 
@@ -139,8 +139,8 @@ public class IntakeV3 implements Subsystem{
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         intake.setDirection(DcMotorEx.Direction.REVERSE);
-        outtakeT.setDirection(DcMotorEx.Direction.REVERSE);
-        outtakeB.setDirection(DcMotorEx.Direction.FORWARD);
+        outtakeT.setDirection(DcMotorEx.Direction.FORWARD);
+        outtakeB.setDirection(DcMotorEx.Direction.REVERSE);
 
         /*
          * Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to
