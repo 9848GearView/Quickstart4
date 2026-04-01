@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
 
-@TeleOp(name="Atlas thing", group="Iterative OpMode")
+@TeleOp(name="Atlas Blue TeleOp", group="Iterative OpMode")
 public class AtlasTeleOpBlue extends OpMode {
     //private Limelight3A camera;
     MecanumDrive chassis = null;
@@ -335,7 +335,24 @@ public class AtlasTeleOpBlue extends OpMode {
         }
         //chassis
         if(gamepad1.x){
-            chassis.setHalfPark(500);
+            chassis.setHalfPark(1000);
+        }
+
+        if(gamepad1.a){
+            if(!posLock) {
+                shootX = follower.getPose().getX();
+                shootY = follower.getPose().getY();
+                //shootH = headingDegrees; // sets heading to 0-360 degree range
+                shootH = (follower.getPose().getHeading() * 180 / Math.PI) % 360; // sets heading to -180-180 degree range, default for pedro pathing
+                posLock = true;
+            } else {
+                posLock = false;
+            }
+        }
+
+        if(posLock && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
+            follower.followPath(shootPos.get());
+            automatedDrive = true;
         }
 //
 //        if(gamepad1.a){
