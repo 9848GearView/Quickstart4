@@ -68,6 +68,7 @@ public class MecanumDrive {
         frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         blMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         brMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        tilt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
 

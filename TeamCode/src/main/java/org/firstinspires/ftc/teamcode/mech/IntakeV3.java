@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -42,6 +44,9 @@ public class IntakeV3 implements Subsystem{
     //distance sensor
     private DistanceSensor distanceSensorGate;
     private DistanceSensor distanceSensorIntake;
+
+    //light
+    I2cDeviceSynch prism;
 
     //turret
     //private CRServo turretL;
@@ -122,6 +127,10 @@ public class IntakeV3 implements Subsystem{
         distanceSensorGate = hwMap.get(DistanceSensor.class, "distanceGate");
         distanceSensorIntake = hwMap.get(DistanceSensor.class, "distanceIntake");
 
+        //light
+        prism = hwMap.get(I2cDeviceSynch.class, "prism");
+        prism.setI2cAddress(I2cAddr.create7bit(0x38)); // Default Prism I2C address is usually 0x24
+        prism.engage();
 
         //turret
 
@@ -199,10 +208,17 @@ public class IntakeV3 implements Subsystem{
         return gate.getPosition();
     }
 
-    //set light color
+    public void setColor(int r, int g, int b) {
+        // Replace 0x01, 0x02, 0x03 with the actual register addresses for R, G, B
+        prism.write8(0x01, r); // Red
+        prism.write8(0x02, g); // Green
+        prism.write8(0x03, b); // Blue
+    }
+
+//set light color
     public void setLightColor() {
         if (gate.getPosition() == .25) {
-            //blinky.setPosition(.500); //open, green
+            setColor(255,0,0);
         }
         if (gate.getPosition() == .38) {
             //blinky.setPosition(.28); //closed, red
