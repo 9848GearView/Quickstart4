@@ -351,7 +351,7 @@ public class AtlasTeleOpBlue extends OpMode {
         }
         //chassis
         if(gamepad1.x){
-            chassis.setHalfPark(1500, 1.0);
+            chassis.setHalfPark(1250, 1.0);
         }
 
         if(gamepad1.a){

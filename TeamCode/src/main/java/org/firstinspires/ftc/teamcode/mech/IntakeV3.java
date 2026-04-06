@@ -218,10 +218,13 @@ public class IntakeV3 implements Subsystem{
 //set light color
     public void setLightColor() {
         if (gate.getPosition() == .25) {
-            setColor(255,0,0);
+            //setColor(255,0,0);
         }
         if (gate.getPosition() == .38) {
             //blinky.setPosition(.28); //closed, red
+        }
+        if (getDistanceGate() < 15){
+            //setColor()
         }
     }
 
