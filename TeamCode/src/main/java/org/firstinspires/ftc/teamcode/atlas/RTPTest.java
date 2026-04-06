@@ -17,14 +17,16 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 @TeleOp(name = "yay test yayyy", group = "test")
 public class RTPTest extends LinearOpMode {
     IntakeV3 cannon = null;
+    RTPAxon axon = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        CRServo crservo = hardwareMap.crservo.get("rightHorizSlide");
-        AnalogInput encoder = hardwareMap.get(AnalogInput.class, "rightHorizSlideEncoder");
         GamepadPair gamepads = new GamepadPair(gamepad1, gamepad2);
-        RTPAxon servo = new RTPAxon(crservo, encoder);
+        cannon = new IntakeV3(hardwareMap);
+        axon = cannon.getRTPAxon();
+
+        RTPAxon servo = new RTPAxon(hardwareMap);
 
         waitForStart();
 

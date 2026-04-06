@@ -81,7 +81,7 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
             camera = hardwareMap.get(Limelight3A.class,"limabean");
             //camera = new LLMech(hardwareMap);
             camera.pipelineSwitch(1);
-            chassis.setHalfPark(1000);
+            chassis.setHalfPark(1000, 1);
             cannon.setGatePosition(.38);
             cannon.setLightColor();
             cannon.setTurret(.5);
@@ -130,7 +130,7 @@ import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
             }
 
             if(gamepad1.x){
-                chassis.setHalfPark(1);
+                chassis.setHalfPark(1000, 1);
             }
 
             //intake

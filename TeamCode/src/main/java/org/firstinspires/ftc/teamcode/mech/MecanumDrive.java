@@ -57,7 +57,7 @@ public class MecanumDrive {
         frMotor.setDirection(DcMotor.Direction.FORWARD);
         blMotor.setDirection(DcMotor.Direction.REVERSE);
         brMotor.setDirection(DcMotor.Direction.FORWARD);
-        tilt.setDirection(DcMotorSimple.Direction.REVERSE);
+        tilt.setDirection(DcMotorSimple.Direction.FORWARD);
 
         flMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -112,8 +112,10 @@ public class MecanumDrive {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
 
-    public void setHalfPark(int i){
-        tilt.setTargetPosition(i);
+    public void setHalfPark(int pos, double pow){
+        tilt.setPower(pow);
+        tilt.setTargetPosition(pos);
+        tilt.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public double getTiltPark() {

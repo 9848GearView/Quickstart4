@@ -79,12 +79,12 @@ public class RTPAxon {
         initialize();
     }
 
-    public RTPAxon(HardwareMap hwMap, CRServo servo1, CRServo servo2, AnalogInput encoder1, AnalogInput encoder2) {
+    public RTPAxon(HardwareMap hwMap) {
         rtp = true;
-        this.turretL = servo1;
-        this.turretR = servo2;
-        servoEncoderL = encoder1;
-        servoEncoderR = encoder2;
+        turretL = hwMap.get(CRServo.class, "turretL");
+        turretR = hwMap.get(CRServo.class, "turretR");
+        servoEncoderL = hwMap.get(AnalogInput.class, "encoderL");
+        servoEncoderR = hwMap.get(AnalogInput.class, "encoderR");
         direction = Direction.FORWARD;
         initialize();
     }
@@ -99,8 +99,8 @@ public class RTPAxon {
 
     // Initialization logic for servo and encoder
     private void initialize() {
-        turretL.setPower(0);
-        turretR.setPower(0);
+        if (turretL != null) turretL.setPower(0);
+        if (turretR != null) turretR.setPower(0);
         try {
             Thread.sleep(50);
         } catch (InterruptedException ignored) {
@@ -147,7 +147,7 @@ public class RTPAxon {
     public void setPower(double power) {
         this.power = Math.max(-maxPower, Math.min(maxPower, power));
         turretL.setPower(this.power * (direction == Direction.REVERSE ? -1 : 1));
-        turretR.setPower(this.power * (direction == Direction.REVERSE ? -1 : 1));
+        turretR.setPower(this.power * (direction == Direction.REVERSE ? 1 : -1));
 
     }
 
@@ -260,8 +260,11 @@ public class RTPAxon {
 
     // Get current angle from encoder (in degrees)
     public double getCurrentAngle() {
-        if (servoEncoderL == null) return 0;
+        if (servoEncoderL == null) return 1;
         return (servoEncoderL.getVoltage() / 3.3) * (direction.equals(Direction.REVERSE) ? -360 : 360);
+    }
+    public double getVoltage(){
+        return servoEncoderL.getVoltage();
     }
 
     // Check if servo is at target (default tolerance)
@@ -345,7 +348,7 @@ public class RTPAxon {
         double output = pTerm + iTerm + dTerm;
 
         // Deadzone for output
-        final double DEADZONE = 0.5;
+        final double DEADZONE = 1;
         if (Math.abs(error) > DEADZONE) {
             double power = Math.min(maxPower, Math.abs(output)) * Math.signum(output);
             setPower(power);
@@ -363,7 +366,7 @@ public class RTPAxon {
                         "Total Rotation: %.2f\n" +
                         "Target Rotation: %.2f\n" +
                         "Current Power: %.3f\n" +
-                        "PID Values: P=%.3f I=%.3f D=%.3f\n" +
+                        "PID Values: P=%.4f I=%.4f D=%.4f\n" +
                         "PID Terms: Error=%.2f Integral=%.2f",
                 servoEncoderL.getVoltage(),
                 getCurrentAngle(),

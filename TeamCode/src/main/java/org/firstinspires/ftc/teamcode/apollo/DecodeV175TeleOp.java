@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.apollo;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -11,7 +12,7 @@ import org.firstinspires.ftc.teamcode.mech.LLMech;
 
 //this is a new version for the new intake system;
 //didnt want to deal with the mess of forgetting how i did something
-
+@Disabled
 @TeleOp(name="DecodeV175TeleOp", group="Iterative OpMode")
 public class DecodeV175TeleOp extends OpMode {
     MecanumDrive chassis = null;

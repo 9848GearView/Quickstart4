@@ -42,9 +42,6 @@ public class AtlasTeleOpBlue extends OpMode {
     ColorSensor.detectedColor detectedColor;
 
 
-    private boolean dPadUpPressed;
-
-
     private boolean rStickPressed;
     private boolean oldrStickPressed;
 
@@ -57,6 +54,17 @@ public class AtlasTeleOpBlue extends OpMode {
     private boolean dPadDownPressed;
     private boolean oldDPadDownPressed;
 
+    //booleans for up
+    private boolean dPadUpPressed;
+    private boolean oldDPadUpPressed;
+
+    //booleans for left
+    private boolean dPadLeftPressed;
+    private boolean oldDPadLeftPressed;
+
+    //booleans for right
+    private boolean dPadRightPressed;
+    private boolean oldDPadRightPressed;
 
 
     //booleans for turret
@@ -67,6 +75,7 @@ public class AtlasTeleOpBlue extends OpMode {
     private String LState;
     private boolean tLock;
     private boolean pushDown = true;
+    private double turretIncrement;
 
     //booleans for b button
     private boolean bPressed;
@@ -117,17 +126,18 @@ public class AtlasTeleOpBlue extends OpMode {
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV3(hardwareMap);
-        axon = IntakeV3.getRTPAxon();
+        axon = cannon.getRTPAxon();
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         //camera = hardwareMap.get(Limelight3A.class,"limabean");
 
         //camera.pipelineSwitch(0);
         //camera.setPollRateHz(90);
         //chassis.setHalfPark(0.45);
-        cannon.setGatePosition(.38);
+        cannon.setGatePosition(.3);
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
         axon.setTargetRotation(0);
+        chassis.setHalfPark(0, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
@@ -143,6 +153,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
         tLock = false;
         velMPS = 0;
+        turretIncrement = 0.1;
         //colSens = new ColorSensor(hardwareMap);
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
     }
@@ -161,7 +172,8 @@ public class AtlasTeleOpBlue extends OpMode {
     public void loop(){
         follower.update();
         visionAid.update();
-        //axon.update();
+        cannon.updateTurret();
+
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
 
         dPadUpPressed = gamepad2.dpad_up;
@@ -171,6 +183,11 @@ public class AtlasTeleOpBlue extends OpMode {
 
         dPadDownPressed = gamepad2.dpad_down;
 
+        dPadUpPressed = gamepad2.dpad_up;
+
+        dPadRightPressed = gamepad2.dpad_right;
+
+        dPadLeftPressed = gamepad2.dpad_left;
 
         aPressed = gamepad2.a;
         bPressed = gamepad2.b;
@@ -199,11 +216,11 @@ public class AtlasTeleOpBlue extends OpMode {
             rightX = 0;
         }
 
-        if(cannon.getGatePosition() == .38){
+        if(cannon.getGatePosition() == 1){
             gateOn = true;
         }
 
-        if(cannon.getGatePosition() == .25){
+        if(cannon.getGatePosition() == 0){
             gateOn = false;
         }
 
@@ -263,20 +280,19 @@ public class AtlasTeleOpBlue extends OpMode {
 //            LState = "far";
 //        }
 
-        if(gamepad2.dpad_left) {
-            axon.changeTargetRotation(-15);
-         }
-        if(gamepad2.dpad_right) {
-            axon.changeTargetRotation(15);
+        if (gamepad2.dpad_left && !oldDPadLeftPressed) {
+            axon.changeTargetRotation(-5); // Move turret left by 5 degrees
         }
-        if(gamepad2.dpad_up) {
-            axon.changeTargetRotation(0);
+        if (gamepad2.dpad_right && !oldDPadRightPressed) {
+            axon.changeTargetRotation(5);  // Move turret right by 5 degrees
+        }
+        if (gamepad2.dpad_up && !oldDPadUpPressed) {
+            axon.setTargetRotation(0);     // Re-center turret
         }
 
         if( bPressed && !oldBPressed) {
             tLock = !tLock; // reminder to find a way to turn this off
         }
-        visionAid.update();
         if (tLock) {
             if (visionAid.hasTarget()){
                 float Kp = -0.000405f; //proportional control constant
@@ -311,13 +327,13 @@ public class AtlasTeleOpBlue extends OpMode {
 
         //test launch in case break
         if(rBumperPressed && !oldRBumperPressed){
-            cannon.setGatePosition(.38);
+            cannon.setGatePosition(.9);
             cannon.setLightColor();
             oldRBumperPressed = true;
         }
 
         if(lBumperPressed && oldRBumperPressed){
-            cannon.setGatePosition(0.25);
+            cannon.setGatePosition(.3);
             cannon.setLightColor();
             oldRBumperPressed = false;
         }
@@ -331,11 +347,11 @@ public class AtlasTeleOpBlue extends OpMode {
             chassis.slowTurn(-0.1);
         }
         else {
-            chassis.drive(-leftY, leftX, rightX);
+            chassis.drive(leftY, -leftX, -rightX);
         }
         //chassis
         if(gamepad1.x){
-            chassis.setHalfPark(1000);
+            chassis.setHalfPark(1500, 1.0);
         }
 
         if(gamepad1.a){
@@ -460,6 +476,13 @@ public class AtlasTeleOpBlue extends OpMode {
             }
         }
 
+if(gamepad2.dpad_left){
+    cannon.adjustTurretAngle(-turretIncrement);
+}
+if(gamepad2.dpad_right){
+    cannon.adjustTurretAngle(turretIncrement);
+}
+
 
         velMPS = (cannon.getLauncherVelocity() / 4) / (28 / (0.096 * Math.PI));
         // old button presses at the bottom of loop
@@ -469,6 +492,10 @@ public class AtlasTeleOpBlue extends OpMode {
         oldYPressed = gamepad2.y;
         oldrStickPressed = rStickPressed;
         oldDPadDownPressed = gamepad2.dpad_down;
+        oldDPadLeftPressed = gamepad2.dpad_left;
+        oldDPadRightPressed = gamepad2.dpad_right;
+        oldDPadUpPressed = gamepad2.dpad_up;
+
 
         //chassis.setLightColor();
 
@@ -513,6 +540,7 @@ public class AtlasTeleOpBlue extends OpMode {
         telemetry.addData("Servo Position", axon.getCurrentAngle());
         telemetry.addData("Total Rotation", axon.getTotalRotation());
         telemetry.addData("Target Rotation", axon.getTargetRotation());
+        telemetry.addData("Current Voltage", cannon.getVoltage());
         telemetry.addLine(axon.log());
 
         telemetry.addLine();

@@ -93,7 +93,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
 
         camera.pipelineSwitch(1);
         camera.setPollRateHz(90);
-        chassis.setHalfPark(0);
+        //chassis.setHalfPark(0);
         cannon.setGatePosition(.38);
         cannon.setLightColor();
         cannon.setTurret(.5);
@@ -147,7 +147,7 @@ public class States_DecodeV2TeleOp_RED extends OpMode {
         }
 
         if(gamepad1.x){
-            chassis.setHalfPark(0);
+            //chassis.setHalfPark(0);
         }
 
         //intake

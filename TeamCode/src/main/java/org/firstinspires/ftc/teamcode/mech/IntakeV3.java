@@ -44,11 +44,11 @@ public class IntakeV3 implements Subsystem{
     private DistanceSensor distanceSensorIntake;
 
     //turret
-    private CRServo turretL;
-    private CRServo turretR;
-    private AnalogInput encoderL;
-    private AnalogInput encoderR;
-    private static RTPAxon axon;
+    //private CRServo turretL;
+    //private CRServo turretR;
+    //private AnalogInput encoderL;
+    //private AnalogInput encoderR;
+    private RTPAxon turretRotation;
     private double tInc = .001;
     private double leftLim = .65;
     private boolean leftLimReached = false;
@@ -124,15 +124,11 @@ public class IntakeV3 implements Subsystem{
 
 
         //turret
-        turretL = hwMap.get(CRServo.class, "turretL");
-        turretR = hwMap.get(CRServo.class, "turretR");
-        encoderL = hwMap.get(AnalogInput.class, "encoderL");
-        encoderR = hwMap.get(AnalogInput.class, "encoderR");
 
 
-        axon = new RTPAxon(hwMap, turretL, turretR, encoderL, encoderR);
-        axon.setMaxPower(.5);
-        axon.setPidCoeffs(0.02, 0.0005, 0.0025);  // change
+        turretRotation = new RTPAxon(hwMap);
+        turretRotation.setMaxPower(.7);
+        turretRotation.setPidCoeffs(0.015, 0.001, 0.0005);  // change
 
 
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -168,25 +164,25 @@ public class IntakeV3 implements Subsystem{
 
     // Wrapper to update the PID and encoder logic
     public void updateTurret() {
-        axon.update();
+        turretRotation.update();
     }
 
     // Wrapper to set the position
     public void setTurretAngle(double degrees) {
-        axon.setTargetRotation(degrees);
+        turretRotation.setTargetRotation(degrees);
     }
 
     // Wrapper for incremental movement (e.g. for manual tuning)
     public void adjustTurretAngle(double delta) {
-        axon.changeTargetRotation(delta);
+        turretRotation.changeTargetRotation(delta);
     }
 
     public double getTurretAngle() {
-        return axon.getTotalRotation();
+        return turretRotation.getTotalRotation();
     }
 
-    public static RTPAxon getRTPAxon(){
-        return axon;
+    public RTPAxon getRTPAxon(){
+        return turretRotation;
     }
 
     //intake
@@ -216,6 +212,10 @@ public class IntakeV3 implements Subsystem{
     //set actuator position
     public void setActuatorPos(double i) {
         angle.setPosition(i);
+    }
+
+    public double getVoltage(){
+        return turretRotation.getVoltage();
     }
 
     //set turret position
