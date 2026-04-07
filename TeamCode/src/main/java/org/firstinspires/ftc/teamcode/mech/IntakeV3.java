@@ -46,7 +46,7 @@ public class IntakeV3 implements Subsystem{
     private DistanceSensor distanceSensorIntake;
 
     //light
-    I2cDeviceSynch prism;
+    //I2cDeviceSynch prism;
 
     //turret
     //private CRServo turretL;
@@ -128,9 +128,9 @@ public class IntakeV3 implements Subsystem{
         distanceSensorIntake = hwMap.get(DistanceSensor.class, "distanceIntake");
 
         //light
-        prism = hwMap.get(I2cDeviceSynch.class, "prism");
-        prism.setI2cAddress(I2cAddr.create7bit(0x38)); // Default Prism I2C address is usually 0x24
-        prism.engage();
+        //prism = hwMap.get(I2cDeviceSynch.class, "prism");
+        //prism.setI2cAddress(I2cAddr.create7bit(0x38)); // Default Prism I2C address is usually 0x24
+        //prism.engage();
 
         //turret
 
@@ -210,9 +210,9 @@ public class IntakeV3 implements Subsystem{
 
     public void setColor(int r, int g, int b) {
         // Replace 0x01, 0x02, 0x03 with the actual register addresses for R, G, B
-        prism.write8(0x01, r); // Red
-        prism.write8(0x02, g); // Green
-        prism.write8(0x03, b); // Blue
+        //prism.write8(0x01, r); // Red
+        //prism.write8(0x02, g); // Green
+        //prism.write8(0x03, b); // Blue
     }
 
 //set light color
