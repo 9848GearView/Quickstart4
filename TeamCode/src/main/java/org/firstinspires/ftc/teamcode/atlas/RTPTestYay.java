@@ -134,10 +134,10 @@ public class RTPTestYay extends OpMode {
 
         // Manual controls for target and PID tuning
         if (gamepad2.dpad_right && !oldDPadRightPressed) {
-            axon.changeTargetRotation(15);
+            axon.changeTargetRotation(40);
         }
         if (gamepad2.dpad_left && !oldDPadLeftPressed) {
-            axon.changeTargetRotation(-15);
+            axon.changeTargetRotation(-40);
         }
         if (gamepad2.dpad_up && !oldDPadUpPressed) {
             axon.setTargetRotation(0);
@@ -157,20 +157,22 @@ public class RTPTestYay extends OpMode {
             axon.setKI(Math.max(0, axon.getKI() - 0.0001));
         }
 
-        if (dPadUpPressed && !oldDPadUpPressed) {
+        if (rBumperPressed && !oldRBumperPressed) {
             axon.setKD(axon.getKD() + 0.0001);
         }
-        if (dPadDownPressed && !oldDPadDownPressed) {
+        if (lBumperPressed && !oldLBumperPressed) {
             axon.setKD(Math.max(0, axon.getKD() - 0.0001));
         }
 
 
-        if (rBumperPressed && !oldRBumperPressed) {
+        /*if (rBumperPressed && !oldRBumperPressed) {
             axon.setKP(0.015);
             axon.setKI(0.0005);
             axon.setKD(0.0025);
             axon.resetPID();
         }
+
+         */
 
         // old button presses at the bottom of loop
         oldAPressed = gamepad2.a;

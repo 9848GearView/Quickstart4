@@ -537,7 +537,8 @@ if(gamepad2.dpad_right){
 
         telemetry.addLine();
 
-        telemetry.addData("Servo Position", axon.getCurrentAngle());
+        telemetry.addData("Servo Position L", axon.getCurrentAngle());
+
         telemetry.addData("Total Rotation", axon.getTotalRotation());
         telemetry.addData("Target Rotation", axon.getTargetRotation());
         telemetry.addData("Current Voltage", cannon.getVoltage());

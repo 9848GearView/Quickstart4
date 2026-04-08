@@ -144,8 +144,8 @@ public class IntakeV3 implements Subsystem{
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         intake.setDirection(DcMotorEx.Direction.REVERSE);
-        outtakeT.setDirection(DcMotorEx.Direction.FORWARD);
-        outtakeB.setDirection(DcMotorEx.Direction.REVERSE);
+        outtakeT.setDirection(DcMotorEx.Direction.REVERSE);
+        outtakeB.setDirection(DcMotorEx.Direction.FORWARD);
 
         /*
          * Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to
