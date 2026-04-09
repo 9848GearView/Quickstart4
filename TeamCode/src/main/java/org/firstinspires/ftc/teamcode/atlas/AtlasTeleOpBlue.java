@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
+import org.firstinspires.ftc.teamcode.mech.RobotStorage;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
 
 
@@ -117,6 +118,9 @@ public class AtlasTeleOpBlue extends OpMode {
     private double leftY;
     private double rightX;
 
+    public double startingX = 36;
+    public double startingY = 20;
+    public double startingH = 90;
     public double shootX;
     public double shootY;
     public double shootH;
@@ -160,7 +164,10 @@ public class AtlasTeleOpBlue extends OpMode {
         chassis.setHalfPark(0, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(36,20,Math.toRadians(90)));
+        startingX = RobotStorage.PoseX;
+        startingY = RobotStorage.PoseY;
+        startingH = RobotStorage.PoseH;
+        follower.setStartingPose(new Pose(startingX,startingY,Math.toRadians(startingH)));
         follower.update();
         shootX = 56;
         shootY = 8;
@@ -276,7 +283,7 @@ public class AtlasTeleOpBlue extends OpMode {
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_0,noIntakeBall);
         }
 
-        if(cannon.getDistanceGate() < 4.50){
+        if(cannon.getDistanceGate() < 4.5){
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_2,gateBall);
         } else {
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_2,noGateBall);
@@ -440,6 +447,8 @@ public class AtlasTeleOpBlue extends OpMode {
         if(posLock && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
             follower.followPath(shootPos.get());
             automatedDrive = true;
+        } else {
+            automatedDrive = false;
         }
 //
 //        if(gamepad1.a){
