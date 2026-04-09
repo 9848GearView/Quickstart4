@@ -19,6 +19,18 @@ import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
 
 
+import static org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver.LayerHeight;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.atlas.Prism.Color;
+import org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver;
+import org.firstinspires.ftc.teamcode.atlas.Prism.PrismAnimations;
+
+import java.util.concurrent.TimeUnit;
+
+
 import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
@@ -33,6 +45,13 @@ public class AtlasTeleOpBlue extends OpMode {
     private Supplier<PathChain> shootPos;
     public Follower follower;
     BlueLimelightAutoAim visionAid = null;
+    GoBildaPrismDriver prism;
+    PrismAnimations.Solid intakeBall = new PrismAnimations.Solid(Color.PURPLE);
+    PrismAnimations.Solid noIntakeBall = new PrismAnimations.Solid(Color.TRANSPARENT);
+    PrismAnimations.Solid gateStatusOpen = new PrismAnimations.Solid(Color.GREEN);
+    PrismAnimations.Solid gateStatusClose = new PrismAnimations.Solid(Color.RED);
+    PrismAnimations.Solid gateBall = new PrismAnimations.Solid(Color.PURPLE);
+    PrismAnimations.Solid noGateBall = new PrismAnimations.Solid(Color.TRANSPARENT);
 
 
     //ColorSensor colSens = null;
@@ -154,6 +173,28 @@ public class AtlasTeleOpBlue extends OpMode {
         tLock = false;
         velMPS = 0;
         turretIncrement = 0.1;
+
+        prism = hardwareMap.get(GoBildaPrismDriver.class,"prism");
+
+        intakeBall.setBrightness(1);
+        noIntakeBall.setBrightness(1);
+        gateStatusOpen.setBrightness(1);
+        gateStatusClose.setBrightness(1);
+        gateBall.setBrightness(1);
+        noGateBall.setBrightness(1);
+
+        intakeBall.setStartIndex(0);
+        intakeBall.setStopIndex(4);
+        noIntakeBall.setStartIndex(0);
+        noIntakeBall.setStopIndex(4);
+        gateStatusOpen.setStartIndex(4);
+        gateStatusOpen.setStopIndex(8);
+        gateStatusClose.setStartIndex(4);
+        gateStatusClose.setStopIndex(8);
+        gateBall.setStartIndex(8);
+        gateBall.setStopIndex(12);
+        noGateBall.setStartIndex(8);
+        noGateBall.setStopIndex(12);
         //colSens = new ColorSensor(hardwareMap);
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
     }
@@ -165,6 +206,7 @@ public class AtlasTeleOpBlue extends OpMode {
 //                .addPath(new BezierLine(new Pose(72,72), new Pose( 72,72)))
 //                .setConstantHeadingInterpolation(0)
 //                .build();
+
 
         //camera.start();
     }
@@ -218,10 +260,24 @@ public class AtlasTeleOpBlue extends OpMode {
 
         if(cannon.getGatePosition() == 1){
             gateOn = true;
+            prism.insertAndUpdateAnimation(LayerHeight.LAYER_1,gateStatusClose);
         }
 
         if(cannon.getGatePosition() == 0){
             gateOn = false;
+            prism.insertAndUpdateAnimation(LayerHeight.LAYER_1,gateStatusOpen);
+        }
+
+        if(cannon.getDistanceIntake() < 4.5){
+            prism.insertAndUpdateAnimation(LayerHeight.LAYER_0,intakeBall);
+        } else {
+            prism.insertAndUpdateAnimation(LayerHeight.LAYER_0,noIntakeBall);
+        }
+
+        if(cannon.getDistanceGate() < 4.5){
+            prism.insertAndUpdateAnimation(LayerHeight.LAYER_2,gateBall);
+        } else {
+            prism.insertAndUpdateAnimation(LayerHeight.LAYER_2,noGateBall);
         }
 
         //intake
