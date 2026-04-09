@@ -157,7 +157,7 @@ public class AtlasTeleOpBlue extends OpMode {
         //camera.pipelineSwitch(0);
         //camera.setPollRateHz(90);
         //chassis.setHalfPark(0.45);
-        cannon.setGatePosition(.35);
+        cannon.setGatePosition(0);
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
         axon.setTargetRotation(0);
@@ -217,6 +217,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
 
         //camera.start();
+        cannon.setGatePosition(.15);
     }
     @Override
     public void loop(){
@@ -266,12 +267,12 @@ public class AtlasTeleOpBlue extends OpMode {
             rightX = 0;
         }
 
-        if(cannon.getGatePosition() == .35){
+        if(cannon.getGatePosition() == .15){
             gateOn = true;
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_1,gateStatusClose);
         }
 
-        if(cannon.getGatePosition() == .3){
+        if(cannon.getGatePosition() == 0){
             gateOn = false;
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_1,gateStatusOpen);
         }
@@ -373,11 +374,11 @@ public class AtlasTeleOpBlue extends OpMode {
         if (tLock) {
             if (visionAid.hasTarget()){
                 float Kp = -0.505f; //proportional control constant
-                //double feedForward = ((rightX + leftX)/2.0) * .005;
+                double feedForward = ((rightX + leftX)/2.0) * .005;
                 double tx = visionAid.getTx();
                 double ta = visionAid.getTa();
                 double deadband = visionAid.getDeadband();
-                double botCorr = (Kp * tx)/* - feedForward*/;
+                double botCorr = (Kp * tx) - feedForward;
 //
                 if(Math.abs(tx) > deadband && !limReached) {
                     axon.changeTargetRotation(botCorr);
@@ -404,13 +405,13 @@ public class AtlasTeleOpBlue extends OpMode {
 
         //test launch in case break
         if(rBumperPressed && !oldRBumperPressed){
-            cannon.setGatePosition(.35);
+            cannon.setGatePosition(.15);
             cannon.setLightColor();
             oldRBumperPressed = true;
         }
 
         if(lBumperPressed && oldRBumperPressed){
-            cannon.setGatePosition(.3);
+            cannon.setGatePosition(0);
             cannon.setLightColor();
             oldRBumperPressed = false;
         }
