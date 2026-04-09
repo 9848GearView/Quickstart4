@@ -89,6 +89,10 @@ public class RTPTestYay extends OpMode {
     public double goalAngle;
     public double launchAngleL = 60;
     public double launchAngleS = 45;
+    public double leftLim = 270;
+    public boolean leftLimReached = false;
+    public double rightLim = -270;
+    public boolean rightLimReached = false;
 
     public static double GRAVITY = -9.81;
 
@@ -98,6 +102,8 @@ public class RTPTestYay extends OpMode {
     private double tInc;
 
     private double velMPS;
+
+    public double maxRotation = 270;
 
 
     @Override
@@ -132,16 +138,27 @@ public class RTPTestYay extends OpMode {
 
         axon.setMaxPower(.7);
 
-        // Manual controls for target and PID tuning
-        if (gamepad2.dpad_right && !oldDPadRightPressed) {
-            axon.changeTargetRotation(40);
+        if(axon.getTargetRotation() > 270){
+            axon.setTargetRotation(270);
         }
-        if (gamepad2.dpad_left && !oldDPadLeftPressed) {
+
+        if(axon.getTargetRotation() < -270){
+            axon.setTargetRotation(-270);
+        }
+
+
+        // Manual controls for target and PID tuning
+        if ((gamepad2.dpad_right && !oldDPadRightPressed)) {
             axon.changeTargetRotation(-40);
+        }
+        if ((gamepad2.dpad_left && !oldDPadLeftPressed)) {
+            axon.changeTargetRotation(40);
         }
         if (gamepad2.dpad_up && !oldDPadUpPressed) {
             axon.setTargetRotation(0);
         }
+
+
 
         if (gamepad2.y && !oldYPressed) {
             axon.setKP(axon.getKP() + 0.001);

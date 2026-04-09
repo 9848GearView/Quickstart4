@@ -87,8 +87,9 @@ public class IntakeV3 implements Subsystem{
     final double LAUNCHER_MIN_VELOCITY = 1550;//started at 1075//was 675//mrs B changed to 800
 
     private String launchStatus;
-
-    PIDFCoefficients Coeffs = new PIDFCoefficients(100, 0, 0, 12.5);//possible values: 100p 12.917 f good?, 15.917 little overshoot//60.917
+    
+    
+    PIDFCoefficients flywheelCoeffs = new PIDFCoefficients(35, 0, 0, 22);//possible values: 100p 12.917 f good?, 15.917 little overshoot//60.917
 
 
     ElapsedTime feedTimer = new ElapsedTime();
@@ -302,8 +303,8 @@ public class IntakeV3 implements Subsystem{
 
     //pidf coefficients and velocity for big triangle
     public void launchClose() {
-        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
         outtakeT.setVelocity(1270);
         outtakeB.setVelocity(1270);
         launchStatus = "close";
@@ -311,8 +312,8 @@ public class IntakeV3 implements Subsystem{
 
     //pidf coefficients and velocity for small triangle
     public void launchFar() {
-        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
         outtakeT.setVelocity(1620);// before adjustments velocity was 1620
         outtakeB.setVelocity(1620);//
         launchStatus = "far";
@@ -320,8 +321,8 @@ public class IntakeV3 implements Subsystem{
 
     //big triangle shooting during auto
     public void launchAutoClose() {
-        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
         outtakeT.setVelocity(1200);
         outtakeB.setVelocity(1200);
         launchStatus = "close";
@@ -330,8 +331,8 @@ public class IntakeV3 implements Subsystem{
 
     //small triangle shooting during auto
     public void launchAutoFar() {
-        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
-        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, Coeffs);
+        outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
+        outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
         outtakeT.setVelocity(1460);
         outtakeB.setVelocity(1460);
         launchStatus = "far";

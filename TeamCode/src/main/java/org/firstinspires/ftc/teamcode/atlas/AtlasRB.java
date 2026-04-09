@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
+import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
@@ -21,7 +22,7 @@ public class AtlasRB extends OpMode {
     private int pathState; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
     java.util.Timer timer = new java.util.Timer();
-    IntakeV2 cannon = null;
+    IntakeV3 cannon = null;
     BlueLimelightAutoAim vision = null;
     private Timer pathTimer;
     private Timer globalTimer;
@@ -33,8 +34,8 @@ public class AtlasRB extends OpMode {
 
         paths = new Paths(follower); // Build paths
 
-        cannon = new IntakeV2(hardwareMap);
-        cannon.setTurret(.25);
+        cannon = new IntakeV3(hardwareMap);
+        cannon.setTurretAngle(.25);
         vision = new BlueLimelightAutoAim(hardwareMap);
 
         pathTimer = new Timer();
@@ -53,7 +54,7 @@ public class AtlasRB extends OpMode {
             double tx = vision.getTx();
             double botCorr = (Kp * tx)/* - feedForward*/;
             if(Math.abs(tx) > .5) {
-                cannon.setTurret(cannon.getTurretPos() + botCorr);
+                cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
             }
 
         }
@@ -192,7 +193,6 @@ public class AtlasRB extends OpMode {
             case 1:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
-                    timer.schedule(new TransferAuto(1), 200);
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new GateAuto(0.38), 3200);
                     pathTimer.resetTimer();
@@ -203,14 +203,12 @@ public class AtlasRB extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5) {
                     follower.followPath(paths.intake1, true);
                     pathTimer.resetTimer();
-                    timer.schedule(new TransferAuto(.35), 0);
                     setPathState(3);
                 }
                 break;
             case 3:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .7) {
                     follower.followPath(paths.gate, true);
-                    timer.schedule(new TransferAuto(0), 200);
                     timer.schedule(new IntakeAuto(0), 500);
                     setPathState(4);
                 }
@@ -227,7 +225,6 @@ public class AtlasRB extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new TransferAuto(1), 200);
                     timer.schedule(new GateAuto(0.38), 3200);
                     pathTimer.resetTimer();
                     setPathState(6);
@@ -236,7 +233,6 @@ public class AtlasRB extends OpMode {
             case 6:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5) {
                     follower.followPath(paths.intakeGate, true);
-                    timer.schedule(new TransferAuto(.35), 0);
                     setPathState(7);
                 }
                 break;
@@ -244,7 +240,6 @@ public class AtlasRB extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shootGate, true);
-                    timer.schedule(new TransferAuto(0), 0);
                     setPathState(8);
                 }
                 break;
@@ -252,7 +247,6 @@ public class AtlasRB extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new TransferAuto(1), 200);
                     timer.schedule(new GateAuto(0.38), 3200);
                     pathTimer.resetTimer();
                     if(globalTimer.getElapsedTimeSeconds() < 20){
@@ -265,7 +259,6 @@ public class AtlasRB extends OpMode {
             case 9:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5) {
                     follower.followPath(paths.intakeFinal, true);
-                    timer.schedule(new TransferAuto(.35), 0);
                     setPathState(10);
                 }
                 break;
@@ -273,7 +266,6 @@ public class AtlasRB extends OpMode {
                 if (!follower.isBusy()) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.parkShoot, true);
-                    timer.schedule(new TransferAuto(0), 0);
                     setPathState(11);
                 }
                 break;
@@ -281,7 +273,6 @@ public class AtlasRB extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0.25), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new TransferAuto(1), 200);
                     timer.schedule(new GateAuto(0.38), 3200);
                     pathTimer.resetTimer();
                     setPathState(12);
@@ -290,7 +281,6 @@ public class AtlasRB extends OpMode {
             case 12:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5) {
                     timer.schedule(new IntakeAuto(0), 0);
-                    timer.schedule(new TransferAuto(0), 0);
                     timer.schedule(new StopLaunchAuto(), 0);
                     setPathState(13);
                 }
@@ -309,19 +299,6 @@ public class AtlasRB extends OpMode {
         @Override
         public void run() {
             cannon.intake(power);
-        }
-    }
-
-    public class TransferAuto extends TimerTask {
-        double power;
-
-        public TransferAuto(double p) {
-            this.power = p;
-        }
-
-        @Override
-        public void run() {
-            cannon.transfer(power);
         }
     }
 
@@ -382,7 +359,7 @@ public class AtlasRB extends OpMode {
 
         @Override
         public void run() {
-            cannon.setTurret(pos);
+            cannon.setTurretAngle(pos);
         }
     }
 

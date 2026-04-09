@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
 
 //guarantee this wont work whatsoever
-
+@Disabled
 @TeleOp(name="States_RED-DecodeV2TeleOp", group="Iterative OpMode")
 public class States_DecodeV2TeleOp_RED extends OpMode {
     private Limelight3A camera;

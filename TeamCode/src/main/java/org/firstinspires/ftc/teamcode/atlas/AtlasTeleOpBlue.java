@@ -92,6 +92,7 @@ public class AtlasTeleOpBlue extends OpMode {
     private boolean lBumperPressed;
     private boolean oldLBumperPressed;
     private String LState;
+    private boolean limReached = false;
     private boolean tLock;
     private boolean pushDown = true;
     private double turretIncrement;
@@ -152,7 +153,7 @@ public class AtlasTeleOpBlue extends OpMode {
         //camera.pipelineSwitch(0);
         //camera.setPollRateHz(90);
         //chassis.setHalfPark(0.45);
-        cannon.setGatePosition(.3);
+        cannon.setGatePosition(.35);
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
         axon.setTargetRotation(0);
@@ -258,12 +259,12 @@ public class AtlasTeleOpBlue extends OpMode {
             rightX = 0;
         }
 
-        if(cannon.getGatePosition() == 1){
+        if(cannon.getGatePosition() == .35){
             gateOn = true;
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_1,gateStatusClose);
         }
 
-        if(cannon.getGatePosition() == 0){
+        if(cannon.getGatePosition() == .3){
             gateOn = false;
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_1,gateStatusOpen);
         }
@@ -336,14 +337,27 @@ public class AtlasTeleOpBlue extends OpMode {
 //            LState = "far";
 //        }
 
-        if (gamepad2.dpad_left && !oldDPadLeftPressed) {
-            axon.changeTargetRotation(-5); // Move turret left by 5 degrees
+        if(axon.getTargetRotation() > 270){
+            axon.setTargetRotation(270);
         }
-        if (gamepad2.dpad_right && !oldDPadRightPressed) {
-            axon.changeTargetRotation(5);  // Move turret right by 5 degrees
+
+        if(axon.getTargetRotation() < -270){
+            axon.setTargetRotation(-270);
+        }
+        if (axon.getTargetRotation() > 270 || axon.getTargetRotation() < -270) {
+            limReached = true;
+        } else {
+            limReached = false;
+        }
+        // Manual controls for target and PID tuning
+        if ((gamepad2.dpad_right && !oldDPadRightPressed)) {
+            axon.changeTargetRotation(-40);
+        }
+        if ((gamepad2.dpad_left && !oldDPadLeftPressed)) {
+            axon.changeTargetRotation(40);
         }
         if (gamepad2.dpad_up && !oldDPadUpPressed) {
-            axon.setTargetRotation(0);     // Re-center turret
+            axon.setTargetRotation(0);
         }
 
         if( bPressed && !oldBPressed) {
@@ -351,15 +365,15 @@ public class AtlasTeleOpBlue extends OpMode {
         }
         if (tLock) {
             if (visionAid.hasTarget()){
-                float Kp = -0.000405f; //proportional control constant
-                double feedForward = ((rightX + leftX)/2.0) * .005;
-                double tx = visionAid.getTx() - 3;
+                float Kp = -0.505f; //proportional control constant
+                //double feedForward = ((rightX + leftX)/2.0) * .005;
+                double tx = visionAid.getTx();
                 double ta = visionAid.getTa();
                 double deadband = visionAid.getDeadband();
-                double botCorr = (Kp * tx) - feedForward;
+                double botCorr = (Kp * tx)/* - feedForward*/;
 //
-                if(Math.abs(tx) > deadband) {
-                    //cannon.setTurret(cannon.getTurretPos() + botCorr);
+                if(Math.abs(tx) > deadband && !limReached) {
+                    axon.changeTargetRotation(botCorr);
                 }
             }
         }
@@ -383,7 +397,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
         //test launch in case break
         if(rBumperPressed && !oldRBumperPressed){
-            cannon.setGatePosition(.9);
+            cannon.setGatePosition(.35);
             cannon.setLightColor();
             oldRBumperPressed = true;
         }
@@ -524,10 +538,10 @@ public class AtlasTeleOpBlue extends OpMode {
 
         if (gamepad2.y && !oldYPressed) {
             if (actuatorIsDown) {
-                cannon.setActuatorPos(0.8); // "Up" position
+                cannon.setActuatorPos(0.0); // "Up" position
                 actuatorIsDown = false;
             } else {
-                cannon.setActuatorPos(0.0); // "Down" position
+                cannon.setActuatorPos(0.8); // "Down" position
                 actuatorIsDown = true;
             }
         }
@@ -598,6 +612,7 @@ if(gamepad2.dpad_right){
         telemetry.addData("Total Rotation", axon.getTotalRotation());
         telemetry.addData("Target Rotation", axon.getTargetRotation());
         telemetry.addData("Current Voltage", cannon.getVoltage());
+        telemetry.addData("Limit Reached", limReached);
         telemetry.addLine(axon.log());
 
         telemetry.addLine();
