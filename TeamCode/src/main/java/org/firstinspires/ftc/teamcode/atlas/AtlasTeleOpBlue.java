@@ -274,7 +274,7 @@ public class AtlasTeleOpBlue extends OpMode {
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_0,noIntakeBall);
         }
 
-        if(cannon.getDistanceGate() < 4.5){
+        if(cannon.getDistanceGate() < 4.50){
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_2,gateBall);
         } else {
             prism.insertAndUpdateAnimation(LayerHeight.LAYER_2,noGateBall);
