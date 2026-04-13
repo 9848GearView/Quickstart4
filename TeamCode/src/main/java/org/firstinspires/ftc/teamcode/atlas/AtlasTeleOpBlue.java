@@ -44,6 +44,7 @@ public class AtlasTeleOpBlue extends OpMode {
     RTPAxon axon = null;
     private Paths paths;
     private Supplier<PathChain> shootPos;
+    private Supplier<PathChain> parkPos;
     public Follower follower;
     BlueLimelightAutoAim visionAid = null;
     GoBildaPrismDriver prism;
@@ -177,6 +178,11 @@ public class AtlasTeleOpBlue extends OpMode {
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(shootX, shootY))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(shootH), 0.8))
                 .build();
+        parkPos = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(105.3, 33.3))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(90), 0.8))
+                .build();
+
 
         tLock = false;
         velMPS = 0;
@@ -196,9 +202,9 @@ public class AtlasTeleOpBlue extends OpMode {
         noIntakeBall.setStartIndex(0);
         noIntakeBall.setStopIndex(4);
         gateStatusOpen.setStartIndex(4);
-        gateStatusOpen.setStopIndex(8);
+        gateStatusOpen.setStopIndex(7);
         gateStatusClose.setStartIndex(4);
-        gateStatusClose.setStopIndex(8);
+        gateStatusClose.setStopIndex(7);
         gateBall.setStartIndex(8);
         gateBall.setStopIndex(12);
         noGateBall.setStartIndex(8);
@@ -224,6 +230,7 @@ public class AtlasTeleOpBlue extends OpMode {
         follower.update();
         visionAid.update();
         cannon.updateTurret();
+        prism.updateAllAnimations();
 
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
 
@@ -269,24 +276,24 @@ public class AtlasTeleOpBlue extends OpMode {
 
         if(cannon.getGatePosition() == .15){
             gateOn = true;
-            prism.insertAndUpdateAnimation(LayerHeight.LAYER_1,gateStatusClose);
+            prism.insertAnimation(LayerHeight.LAYER_1,gateStatusClose);
         }
 
         if(cannon.getGatePosition() == 0){
             gateOn = false;
-            prism.insertAndUpdateAnimation(LayerHeight.LAYER_1,gateStatusOpen);
+            prism.insertAnimation(LayerHeight.LAYER_1,gateStatusOpen);
         }
 
         if(cannon.getDistanceIntake() < 4.5){
-            prism.insertAndUpdateAnimation(LayerHeight.LAYER_0,intakeBall);
+            prism.insertAnimation(LayerHeight.LAYER_0,intakeBall);
         } else {
-            prism.insertAndUpdateAnimation(LayerHeight.LAYER_0,noIntakeBall);
+            prism.insertAnimation(LayerHeight.LAYER_0,noIntakeBall);
         }
 
         if(cannon.getDistanceGate() < 4.5){
-            prism.insertAndUpdateAnimation(LayerHeight.LAYER_2,gateBall);
+            prism.insertAnimation(LayerHeight.LAYER_2,gateBall);
         } else {
-            prism.insertAndUpdateAnimation(LayerHeight.LAYER_2,noGateBall);
+            prism.insertAnimation(LayerHeight.LAYER_2,noGateBall);
         }
 
         //intake
@@ -440,14 +447,26 @@ public class AtlasTeleOpBlue extends OpMode {
                 shootH = (follower.getPose().getHeading() * 180 / Math.PI) % 360; // sets heading to -180-180 degree range, default for pedro pathing
                 posLock = true;
             } else {
+                follower.breakFollowing();
+                automatedDrive = false;
                 posLock = false;
             }
         }
 
-        if(posLock && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
+        if(posLock && !automatedDrive && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
             follower.followPath(shootPos.get());
             automatedDrive = true;
         } else {
+            automatedDrive = false;
+        }
+
+        if(gamepad1.b){
+            follower.followPath(parkPos.get());
+            automatedDrive = true;
+        }
+
+        if(!follower.isBusy() && automatedDrive){
+            follower.breakFollowing();
             automatedDrive = false;
         }
 //

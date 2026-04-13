@@ -31,7 +31,7 @@ public class JoeyFlywheel extends OpMode {
         outtakeT.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outtakeT.setDirection(DcMotorSimple.Direction.FORWARD);
-        outtakeB.setDirection(DcMotorSimple.Direction.FORWARD);
+        outtakeB.setDirection(DcMotorSimple.Direction.REVERSE);
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0, 0, F);
         outtakeT.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         outtakeB.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
