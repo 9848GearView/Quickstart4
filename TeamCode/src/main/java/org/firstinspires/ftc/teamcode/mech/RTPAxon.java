@@ -124,9 +124,9 @@ public class RTPAxon {
         homeAngle = previousAngle;
 
         // Default PID coefficients
-        kP = 0.01;
+        kP = 0.0155;
         kI = 0.0015;
-        kD = 0.0006;
+        kD = 0.00035;
         integralSum = 0.0;
         lastError = 0.0;
         maxIntegralSum = 100.0;

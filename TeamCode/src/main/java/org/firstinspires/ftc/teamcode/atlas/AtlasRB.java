@@ -36,7 +36,7 @@ public class AtlasRB extends OpMode {
         paths = new Paths(follower); // Build paths
 
         cannon = new IntakeV3(hardwareMap);
-        cannon.setTurretAngle(.25);
+        //cannon.setTurretAngle(.25);
         vision = new BlueLimelightAutoAim(hardwareMap);
 
         pathTimer = new Timer();
@@ -55,7 +55,7 @@ public class AtlasRB extends OpMode {
             double tx = vision.getTx();
             double botCorr = (Kp * tx)/* - feedForward*/;
             if(Math.abs(tx) > .5) {
-                cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
+                //cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
             }
 
         }
@@ -363,7 +363,7 @@ public class AtlasRB extends OpMode {
 
         @Override
         public void run() {
-            cannon.setTurretAngle(pos);
+            //cannon.setTurretAngle(pos);
         }
     }
 

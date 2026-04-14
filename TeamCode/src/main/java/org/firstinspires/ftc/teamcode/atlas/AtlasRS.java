@@ -10,6 +10,7 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
+import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.mech.RobotStorage;
 import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
@@ -24,6 +25,7 @@ public class AtlasRS extends OpMode {
     private Paths paths; // Paths defined in the Paths class
     java.util.Timer timer = new java.util.Timer();
     IntakeV3 cannon = null;
+    RTPAxon axon = null;
     BlueLimelightAutoAim vision = null;
     private Timer pathTimer;
     public int timesHumanIntake = 0;
@@ -37,8 +39,9 @@ public class AtlasRS extends OpMode {
         paths = new Paths(follower); // Build paths
 
         cannon = new IntakeV3(hardwareMap);
+        axon = cannon.getRTPAxon();
 
-        cannon.setTurretAngle(.149);
+        axon.setTargetRotation(-45);
         vision = new BlueLimelightAutoAim(hardwareMap);
 
 
@@ -57,7 +60,7 @@ public class AtlasRS extends OpMode {
             double tx = vision.getTx() - 0.2;
             double botCorr = (Kp * tx)/* - feedForward*/;
             if(Math.abs(tx) > .5) {
-                cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
+                //cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
             }
 
         } /* else {

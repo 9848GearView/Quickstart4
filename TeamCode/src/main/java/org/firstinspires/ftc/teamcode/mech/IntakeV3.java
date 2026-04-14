@@ -83,13 +83,14 @@ public class IntakeV3 implements Subsystem{
 
 
     //likely change
-    final double LAUNCHER_TARGET_VELOCITY = 1600;//started at 1125//was725//Mrs.b changed to 850
-    final double LAUNCHER_MIN_VELOCITY = 1550;//started at 1075//was 675//mrs B changed to 800
+    final double LAUNCHER_TARGET_VELOCITY = 1365;//started at 1125//was725//Mrs.b changed to 850
+    final double LAUNCHER_MIN_VELOCITY = 1100;//started at 1075//was 675//mrs B changed to 800
+    final double farVelocity = 1480;
 
     private String launchStatus;
     
     
-    PIDFCoefficients flywheelCoeffs = new PIDFCoefficients(35, 0, 0, 22);//possible values: 100p 12.917 f good?, 15.917 little overshoot//60.917
+    PIDFCoefficients flywheelCoeffs = new PIDFCoefficients(36, 0, 0, 18);//possible values: 100p 12.917 f good?, 15.917 little overshoot//60.917
 
 
     ElapsedTime feedTimer = new ElapsedTime();
@@ -175,16 +176,6 @@ public class IntakeV3 implements Subsystem{
     // Wrapper to update the PID and encoder logic
     public void updateTurret() {
         turretRotation.update();
-    }
-
-    // Wrapper to set the position
-    public void setTurretAngle(double degrees) {
-        turretRotation.setTargetRotation(degrees);
-    }
-
-    // Wrapper for incremental movement (e.g. for manual tuning)
-    public void adjustTurretAngle(double delta) {
-        turretRotation.changeTargetRotation(delta);
     }
 
     public double getTurretAngle() {
@@ -314,8 +305,8 @@ public class IntakeV3 implements Subsystem{
     public void launchFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
-        outtakeT.setVelocity(1620);// before adjustments velocity was 1620
-        outtakeB.setVelocity(1620);//
+        outtakeT.setVelocity(farVelocity);// before adjustments velocity was 1620
+        outtakeB.setVelocity(farVelocity);//
         launchStatus = "far";
     }//closes method
 

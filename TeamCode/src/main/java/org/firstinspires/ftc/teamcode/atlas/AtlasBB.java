@@ -7,6 +7,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.util.Timer;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
-
+@Disabled
 @Autonomous(name = "Artemis Blue Big", group = "Autonomous")
 public class AtlasBB extends OpMode {
     public Follower follower; // Pedro Pathing follower instance
@@ -36,7 +37,7 @@ public class AtlasBB extends OpMode {
         paths = new Paths(follower); // Build paths
 
         cannon = new IntakeV3(hardwareMap);
-        cannon.setTurretAngle(.25);
+        //cannon.setTargetRotation(.25);
         vision = new BlueLimelightAutoAim(hardwareMap);
 
         pathTimer = new Timer();
@@ -55,7 +56,7 @@ public class AtlasBB extends OpMode {
             double tx = vision.getTx();
             double botCorr = (Kp * tx)/* - feedForward*/;
             if(Math.abs(tx) > .5) {
-                cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
+                //cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
             }
 
         }
@@ -363,7 +364,7 @@ public class AtlasBB extends OpMode {
 
         @Override
         public void run() {
-            cannon.setTurretAngle(pos);
+            //cannon.setTurretAngle(pos);
         }
     }
 

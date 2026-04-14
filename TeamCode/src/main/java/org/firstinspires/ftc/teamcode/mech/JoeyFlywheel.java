@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.mech;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,13 +13,13 @@ public class JoeyFlywheel extends OpMode {
     private DcMotorEx outtakeT;
     private DcMotorEx outtakeB;
 
-    public double highVelocity = 1150;
-    public double lowVelocity = 900;
+    public double highVelocity = 1365;
+    public double lowVelocity = 1200;
 
     double curTargetVelocity = highVelocity;
 
-    double F = 0;
-    double P = 0;
+    double F = 21;
+    double P = 90;
 
     double[] stepSizes = {10.0, 1.0, 0.1, 0.01, 0.001};
     int stepIndex = 1;
@@ -30,7 +30,7 @@ public class JoeyFlywheel extends OpMode {
         outtakeB = hardwareMap.get(DcMotorEx.class, "outtakeB");
         outtakeT.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        outtakeT.setDirection(DcMotorSimple.Direction.FORWARD);
+        outtakeT.setDirection(DcMotorSimple.Direction.REVERSE);
         outtakeB.setDirection(DcMotorSimple.Direction.REVERSE);
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0, 0, F);
         outtakeT.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);

@@ -7,11 +7,13 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.util.Timer;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RobotStorage;
 import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
+import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
@@ -23,6 +25,7 @@ public class AtlasBS extends OpMode {
     private Paths paths; // Paths defined in the Paths class
     java.util.Timer timer = new java.util.Timer();
     IntakeV3 cannon = null;
+    RTPAxon axon = null;
     BlueLimelightAutoAim vision = null;
     private Timer pathTimer;
     public int timesHumanIntake = 0;
@@ -36,14 +39,20 @@ public class AtlasBS extends OpMode {
         paths = new Paths(follower); // Build paths
 
         cannon = new IntakeV3(hardwareMap);
+        axon = cannon.getRTPAxon();
 
-        cannon.setTurretAngle(.149);
+        axon.changeTargetRotation(-170.01);
         vision = new BlueLimelightAutoAim(hardwareMap);
-
+        cannon.setGatePosition(0.15);
 
         pathTimer = new Timer();
 
         telemetry.addData("Status", "Initialized");
+    }
+
+    @Override
+    public void init_loop(){
+        axon.update();
     }
 
     @Override
@@ -55,7 +64,7 @@ public class AtlasBS extends OpMode {
             double tx = vision.getTx() - 0.2;
             double botCorr = (Kp * tx)/* - feedForward*/;
             if(Math.abs(tx) > .5) {
-                cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
+                //cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
             }
 
         } /* else {
@@ -63,6 +72,7 @@ public class AtlasBS extends OpMode {
         }*/
 
         follower.update(); // Update Pedro Pathing
+        axon.update();
         RobotStorage.PoseX = follower.getPose().getX();
         RobotStorage.PoseY = follower.getPose().getY();
         RobotStorage.PoseH = follower.getPose().getHeading();
@@ -154,7 +164,7 @@ public class AtlasBS extends OpMode {
                                     new Pose(59.000, 20.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             intake2 = follower.pathBuilder()
@@ -240,7 +250,7 @@ public class AtlasBS extends OpMode {
                                     new Pose(59.000, 20.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             park = follower.pathBuilder()
@@ -257,10 +267,10 @@ public class AtlasBS extends OpMode {
                     .addPath(
                             new BezierLine(
                                     new Pose(11.400, 14.900),
-                                    new Pose(44.000, 22.000)
+                                    new Pose(40.000, 22.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();        }
     }
 
@@ -277,8 +287,8 @@ public class AtlasBS extends OpMode {
                 break;
             case 1:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(.25), 100);
-                    timer.schedule(new GateAuto(0.38), 3000);
+                    timer.schedule(new GateAuto(0), 100);
+                    timer.schedule(new GateAuto(0.15), 3000);
                     pathTimer.resetTimer();
                     setPathState(2);
                 }
@@ -313,9 +323,9 @@ public class AtlasBS extends OpMode {
                 break;
             case 4:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2950);
+                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     setPathState(5);
                 }
@@ -335,9 +345,9 @@ public class AtlasBS extends OpMode {
                 break;
             case 7:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2950);
+                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     setPathState(82); // 8 to continue to pickup 3, 82 to go second human player, 11 to go to park early
                 }
@@ -358,9 +368,9 @@ public class AtlasBS extends OpMode {
                 break;
             case 10:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2950);
+                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     setPathState(11);
                 }
@@ -396,9 +406,9 @@ public class AtlasBS extends OpMode {
                 break;
             case 102:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2950);
+                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     if(timesHumanIntake < setTimesHumanIntake){
                         setPathState(82);

@@ -12,12 +12,14 @@ import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.mech.GamepadPair;
 
 import org.firstinspires.ftc.teamcode.mech.IntakeV3;
+import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 
 
 // TeleOp test class for manual tuning and testing
 @TeleOp(name = "YAYYYYYY", group = "test")
 public class RTPTestYay extends OpMode {
     IntakeV3 cannon = null;
+    BlueLimelightAutoAim visionAid = null;
     RTPAxon axon = null;
 
     private boolean rStickPressed;
@@ -25,7 +27,9 @@ public class RTPTestYay extends OpMode {
 
     //booleans for a button
     private boolean aPressed;
+    private boolean a1Pressed;
     private boolean oldAPressed;
+    private boolean oldA1Pressed;
     private boolean intakeOn = true;
 
     //booleans for down
@@ -56,18 +60,24 @@ public class RTPTestYay extends OpMode {
     private double turretIncrement;
 
     //booleans for b button
+    private boolean b1Pressed;
     private boolean bPressed;
     private boolean oldBPressed;
+    private boolean oldB1Pressed;
     private boolean gateOn = true;
 
     //booleans for x button
     private boolean xPressed;
+    private boolean x1Pressed;
     private boolean oldXPressed;
+    private boolean oldX1Pressed;
     private boolean launchTrigger = false;
 
     //booleans for y
     private boolean yPressed;
+    private boolean y1Pressed;
     private boolean oldYPressed;
+    private boolean oldY1Pressed;
     private boolean oldGP1Y;
     private boolean actuatorIsDown;
 
@@ -93,7 +103,10 @@ public class RTPTestYay extends OpMode {
     public boolean leftLimReached = false;
     public double rightLim = -270;
     public boolean rightLimReached = false;
-
+    public double Kp = 0;
+    public double KpInc = .005;
+    public double dB = 0;
+    public double dBInc = .05;
     public static double GRAVITY = -9.81;
 
     private boolean far;
@@ -109,13 +122,16 @@ public class RTPTestYay extends OpMode {
     @Override
     public void init() {
         cannon = new IntakeV3(hardwareMap);
+        visionAid = new BlueLimelightAutoAim(hardwareMap);
         axon = cannon.getRTPAxon();
+
 
     }
 
     @Override
     public void loop() {
         axon.update();
+        visionAid.update();
 
         //controlled turning
         rStickPressed = gamepad1.right_stick_button;
@@ -129,7 +145,10 @@ public class RTPTestYay extends OpMode {
         dPadLeftPressed = gamepad2.dpad_left;
 
         aPressed = gamepad2.a;
+        a1Pressed = gamepad1.a;
+
         bPressed = gamepad2.b;
+        b1Pressed = gamepad1.b;
 
         xPressed = gamepad2.x;
 
@@ -191,21 +210,69 @@ public class RTPTestYay extends OpMode {
 
          */
 
+        if (gamepad1.y && !oldY1Pressed) {
+            Kp = Kp - KpInc;
+        }
+        if (gamepad1.x && !oldX1Pressed) {
+            Kp = Kp + KpInc;
+        }
+
+        if (gamepad1.a && !oldA1Pressed) {
+            dB = dB - dBInc;
+        }
+        if (gamepad1.b && !oldB1Pressed) {
+            dB = dB + dBInc;
+        }
+
+        if (visionAid.hasTarget()){
+            double tx = visionAid.getTx();
+            double deadband = dB;
+            double botCorr = (Kp * tx);
+//
+            if(Math.abs(tx) == deadband + 2){ //added so it takes less time to know what the perfect point is
+                double perf = axon.getTotalRotation();
+                axon.setTargetRotation(perf);
+            } else if(Math.abs(tx) > deadband && (axon.getTargetRotation() + botCorr > -270 && axon.getTargetRotation() - botCorr < 270)) {
+                axon.changeTargetRotation(botCorr);
+            }
+
+        }
+
+
+
+
+
         // old button presses at the bottom of loop
         oldAPressed = gamepad2.a;
         oldBPressed = gamepad2.b;
         oldXPressed = gamepad2.x;
         oldYPressed = gamepad2.y;
+
+        oldA1Pressed = gamepad1.a;
+        oldB1Pressed = gamepad1.b;
+        oldX1Pressed = gamepad1.x;
+        oldY1Pressed = gamepad1.y;
+
         oldrStickPressed = rStickPressed;
         oldDPadDownPressed = gamepad2.dpad_down;
         oldDPadLeftPressed = gamepad2.dpad_left;
         oldDPadRightPressed = gamepad2.dpad_right;
         oldDPadUpPressed = gamepad2.dpad_up;
+        oldLBumperPressed = gamepad2.left_bumper;
+        oldRBumperPressed = gamepad2.right_bumper;
 
 
         telemetry.addData("Starting angle", axon.STARTPOS);
         telemetry.addLine(axon.log());
         telemetry.addData("NTRY", axon.ntry);
+        telemetry.addLine();
+        telemetry.addData("Tx", visionAid.getTx());
+        telemetry.addData("Kp", Kp);
+        telemetry.addData("Deadband", dB);
+        telemetry.addLine();
+        telemetry.addData("Tx", visionAid.getTx());
+        telemetry.addData("Kp", Kp);
+        telemetry.addData("Deadband", dB);
         telemetry.update();
 
     }

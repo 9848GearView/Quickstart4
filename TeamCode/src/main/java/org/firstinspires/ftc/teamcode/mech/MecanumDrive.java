@@ -59,10 +59,10 @@ public class MecanumDrive {
         brMotor.setDirection(DcMotor.Direction.FORWARD);
         tilt.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        flMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        blMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        brMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        blMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        brMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         flMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

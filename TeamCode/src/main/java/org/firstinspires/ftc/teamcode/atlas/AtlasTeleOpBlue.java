@@ -13,11 +13,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV3;
+import org.firstinspires.ftc.teamcode.mech.FlyWheelMech4;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.mech.RobotStorage;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
+
 
 
 import static org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver.LayerHeight;
@@ -41,6 +43,7 @@ public class AtlasTeleOpBlue extends OpMode {
     //private Limelight3A camera;
     MecanumDrive chassis = null;
     IntakeV3 cannon = null;
+    FlyWheelMech4 wheel = null;
     RTPAxon axon = null;
     private Paths paths;
     private Supplier<PathChain> shootPos;
@@ -151,6 +154,7 @@ public class AtlasTeleOpBlue extends OpMode {
     public void init(){
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV3(hardwareMap);
+        wheel = new FlyWheelMech4(hardwareMap);
         axon = cannon.getRTPAxon();
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         //camera = hardwareMap.get(Limelight3A.class,"limabean");
@@ -380,14 +384,17 @@ public class AtlasTeleOpBlue extends OpMode {
         }
         if (tLock) {
             if (visionAid.hasTarget()){
-                float Kp = -0.505f; //proportional control constant
-                double feedForward = ((rightX + leftX)/2.0) * .005;
+                float Kp = -0.205f; //proportional control constant
+                double feedForward = ((rightX + leftX)/2.0) * .0085;
                 double tx = visionAid.getTx();
                 double ta = visionAid.getTa();
                 double deadband = visionAid.getDeadband();
                 double botCorr = (Kp * tx) - feedForward;
 //
-                if(Math.abs(tx) > deadband && !limReached) {
+                if(Math.abs(tx) == deadband + 2){ //added so it takes less time to know what the perfect point is, temporarily widens to deadband to give LL a ballpark
+                    double perf = axon.getTotalRotation();
+                    axon.setTargetRotation(perf);
+                } else if(Math.abs(tx) > deadband && (axon.getTargetRotation() + botCorr > -270 && axon.getTargetRotation() - botCorr < 270)) {
                     axon.changeTargetRotation(botCorr);
                 }
             }
@@ -397,16 +404,19 @@ public class AtlasTeleOpBlue extends OpMode {
         //altitude actuator
         if (gamepad2.left_trigger > 0.1) {
             //shoot close
-            cannon.launchClose();
+            //cannon.launchClose();
+            wheel.FlywheelMotorOn(1070);
             cannon.setActuatorPos(.8); //.53
         }
         if (gamepad2.right_trigger > 0.1) {
             // shoot far
-            cannon.launchFar();
+            //cannon.launchFar();
+            wheel.FlywheelMotorOn(1365);
             cannon.setActuatorPos(1);
         }
 
         if(gamepad2.x) {
+            wheel.FlywheelMotorOff();
             cannon.stopLaunch();
         }
 
@@ -575,12 +585,6 @@ public class AtlasTeleOpBlue extends OpMode {
             }
         }
 
-if(gamepad2.dpad_left){
-    cannon.adjustTurretAngle(-turretIncrement);
-}
-if(gamepad2.dpad_right){
-    cannon.adjustTurretAngle(turretIncrement);
-}
 
 
         velMPS = (cannon.getLauncherVelocity() / 4) / (28 / (0.096 * Math.PI));
