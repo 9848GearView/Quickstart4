@@ -4,6 +4,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 public class BlueLimelightAutoAim {
@@ -63,12 +64,10 @@ public class BlueLimelightAutoAim {
 //        return Math.sqrt(x*x + z*z);
         return result.getBotposeAvgDist();
     }
-
-
-    /*public int getTid() {
-        if(result == null){
-            return -1;
-        }
-        return result.getTid();
-    }*/
+    public void feed(Telemetry telemetry){
+        telemetry.addData("Tag found", hasTarget());
+        telemetry.addData("Deadband",getDeadband());
+        telemetry.addData("Ta", getTa());
+        telemetry.addData("Tx", getTx());
+    }
 }

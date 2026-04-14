@@ -270,10 +270,6 @@ public class RTPTestYay extends OpMode {
         telemetry.addData("Kp", Kp);
         telemetry.addData("Deadband", dB);
         telemetry.addLine();
-        telemetry.addData("Tx", visionAid.getTx());
-        telemetry.addData("Kp", Kp);
-        telemetry.addData("Deadband", dB);
-        telemetry.update();
 
     }
 }

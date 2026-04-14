@@ -29,7 +29,7 @@ public class AtlasBS extends OpMode {
     BlueLimelightAutoAim vision = null;
     private Timer pathTimer;
     public int timesHumanIntake = 0;
-    public int setTimesHumanIntake = 1;
+    public int setTimesHumanIntake = 3;//change this for the amount of times it does human player (not including first intake)
 
     @Override
     public void init() {
@@ -41,7 +41,7 @@ public class AtlasBS extends OpMode {
         cannon = new IntakeV3(hardwareMap);
         axon = cannon.getRTPAxon();
 
-        axon.changeTargetRotation(-170.01);
+        axon.setTargetRotation(0);
         vision = new BlueLimelightAutoAim(hardwareMap);
         cannon.setGatePosition(0.15);
 
@@ -53,6 +53,9 @@ public class AtlasBS extends OpMode {
     @Override
     public void init_loop(){
         axon.update();
+        //telemetry.addData("Limit Reached", limReached);
+        telemetry.addLine(axon.log());
+
     }
 
     @Override
@@ -287,7 +290,7 @@ public class AtlasBS extends OpMode {
                 break;
             case 1:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0), 100);
+                    timer.schedule(new GateAuto(0), 500);
                     timer.schedule(new GateAuto(0.15), 3000);
                     pathTimer.resetTimer();
                     setPathState(2);

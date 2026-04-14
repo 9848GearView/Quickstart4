@@ -51,6 +51,8 @@ public class IntakeV3 implements Subsystem{
     //turret
     //private CRServo turretL;
     //private CRServo turretR;
+    private Servo turretL;
+    private Servo turretR;
     //private AnalogInput encoderL;
     //private AnalogInput encoderR;
     private RTPAxon turretRotation;
@@ -136,10 +138,11 @@ public class IntakeV3 implements Subsystem{
 
         //turret
 
-
-        turretRotation = new RTPAxon(hwMap);
-        turretRotation.setMaxPower(.7);
-        turretRotation.setPidCoeffs(0.015, 0.001, 0.0005);  // change
+        turretL = hwMap.get(Servo.class, "turretL");
+        turretR = hwMap.get(Servo.class, "turretR");
+//        turretRotation = new RTPAxon(hwMap);
+//        turretRotation.setMaxPower(.7);
+//        turretRotation.setPidCoeffs(turretRotation.getKP(), turretRotation.getKI(), turretRotation.getKD());
 
 
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -230,11 +233,11 @@ public class IntakeV3 implements Subsystem{
     }
 
     //set turret position
-    /*public void setTurret(double i) {
+    public void setTurret(double i) {
         turretL.setPosition(i);
         turretR.setPosition(i);
     }
-
+    /*
     //limelight scanning
     public void scanTurret() {
         //update if I've reached right or left limit
@@ -324,8 +327,8 @@ public class IntakeV3 implements Subsystem{
     public void launchAutoFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
-        outtakeT.setVelocity(1460);
-        outtakeB.setVelocity(1460);
+        outtakeT.setVelocity(1210);
+        outtakeB.setVelocity(1210);
         launchStatus = "far";
     }//closes method
 
@@ -342,8 +345,7 @@ public class IntakeV3 implements Subsystem{
 
     //get turret position
     public double getTurretPos() {
-        //return turretL.getPosition();
-        return 0;
+        return turretL.getPosition();
     }
 
     //checks if the turret has reached the rightmost limit

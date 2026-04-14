@@ -44,7 +44,7 @@ public class AtlasTeleOpBlue extends OpMode {
     MecanumDrive chassis = null;
     IntakeV3 cannon = null;
     FlyWheelMech4 wheel = null;
-    RTPAxon axon = null;
+    //RTPAxon axon = null;
     private Paths paths;
     private Supplier<PathChain> shootPos;
     private Supplier<PathChain> parkPos;
@@ -155,7 +155,7 @@ public class AtlasTeleOpBlue extends OpMode {
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV3(hardwareMap);
         wheel = new FlyWheelMech4(hardwareMap);
-        axon = cannon.getRTPAxon();
+        //axon = cannon.getRTPAxon();
         visionAid = new BlueLimelightAutoAim(hardwareMap);
         //camera = hardwareMap.get(Limelight3A.class,"limabean");
 
@@ -165,7 +165,7 @@ public class AtlasTeleOpBlue extends OpMode {
         cannon.setGatePosition(0);
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
-        axon.setTargetRotation(0);
+        //axon.setTargetRotation(0);
         chassis.setHalfPark(0, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
@@ -216,6 +216,15 @@ public class AtlasTeleOpBlue extends OpMode {
         //colSens = new ColorSensor(hardwareMap);
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
     }
+
+//    @Override
+//    public void init_loop(){
+//        axon.update();
+//        //telemetry.addData("Limit Reached", limReached);
+//        telemetry.addLine(axon.log());
+//
+//    }
+
     @Override
     public void start(){
         //shootPos = new Path(new BezierLine(new Pose(follower.getPose().getX(),follower.getPose().getY()), new Pose(shootX, shootY)));
@@ -228,12 +237,12 @@ public class AtlasTeleOpBlue extends OpMode {
 
         //camera.start();
         cannon.setGatePosition(.15);
+        follower.startTeleOpDrive(true);
     }
     @Override
     public void loop(){
         follower.update();
         visionAid.update();
-        cannon.updateTurret();
         prism.updateAllAnimations();
 
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
@@ -355,63 +364,90 @@ public class AtlasTeleOpBlue extends OpMode {
 //        } else if(cannon.getLaunchStatus().equals("far")){
 //            LState = "far";
 //        }
-
-        if(axon.getTargetRotation() > 270){
-            axon.setTargetRotation(270);
-        }
-
-        if(axon.getTargetRotation() < -270){
-            axon.setTargetRotation(-270);
-        }
-        if (axon.getTargetRotation() > 270 || axon.getTargetRotation() < -270) {
+//
+//        if(axon.getTargetRotation() > 270){
+//            axon.setTargetRotation(269);
+//        }
+//
+//        if(axon.getTargetRotation() < -270){
+//            axon.setTargetRotation(-269);
+//        }
+        /*if (axon.getTargetRotation() > 270 || axon.getTargetRotation() < -270) {
             limReached = true;
         } else {
             limReached = false;
         }
+         */
         // Manual controls for target and PID tuning
         if ((gamepad2.dpad_right && !oldDPadRightPressed)) {
-            axon.changeTargetRotation(-40);
+            //axon.changeTargetRotation(-40);
+            cannon.setTurret(cannon.getTurretPos() + .1);
         }
         if ((gamepad2.dpad_left && !oldDPadLeftPressed)) {
-            axon.changeTargetRotation(40);
+            //axon.changeTargetRotation(40);
+            cannon.setTurret(cannon.getTurretPos() - .1);
         }
         if (gamepad2.dpad_up && !oldDPadUpPressed) {
-            axon.setTargetRotation(0);
+            //axon.setTargetRotation(0);
+            cannon.setTurret(.5);
         }
 
         if( bPressed && !oldBPressed) {
             tLock = !tLock; // reminder to find a way to turn this off
         }
+
         if (tLock) {
             if (visionAid.hasTarget()){
-                float Kp = -0.205f; //proportional control constant
-                double feedForward = ((rightX + leftX)/2.0) * .0085;
+                float Kp = -0.05f;
                 double tx = visionAid.getTx();
-                double ta = visionAid.getTa();
                 double deadband = visionAid.getDeadband();
-                double botCorr = (Kp * tx) - feedForward;
+
 //
-                if(Math.abs(tx) == deadband + 2){ //added so it takes less time to know what the perfect point is, temporarily widens to deadband to give LL a ballpark
-                    double perf = axon.getTotalRotation();
-                    axon.setTargetRotation(perf);
-                } else if(Math.abs(tx) > deadband && (axon.getTargetRotation() + botCorr > -270 && axon.getTargetRotation() - botCorr < 270)) {
-                    axon.changeTargetRotation(botCorr);
+                double feedForward = ((rightX + leftX)/2.0) * .005;
+                double botCorr = (Kp * tx) - feedForward;
+                if(Math.abs(tx) > deadband) {
+                    cannon.setTurret(cannon.getTurretPos() + botCorr);
                 }
+
             }
         }
         //end auto aim
+
+
+        /*if (tLock) {
+            if (visionAid.hasTarget()){
+                float Kp = -0.185f;
+                double tx = visionAid.getTx();
+                double deadband = visionAid.getDeadband();
+
+                // Only move if we are outside the deadband
+                if(Math.abs(tx) > deadband) {
+                    // Use a smaller botCorr since it's being added every frame
+                    // Or calculate an absolute target:
+                    double newTarget = axon.getTargetRotation() + (tx * yt);
+
+                    // Clamp the target before applying it
+                    if(newTarget < 270 && newTarget > -270) {
+                        axon.setTargetRotation(newTarget);
+                    }
+                }
+            }
+        }
+
+         */
+
 
         //altitude actuator
         if (gamepad2.left_trigger > 0.1) {
             //shoot close
             //cannon.launchClose();
-            wheel.FlywheelMotorOn(1070);
+            wheel.FlywheelMotorOn(1020);
             cannon.setActuatorPos(.8); //.53
         }
         if (gamepad2.right_trigger > 0.1) {
             // shoot far
             //cannon.launchFar();
-            wheel.FlywheelMotorOn(1365);
+            wheel.FlywheelMotorOn(1350);
             cannon.setActuatorPos(1);
         }
 
@@ -599,6 +635,7 @@ public class AtlasTeleOpBlue extends OpMode {
         oldDPadRightPressed = gamepad2.dpad_right;
         oldDPadUpPressed = gamepad2.dpad_up;
 
+        //axon.update();
 
         //chassis.setLightColor();
 
@@ -607,10 +644,7 @@ public class AtlasTeleOpBlue extends OpMode {
         //colSens.getDetectedColor(telemetry);
 //
         telemetry.addData("Tlock on", tLock);
-        telemetry.addData("Tag found", visionAid.hasTarget());
-        telemetry.addData("Deadband", visionAid.getDeadband());
-        telemetry.addData("Ta", visionAid.getTa());
-        telemetry.addData("Tx", visionAid.getTx());
+        visionAid.feed(telemetry);
 
         telemetry.addLine();
 
@@ -640,13 +674,13 @@ public class AtlasTeleOpBlue extends OpMode {
 
         telemetry.addLine();
 
-        telemetry.addData("Servo Position L", axon.getCurrentAngle());
-
-        telemetry.addData("Total Rotation", axon.getTotalRotation());
-        telemetry.addData("Target Rotation", axon.getTargetRotation());
-        telemetry.addData("Current Voltage", cannon.getVoltage());
+//        telemetry.addData("Servo Position L", axon.getCurrentAngle());
+//
+//        telemetry.addData("Total Rotation", axon.getTotalRotation());
+//        telemetry.addData("Target Rotation", axon.getTargetRotation());
+//        telemetry.addData("Current Voltage", cannon.getVoltage());
         telemetry.addData("Limit Reached", limReached);
-        telemetry.addLine(axon.log());
+//        telemetry.addLine(axon.log());
 
         telemetry.addLine();
 

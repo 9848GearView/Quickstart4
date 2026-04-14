@@ -124,9 +124,9 @@ public class RTPAxon {
         homeAngle = previousAngle;
 
         // Default PID coefficients
-        kP = 0.0155;
-        kI = 0.0015;
-        kD = 0.00035;
+        kP = 0.0121;
+        kI = 0.0000;
+        kD = 0.0001;
         integralSum = 0.0;
         lastError = 0.0;
         maxIntegralSum = 100.0;
@@ -331,7 +331,7 @@ public class RTPAxon {
         integralSum = Math.max(-maxIntegralSum, Math.min(maxIntegralSum, integralSum));
 
         // Integral wind-down in deadzone
-        final double INTEGRAL_DEADZONE = 1.0;
+        final double INTEGRAL_DEADZONE = 4.0;
         if (Math.abs(error) < INTEGRAL_DEADZONE) {
             integralSum *= 0.95;
         }
@@ -348,7 +348,7 @@ public class RTPAxon {
         double output = pTerm + iTerm + dTerm;
 
         // Deadzone for output
-        final double DEADZONE = 1;
+        final double DEADZONE = 2;
         if (Math.abs(error) > DEADZONE) {
             double power = Math.min(maxPower, Math.abs(output)) * Math.signum(output);
             setPower(power);
