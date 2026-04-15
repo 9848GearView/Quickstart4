@@ -52,6 +52,7 @@ public class AtlasTeleOpBlue extends OpMode {
     private Supplier<PathChain> parkPos;
     public Follower follower;
     BlueLimelightAutoAim visionAid = null;
+    ArrayList<LynxModule> hubs = new ArrayList<>(hardwareMap.getAll(LynxModule.class));
     GoBildaPrismDriver prism;
     PrismAnimations.Solid intakeBall = new PrismAnimations.Solid(Color.PURPLE);
     PrismAnimations.Solid noIntakeBall = new PrismAnimations.Solid(Color.TRANSPARENT);
@@ -219,9 +220,10 @@ public class AtlasTeleOpBlue extends OpMode {
         //colSens = new ColorSensor(hardwareMap);
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
 
-        //ArrayList<LynxModule> hubs = new ArrayList<>(hardwareMap.getAll(LynxModule.class));
-        // set bulk read mode to manual for hubs
-        //for (LynxModule hub)
+        //set bulk read mode to manual for hubs
+        for (LynxModule hub : hubs){
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
     }
 
 //    @Override
@@ -248,6 +250,9 @@ public class AtlasTeleOpBlue extends OpMode {
     }
     @Override
     public void loop(){
+        for(LynxModule hub : hubs) {
+            hub.clearBulkCache();
+        }
         follower.update();
         visionAid.update();
         prism.updateAllAnimations();
