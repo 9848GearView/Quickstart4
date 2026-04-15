@@ -29,7 +29,8 @@ public class MecanumDrive {
 
     private IMU imu;
 
-    //private Servo blinky;
+    private Servo blinky;
+    private Servo blinky2;
 
     private double absoluteValueLA = -164;// 153 red || -153 blue || 164 red/blue
     private double LA = absoluteValueLA;
@@ -50,7 +51,8 @@ public class MecanumDrive {
         imu.initialize(new IMU.Parameters(RevOrientation));
         //imu.resetYaw();
 
-        //blinky = hwMap.get(Servo.class, "blinky");
+        blinky = hwMap.get(Servo.class, "blinky");
+        blinky2 = hwMap.get(Servo.class, "blinky");
 
 
         flMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -127,28 +129,34 @@ public class MecanumDrive {
     public void resetRobotAngle(){
         imu.resetYaw();
     }
-
+//comment start
 //    public void setLightColor(){
 //        //launch angle is positive, so blue
 //        if(LA > 0) {
 //            if (getRobotAngle() > LA + 2) {
 //                blinky.setPosition(.28);//show red
+//                blinky2.setPosition(.28);
 //            } else if (getRobotAngle() < LA - 2) {
 //                blinky.setPosition(.611);//show blue
+//                blinky2.setPosition(.611);
 //            } else {
 //                blinky.setPosition(.500);//show green
+//                blinky2.setPosition(.500);
 //            }
 //        }else{//launch angle is negative so red
 //            if (getRobotAngle() > LA + 2) {
 //                blinky.setPosition(.611);//show blue
+//                blinky2.setPosition(.611);
 //            } else if (getRobotAngle() < LA - 2) {
 //                blinky.setPosition(.28);//show red
+//                blinky2.setPosition(.28);
 //            } else {
 //                blinky.setPosition(.500);//show green
+//                blinky2.setPosition(.500);
 //            }
 //        }
 //    }
-
+//comment end
 
     public void redLaunchAngle(){
         LA = absoluteValueLA*-1;

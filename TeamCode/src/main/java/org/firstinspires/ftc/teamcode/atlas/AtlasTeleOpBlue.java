@@ -8,6 +8,7 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -31,6 +32,7 @@ import org.firstinspires.ftc.teamcode.atlas.Prism.Color;
 import org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.atlas.Prism.PrismAnimations;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 
@@ -166,6 +168,7 @@ public class AtlasTeleOpBlue extends OpMode {
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
         //axon.setTargetRotation(0);
+        cannon.setTurret(0.5);
         chassis.setHalfPark(0, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
@@ -190,7 +193,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
         tLock = false;
         velMPS = 0;
-        turretIncrement = 0.1;
+        turretIncrement = 0.05;
 
         prism = hardwareMap.get(GoBildaPrismDriver.class,"prism");
 
@@ -215,6 +218,10 @@ public class AtlasTeleOpBlue extends OpMode {
         noGateBall.setStopIndex(12);
         //colSens = new ColorSensor(hardwareMap);
         //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
+
+        //ArrayList<LynxModule> hubs = new ArrayList<>(hardwareMap.getAll(LynxModule.class));
+        // set bulk read mode to manual for hubs
+        //for (LynxModule hub)
     }
 
 //    @Override
@@ -381,11 +388,11 @@ public class AtlasTeleOpBlue extends OpMode {
         // Manual controls for target and PID tuning
         if ((gamepad2.dpad_right && !oldDPadRightPressed)) {
             //axon.changeTargetRotation(-40);
-            cannon.setTurret(cannon.getTurretPos() + .1);
+            cannon.setTurret(cannon.getTurretPos() + tInc);
         }
         if ((gamepad2.dpad_left && !oldDPadLeftPressed)) {
             //axon.changeTargetRotation(40);
-            cannon.setTurret(cannon.getTurretPos() - .1);
+            cannon.setTurret(cannon.getTurretPos() - tInc);
         }
         if (gamepad2.dpad_up && !oldDPadUpPressed) {
             //axon.setTargetRotation(0);
@@ -398,12 +405,12 @@ public class AtlasTeleOpBlue extends OpMode {
 
         if (tLock) {
             if (visionAid.hasTarget()){
-                float Kp = -0.05f;
+                float Kp = -0.000405f;
                 double tx = visionAid.getTx();
                 double deadband = visionAid.getDeadband();
 
 //
-                double feedForward = ((rightX + leftX)/2.0) * .005;
+                double feedForward = ((rightX + leftX)/2.0) * .05;
                 double botCorr = (Kp * tx) - feedForward;
                 if(Math.abs(tx) > deadband) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);
@@ -458,13 +465,13 @@ public class AtlasTeleOpBlue extends OpMode {
 
         //test launch in case break
         if(rBumperPressed && !oldRBumperPressed){
-            cannon.setGatePosition(.15);
+            cannon.setGatePosition(.15); //closed
             cannon.setLightColor();
             oldRBumperPressed = true;
         }
 
         if(lBumperPressed && oldRBumperPressed){
-            cannon.setGatePosition(0);
+            cannon.setGatePosition(0); //open
             cannon.setLightColor();
             oldRBumperPressed = false;
         }

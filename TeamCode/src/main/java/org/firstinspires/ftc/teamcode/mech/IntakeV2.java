@@ -50,9 +50,9 @@ public class IntakeV2 implements Subsystem{
     //private AnalogInput encoder;
     //private RTPAxon axon;
     private double tInc = .001;
-    private double leftLim = .65;
+    private double leftLim = .75;
     private boolean leftLimReached = false;
-    private double rightLim = .35;
+    private double rightLim = .25;
     private boolean rightLimReached = false;
     private boolean movingRight = false;
 
@@ -209,6 +209,9 @@ public class IntakeV2 implements Subsystem{
     }
 
     //limelight scanning
+
+
+
     public void scanTurret(){
         //update if I've reached right or left limit
         leftLimReached = getTurretPos() > leftLim;

@@ -40,6 +40,7 @@ public class IntakeV3 implements Subsystem{
     //gate
     private Servo gate;
     private Servo blinky;
+    private Servo blinky2;
 
     //distance sensor
     private DistanceSensor distanceSensorGate;
@@ -125,7 +126,8 @@ public class IntakeV3 implements Subsystem{
 
         //gate
         gate = hwMap.get(Servo.class, "gate");
-        //blinky = hwMap.get(Servo.class, "blinky");
+        blinky = hwMap.get(Servo.class, "blinky");
+        blinky2 = hwMap.get(Servo.class, "blinky2");
 
         //distance sensor
         distanceSensorGate = hwMap.get(DistanceSensor.class, "distanceGate");
@@ -212,11 +214,14 @@ public class IntakeV3 implements Subsystem{
 
 //set light color
     public void setLightColor() {
-        if (gate.getPosition() == .25) {
+        if (gate.getPosition() == 0) {
             //setColor(255,0,0);
+            blinky.setPosition(.500); //open, green
+            blinky2.setPosition(.500);
         }
-        if (gate.getPosition() == .38) {
-            //blinky.setPosition(.28); //closed, red
+        if (gate.getPosition() == .15) {
+            blinky.setPosition(.28);
+            blinky2.setPosition(.28);//closed, red
         }
         if (getDistanceGate() < 15){
             //setColor()
@@ -237,6 +242,14 @@ public class IntakeV3 implements Subsystem{
         turretL.setPosition(i);
         turretR.setPosition(i);
     }
+
+    public boolean limsReached(){
+        if(getTurretPos() == .75 || getTurretPos() == .25){
+            return true;
+        }
+        return false;
+    }
+
     /*
     //limelight scanning
     public void scanTurret() {
