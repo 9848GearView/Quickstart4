@@ -62,17 +62,15 @@ public class AtlasBS extends OpMode {
     public void loop() {
         vision.update();
         if (vision.hasTarget()){
-            float Kp = -0.0004f; //proportional control constant
-            //double feedForward = ((rightX + leftX)/2.0) * .005;
-            double tx = vision.getTx() - 0.2;
-            double botCorr = (Kp * tx)/* - feedForward*/;
-            if(Math.abs(tx) > .5) {
-                //cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
+            float Kp = -0.00041f;
+            double tx = vision.getTx();
+            double deadband = vision.getDeadband();
+            double botCorr = (Kp * tx);
+            if(Math.abs(tx) > deadband) {
+                cannon.setTurret(cannon.getTurretPos() + botCorr);
             }
 
-        } /* else {
-            cannon.setTurret(.149);
-        }*/
+        }
 
         follower.update(); // Update Pedro Pathing
         axon.update();

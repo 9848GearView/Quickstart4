@@ -51,8 +51,10 @@ public class AtlasTeleOpBlue extends OpMode {
     private Supplier<PathChain> shootPos;
     private Supplier<PathChain> parkPos;
     public Follower follower;
-    BlueLimelightAutoAim visionAid = null;
-    ArrayList<LynxModule> hubs = new ArrayList<>(hardwareMap.getAll(LynxModule.class));
+    BlueLimelightAutoAim vision = null;
+
+    //Mrs. B moved instantiation of hubs ArrayList to init method
+    ArrayList<LynxModule> hubs;
     GoBildaPrismDriver prism;
     PrismAnimations.Solid intakeBall = new PrismAnimations.Solid(Color.PURPLE);
     PrismAnimations.Solid noIntakeBall = new PrismAnimations.Solid(Color.TRANSPARENT);
@@ -94,21 +96,24 @@ public class AtlasTeleOpBlue extends OpMode {
     private boolean oldDPadRightPressed;
 
 
-    //booleans for turret
+    //booleans for gate
     private boolean rBumperPressed;
     private boolean oldRBumperPressed;
     private boolean lBumperPressed;
     private boolean oldLBumperPressed;
+    private boolean gateOn = true;
     private String LState;
-    private boolean limReached = false;
-    private boolean tLock;
+    
+    
     private boolean pushDown = true;
-    private double turretIncrement;
+   
 
-    //booleans for b button
+    //booleans for turrect alignment
     private boolean bPressed;
     private boolean oldBPressed;
-    private boolean gateOn = true;
+    private boolean tLock;
+    private boolean limReached = cannon.limsReached(cannon.getTurretPos());
+    
 
     //booleans for x button
     private boolean xPressed;
@@ -155,11 +160,12 @@ public class AtlasTeleOpBlue extends OpMode {
 
     @Override
     public void init(){
+        hubs = new ArrayList<>(hardwareMap.getAll(LynxModule.class));
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV3(hardwareMap);
         wheel = new FlyWheelMech4(hardwareMap);
         //axon = cannon.getRTPAxon();
-        visionAid = new BlueLimelightAutoAim(hardwareMap);
+        vision = new BlueLimelightAutoAim(hardwareMap);
         //camera = hardwareMap.get(Limelight3A.class,"limabean");
 
         //camera.pipelineSwitch(0);
@@ -169,7 +175,7 @@ public class AtlasTeleOpBlue extends OpMode {
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
         //axon.setTargetRotation(0);
-        cannon.setTurret(0.5);
+        cannon.setTurret(0.7);
         chassis.setHalfPark(0, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
@@ -194,9 +200,12 @@ public class AtlasTeleOpBlue extends OpMode {
 
         tLock = false;
         velMPS = 0;
-        turretIncrement = 0.05;
+        
 
-        prism = hardwareMap.get(GoBildaPrismDriver.class,"prism");
+        //Mrs. B Added
+        tInc = 0.005;
+
+        //prism = hardwareMap.get(GoBildaPrismDriver.class,"prism");
 
         intakeBall.setBrightness(1);
         noIntakeBall.setBrightness(1);
@@ -246,6 +255,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
         //camera.start();
         cannon.setGatePosition(.15);
+        cannon.setLightColor();
         follower.startTeleOpDrive(true);
     }
     @Override
@@ -254,8 +264,9 @@ public class AtlasTeleOpBlue extends OpMode {
             hub.clearBulkCache();
         }
         follower.update();
-        visionAid.update();
-        prism.updateAllAnimations();
+        vision.update();
+        cannon.setLightColor();
+        //prism.updateAllAnimations();
 
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
 
@@ -301,24 +312,24 @@ public class AtlasTeleOpBlue extends OpMode {
 
         if(cannon.getGatePosition() == .15){
             gateOn = true;
-            prism.insertAnimation(LayerHeight.LAYER_1,gateStatusClose);
+            //prism.insertAnimation(LayerHeight.LAYER_1,gateStatusClose);
         }
 
         if(cannon.getGatePosition() == 0){
             gateOn = false;
-            prism.insertAnimation(LayerHeight.LAYER_1,gateStatusOpen);
+            //prism.insertAnimation(LayerHeight.LAYER_1,gateStatusOpen);
         }
 
         if(cannon.getDistanceIntake() < 4.5){
-            prism.insertAnimation(LayerHeight.LAYER_0,intakeBall);
+            //prism.insertAnimation(LayerHeight.LAYER_0,intakeBall);
         } else {
-            prism.insertAnimation(LayerHeight.LAYER_0,noIntakeBall);
+            //prism.insertAnimation(LayerHeight.LAYER_0,noIntakeBall);
         }
 
         if(cannon.getDistanceGate() < 4.5){
-            prism.insertAnimation(LayerHeight.LAYER_2,gateBall);
+            //prism.insertAnimation(LayerHeight.LAYER_2,gateBall);
         } else {
-            prism.insertAnimation(LayerHeight.LAYER_2,noGateBall);
+           // prism.insertAnimation(LayerHeight.LAYER_2,noGateBall);
         }
 
         //intake
@@ -333,12 +344,12 @@ public class AtlasTeleOpBlue extends OpMode {
 
 
         //spits out balls
-        if(gamepad2.dpad_down){
+        if(gamepad2.dpad_down && !oldDPadDownPressed){
             pushDown = !pushDown;
             if(pushDown) {
                 cannon.intake(0);
-            } else {
-                cannon.intake(-.4);
+            }else {
+                cannon.intake(-0.6);
             }
         }
 
@@ -391,11 +402,11 @@ public class AtlasTeleOpBlue extends OpMode {
         }
          */
         // Manual controls for target and PID tuning
-        if ((gamepad2.dpad_right && !oldDPadRightPressed)) {
+        if (gamepad2.dpad_right && !oldDPadRightPressed) {
             //axon.changeTargetRotation(-40);
             cannon.setTurret(cannon.getTurretPos() + tInc);
         }
-        if ((gamepad2.dpad_left && !oldDPadLeftPressed)) {
+        if (gamepad2.dpad_left && !oldDPadLeftPressed) {
             //axon.changeTargetRotation(40);
             cannon.setTurret(cannon.getTurretPos() - tInc);
         }
@@ -409,13 +420,13 @@ public class AtlasTeleOpBlue extends OpMode {
         }
 
         if (tLock) {
-            if (visionAid.hasTarget()){
-                float Kp = -0.000405f;
-                double tx = visionAid.getTx();
-                double deadband = visionAid.getDeadband();
+            if (vision.hasTarget()){
+                float Kp = -0.00041f;
+                double tx = vision.getTx();
+                double deadband = vision.getDeadband();
 
 //
-                double feedForward = ((rightX + leftX)/2.0) * .05;
+                double feedForward = ((rightX + leftX)/2.0) * .1;
                 double botCorr = (Kp * tx) - feedForward;
                 if(Math.abs(tx) > deadband) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);
@@ -427,10 +438,10 @@ public class AtlasTeleOpBlue extends OpMode {
 
 
         /*if (tLock) {
-            if (visionAid.hasTarget()){
+            if (vision.hasTarget()){
                 float Kp = -0.185f;
-                double tx = visionAid.getTx();
-                double deadband = visionAid.getDeadband();
+                double tx = vision.getTx();
+                double deadband = vision.getDeadband();
 
                 // Only move if we are outside the deadband
                 if(Math.abs(tx) > deadband) {
@@ -656,7 +667,7 @@ public class AtlasTeleOpBlue extends OpMode {
         //colSens.getDetectedColor(telemetry);
 //
         telemetry.addData("Tlock on", tLock);
-        visionAid.feed(telemetry);
+        vision.feed(telemetry);
 
         telemetry.addLine();
 

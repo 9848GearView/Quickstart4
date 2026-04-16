@@ -239,12 +239,14 @@ public class IntakeV3 implements Subsystem{
 
     //set turret position
     public void setTurret(double i) {
-        turretL.setPosition(i);
-        turretR.setPosition(i);
+        if(!limsReached(i)) {
+            turretL.setPosition(i);
+            turretR.setPosition(i);
+        }
     }
 
-    public boolean limsReached(){
-        if(getTurretPos() == .75 || getTurretPos() == .25){
+    public boolean limsReached(double i){
+        if(i >=.75| i <= .25){
             return true;
         }
         return false;

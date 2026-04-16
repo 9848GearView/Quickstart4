@@ -282,8 +282,8 @@ public class AtlasRS extends OpMode {
                 break;
             case 1:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(.25), 100);
-                    timer.schedule(new GateAuto(0.38), 3000);
+                    timer.schedule(new GateAuto(0), 500);
+                    timer.schedule(new GateAuto(0.15), 3000);
                     pathTimer.resetTimer();
                     setPathState(2);
                 }
@@ -295,7 +295,7 @@ public class AtlasRS extends OpMode {
                     setPathState(3);
                 }
                 break;
-            case 22:
+//            case 22:
 //                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
 //                    follower.followPath(paths.intake1Mid, true);
 ////                    pathTimer.resetTimer();
@@ -319,9 +319,9 @@ public class AtlasRS extends OpMode {
                 break;
             case 4:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2950);
+                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     setPathState(5);
                 }
@@ -342,9 +342,9 @@ public class AtlasRS extends OpMode {
                 break;
             case 7:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2950);
+                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     setPathState(82); // 8 to continue to pickup 3, 82 to go second human player, 11 to go to park early
                 }
@@ -366,9 +366,9 @@ public class AtlasRS extends OpMode {
                 break;
             case 10:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2950);
+                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     setPathState(11);
                 }
@@ -405,9 +405,9 @@ public class AtlasRS extends OpMode {
                 break;
             case 102:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 2950);
+                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     if(timesHumanIntake < setTimesHumanIntake){
                         setPathState(82);
