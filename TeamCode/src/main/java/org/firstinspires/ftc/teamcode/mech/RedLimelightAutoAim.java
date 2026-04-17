@@ -4,20 +4,18 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class RedLimelightAutoAim {
     private Limelight3A limelight;
     private LLResult result;
-    private int targetTagID = 24; // default is 20 for blue, 24 is red
+
     //List<LLResultTypes.FiducialResult> fudicials = result.getFiducialResults();
 
     public RedLimelightAutoAim(HardwareMap hardwareMap){
         limelight = hardwareMap.get(Limelight3A.class, "limabean");
         limelight.pipelineSwitch(1);// AprilTag pipeline
         limelight.start();
-    }
-
-    public void setTargetTag(int id){
-        targetTagID = id;
     }
 
     public void update(){
@@ -35,7 +33,18 @@ public class RedLimelightAutoAim {
 
         return result.getTx();
     }
-
+    public double getTa(){
+        if (result == null){
+            return 0;
+        }
+        return result.getTa();
+    }
+    public double getDeadband(){
+        if (result == null){
+            return .5;
+        }
+        return (.3 * getTa())+ .44;
+    }
     //to track distance
     public double getDistanceMeters() {
 
@@ -50,12 +59,10 @@ public class RedLimelightAutoAim {
 //        return Math.sqrt(x*x + z*z);
         return result.getBotposeAvgDist();
     }
-
-
-    /*public int getTid() {
-        if(result == null){
-            return -1;
-        }
-        return result.getTid();
-    }*/
+    public void feed(Telemetry telemetry){
+        telemetry.addData("Tag found", hasTarget());
+        telemetry.addData("Deadband",getDeadband());
+        telemetry.addData("Ta", getTa());
+        telemetry.addData("Tx", getTx());
+    }
 }

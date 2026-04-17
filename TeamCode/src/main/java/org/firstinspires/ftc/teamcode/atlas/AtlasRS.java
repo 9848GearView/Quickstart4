@@ -25,7 +25,7 @@ public class AtlasRS extends OpMode {
     private Paths paths; // Paths defined in the Paths class
     java.util.Timer timer = new java.util.Timer();
     IntakeV3 cannon = null;
-    RTPAxon axon = null;
+    //RTPAxon axon = null;
     BlueLimelightAutoAim vision = null;
     private Timer pathTimer;
     public int timesHumanIntake = 0;
@@ -39,11 +39,13 @@ public class AtlasRS extends OpMode {
         paths = new Paths(follower); // Build paths
 
         cannon = new IntakeV3(hardwareMap);
-        axon = cannon.getRTPAxon();
+        //axon = cannon.getRTPAxon();
 
-        axon.setTargetRotation(-45);
+        //axon.setTargetRotation(-45);
         vision = new BlueLimelightAutoAim(hardwareMap);
 
+        cannon.setGatePosition(0.15);
+        cannon.setTurret(0.615);
 
         pathTimer = new Timer();
 
@@ -207,10 +209,10 @@ public class AtlasRS extends OpMode {
 
             humanplayer = follower.pathBuilder()
                     .addPath(
-                            new BezierCurve(
+                            new BezierLine(
                                     new Pose(85.000, 20.000),
-                                    new Pose(84.600, 9.200),
-                                    new Pose(134.900, 8.400)
+                                    //new Pose(84.600, 9.200),
+                                    new Pose(132.000, 14.900)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(0))

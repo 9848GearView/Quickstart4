@@ -6,42 +6,28 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
-
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.mech.ColorSensor;
-import org.firstinspires.ftc.teamcode.mech.IntakeV3;
-import org.firstinspires.ftc.teamcode.mech.FlyWheelMech4;
-import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
-import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
-import org.firstinspires.ftc.teamcode.mech.RTPAxon;
-import org.firstinspires.ftc.teamcode.mech.RobotStorage;
-import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
-
-
-
-import static org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver.LayerHeight;
-
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.atlas.Prism.Color;
 import org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.atlas.Prism.PrismAnimations;
+import org.firstinspires.ftc.teamcode.mech.ColorSensor;
+import org.firstinspires.ftc.teamcode.mech.FlyWheelMech4;
+import org.firstinspires.ftc.teamcode.mech.IntakeV3;
+import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
+import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
+import org.firstinspires.ftc.teamcode.mech.RobotStorage;
+import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
-
 import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
 
-@TeleOp(name="Atlas Blue TeleOp", group="Iterative OpMode")
-public class AtlasTeleOpBlue extends OpMode {
+@TeleOp(name="Atlas Red TeleOp", group="Iterative OpMode")
+public class AtlasTeleOpRed extends OpMode {
     //private Limelight3A camera;
     MecanumDrive chassis = null;
     IntakeV3 cannon = null;
@@ -51,7 +37,7 @@ public class AtlasTeleOpBlue extends OpMode {
     private Supplier<PathChain> shootPos;
     private Supplier<PathChain> parkPos;
     public Follower follower;
-    BlueLimelightAutoAim vision = null;
+    RedLimelightAutoAim vision = null;
 
     //Mrs. B moved instantiation of hubs ArrayList to init method
     ArrayList<LynxModule> hubs;
@@ -103,17 +89,17 @@ public class AtlasTeleOpBlue extends OpMode {
     private boolean oldLBumperPressed;
     private boolean gateOn = true;
     private String LState;
-    
-    
+
+
     private boolean pushDown = true;
-   
+
 
     //booleans for turrect alignment
     private boolean bPressed;
     private boolean oldBPressed;
     private boolean tLock;
     private boolean limReached = false;
-    
+
 
     //booleans for x button
     private boolean xPressed;
@@ -165,7 +151,7 @@ public class AtlasTeleOpBlue extends OpMode {
         cannon = new IntakeV3(hardwareMap);
         wheel = new FlyWheelMech4(hardwareMap);
         //axon = cannon.getRTPAxon();
-        vision = new BlueLimelightAutoAim(hardwareMap);
+        vision = new RedLimelightAutoAim(hardwareMap);
         //camera = hardwareMap.get(Limelight3A.class,"limabean");
 
         //camera.pipelineSwitch(0);
@@ -200,7 +186,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
         tLock = false;
         velMPS = 0;
-        
+
 
         //Mrs. B Added
         tInc = 0.05;

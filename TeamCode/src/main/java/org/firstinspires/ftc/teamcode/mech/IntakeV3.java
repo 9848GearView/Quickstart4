@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.arcrobotics.ftclib.command.Subsystem;
 
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Timer;
@@ -42,22 +43,22 @@ public class IntakeV3 implements Subsystem{
     private Servo blinky;
     private Servo blinky2;
 
+
     //distance sensor
     private DistanceSensor distanceSensorGate;
     private DistanceSensor distanceSensorIntake;
+    private Servo distanceGateLight;
+    private Servo distanceIntakeLight;
 
     //light
     //I2cDeviceSynch prism;
 
     //turret
-    //private CRServo turretL;
-    //private CRServo turretR;
     private Servo turretL;
     private Servo turretR;
     //private AnalogInput encoderL;
     //private AnalogInput encoderR;
     private RTPAxon turretRotation;
-    private double tInc = .001;
     private double leftLim = .65;
     private boolean leftLimReached = false;
     private double rightLim = .35;
@@ -70,47 +71,21 @@ public class IntakeV3 implements Subsystem{
 
     ElapsedTime feederTimer = new ElapsedTime();
 
-    private Timer timer;
-    private final int DBM = 1000;
-
-    //n Steven and Alex code :) - Mrs. B moved here from their auto code
-    final double FEED_TIME_SECONDS = 3;
-
-    final double STOP_SPEED = 0.0;
-    final double FULL_SPEED = 1.0;
-
-    //private double voltage = batteryVoltageSensor.getVoltage();
-
-    //double adjustedFFar = 16 * (12/voltage);
-    //double adjustedFClose = 15.5 * (12/voltage);
-
-
     //likely change
     final double LAUNCHER_TARGET_VELOCITY = 1365;//started at 1125//was725//Mrs.b changed to 850
     final double LAUNCHER_MIN_VELOCITY = 1100;//started at 1075//was 675//mrs B changed to 800
     final double farVelocity = 1480;
 
     private String launchStatus;
-    
-    
+
+
     PIDFCoefficients flywheelCoeffs = new PIDFCoefficients(36, 0, 0, 18);//possible values: 100p 12.917 f good?, 15.917 little overshoot//60.917
 
 
     ElapsedTime feedTimer = new ElapsedTime();
 
 
-    private LaunchState launchState;
-
-
-    public enum LaunchState {
-        IDLE,
-        SPIN_UP,
-        LAUNCH,
-        LAUNCHING
-    }
-
     public IntakeV3(HardwareMap hwMap) {
-        launchState = LaunchState.IDLE;
 
         //batteryVoltageSensor = hwMap.voltageSensor.iterator().next();
 
@@ -129,6 +104,10 @@ public class IntakeV3 implements Subsystem{
         blinky = hwMap.get(Servo.class, "blinky");
         blinky2 = hwMap.get(Servo.class, "blinky2");
 
+        distanceGateLight = hwMap.get(Servo.class, "gateLight");
+        distanceIntakeLight = hwMap.get(Servo.class, "intakeLight");
+
+
         //distance sensor
         distanceSensorGate = hwMap.get(DistanceSensor.class, "distanceGate");
         distanceSensorIntake = hwMap.get(DistanceSensor.class, "distanceIntake");
@@ -142,10 +121,6 @@ public class IntakeV3 implements Subsystem{
 
         turretL = hwMap.get(Servo.class, "turretL");
         turretR = hwMap.get(Servo.class, "turretR");
-//        turretRotation = new RTPAxon(hwMap);
-//        turretRotation.setMaxPower(.7);
-//        turretRotation.setPidCoeffs(turretRotation.getKP(), turretRotation.getKI(), turretRotation.getKD());
-
 
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -178,18 +153,6 @@ public class IntakeV3 implements Subsystem{
          */
     }
 
-    // Wrapper to update the PID and encoder logic
-    public void updateTurret() {
-        turretRotation.update();
-    }
-
-    public double getTurretAngle() {
-        return turretRotation.getTotalRotation();
-    }
-
-    public RTPAxon getRTPAxon(){
-        return turretRotation;
-    }
 
     //intake
     public void intake(double i) {
@@ -204,13 +167,13 @@ public class IntakeV3 implements Subsystem{
     public double getGatePosition() {
         return gate.getPosition();
     }
-
-    public void setColor(int r, int g, int b) {
-        // Replace 0x01, 0x02, 0x03 with the actual register addresses for R, G, B
-        //prism.write8(0x01, r); // Red
-        //prism.write8(0x02, g); // Green
-        //prism.write8(0x03, b); // Blue
-    }
+//
+//    public void setColor(int r, int g, int b) {
+//        // Replace 0x01, 0x02, 0x03 with the actual register addresses for R, G, B
+//        //prism.write8(0x01, r); // Red
+//        //prism.write8(0x02, g); // Green
+//        //prism.write8(0x03, b); // Blue
+//    }
 
 //set light color
     public void setLightColor() {
@@ -223,18 +186,38 @@ public class IntakeV3 implements Subsystem{
             blinky.setPosition(.28);
             blinky2.setPosition(.28);//closed, red
         }
-        if (getDistanceGate() < 15){
-            //setColor()
+        if (getDistanceGate() < 10){
+            distanceGateLight.setPosition(.388);
+        } else {
+            distanceGateLight.setPosition(0);
+        }
+
+        if (getDistanceIntake() < 10){
+            distanceIntakeLight.setPosition(.388);
+        } else {
+            distanceIntakeLight.setPosition(0);
+        }
+    }
+
+    public void setGateLightColor(boolean isBall){
+        if(isBall){
+            distanceGateLight.setPosition(0.722);
+        } else {
+            distanceGateLight.setPosition(0);
+        }
+    }
+
+    public void setIntakeLightColor(boolean isBall){
+        if(isBall){
+            distanceIntakeLight.setPosition(0.722);
+        } else {
+            distanceIntakeLight.setPosition(0);
         }
     }
 
     //set actuator position
     public void setActuatorPos(double i) {
         angle.setPosition(i);
-    }
-
-    public double getVoltage(){
-        return turretRotation.getVoltage();
     }
 
     //set turret position
@@ -252,62 +235,12 @@ public class IntakeV3 implements Subsystem{
         return false;
     }
 
-    /*
-    //limelight scanning
-    public void scanTurret() {
-        //update if I've reached right or left limit
-        leftLimReached = getTurretPos() > leftLim;
-        rightLimReached = getTurretPos() < rightLim;
-
-        //scan right (towards 0.35 right limit)
-        if (movingRight) {
-            if (rightLimReached) {
-                setTurret(getTurretPos() + tInc);
-                movingRight = false;
-            } else {
-                setTurret(getTurretPos() - tInc);
-                movingRight = true;
-            }
-        }
-        //scan left (towards 0.65 right limit)
-        if (!movingRight) {
-            if (leftLimReached) {
-                setTurret(getTurretPos() - tInc);
-                movingRight = true;
-            } else {
-                setTurret(getTurretPos() + tInc);
-                movingRight = false;
-            }
-        }
-
-    }
-    
-     */
-
     //stop launch motors
     public void stopLaunch() {
-        launchState = LaunchState.IDLE;
+
         outtakeT.setVelocity(0);
         outtakeB.setVelocity(0);
         // change set positions to whatever
-    }
-
-    //start spinning up outtake motors
-    public void toggleSpinUp() {
-        if (launchState == LaunchState.IDLE) {
-            launchState = LaunchState.SPIN_UP;
-        } else {
-            stopLaunch();
-        }
-    }
-
-    //request gate open
-    //not used, outtake is on all match and only thing that's necessary is to use right bumper to close and open gate
-    public void requestLaunch() {
-        if (launchState == LaunchState.SPIN_UP &&
-                getLauncherVelocity() > LAUNCHER_MIN_VELOCITY) {
-            launchState = LaunchState.LAUNCH;
-        }
     }
 
     //pidf coefficients and velocity for big triangle
@@ -342,8 +275,8 @@ public class IntakeV3 implements Subsystem{
     public void launchAutoFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
-        outtakeT.setVelocity(1210);
-        outtakeB.setVelocity(1210);
+        outtakeT.setVelocity(1150);
+        outtakeB.setVelocity(1150);
         launchStatus = "far";
     }//closes method
 
@@ -353,35 +286,13 @@ public class IntakeV3 implements Subsystem{
         outtakeB.setVelocity(p);
     }
 
-    /*public void setMaxPowerAxon(double p) {
-        axon.setMaxPower(p);
-    }
-     */
-
     //get turret position
     public double getTurretPos() {
         return turretL.getPosition();
     }
 
-    //checks if the turret has reached the rightmost limit
-    public boolean getRightLimitReached(){
-        return rightLimReached;
-    }
-
-    //checks if the turret has reached the rightmost limit
-    public boolean getLeftLimitReached(){
-        return leftLimReached;
-    }
-
     //get actuator position
     public double getActuatorPos(){return angle.getPosition();}
-
-    //find what LaunchState the robot's in
-    public LaunchState getLaunchState(){
-        return launchState;
-    }
-
-    public double getMinVelocity() { return LAUNCHER_MIN_VELOCITY;}
 
     //accessor method for OWMotor’s velocity
     public double getLauncherVelocity(){
@@ -393,13 +304,16 @@ public class IntakeV3 implements Subsystem{
         return angle.getPosition();
     }
 
-    public String getLaunchStatus() {return launchStatus;}
-
     public double getDistanceGate() {return distanceSensorGate.getDistance(DistanceUnit.CM);}
     public double getDistanceIntake() {return distanceSensorIntake.getDistance(DistanceUnit.CM);}
 
-    public boolean hasFinishedShot() {
-        return launchState == LaunchState.IDLE && feederTimer.seconds() > 0.1;
+    public void feed(Telemetry telemetry){
+        telemetry.addData("Launcher Pos", getTurretPos());
+        telemetry.addData("Elevator Actuation",getActuatorPos());
+        telemetry.addData("Actuator Position", getActuatorPosition());
+        telemetry.addLine();
+        telemetry.addData("Gate Distance (cm)", getDistanceGate());
+        telemetry.addData("Intake Distance (cm)", getDistanceIntake());
     }
 
 }//closes class

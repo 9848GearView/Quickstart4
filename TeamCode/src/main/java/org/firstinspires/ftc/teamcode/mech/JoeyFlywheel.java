@@ -18,8 +18,8 @@ public class JoeyFlywheel extends OpMode {
 
     double curTargetVelocity = highVelocity;
 
-    double F = 21;
-    double P = 90;
+    double F = 0;
+    double P = 0;
 
     double[] stepSizes = {10.0, 1.0, 0.1, 0.01, 0.001};
     int stepIndex = 1;
@@ -31,7 +31,7 @@ public class JoeyFlywheel extends OpMode {
         outtakeT.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outtakeT.setDirection(DcMotorSimple.Direction.REVERSE);
-        outtakeB.setDirection(DcMotorSimple.Direction.REVERSE);
+        outtakeB.setDirection(DcMotorSimple.Direction.FORWARD);
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0, 0, F);
         outtakeT.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         outtakeB.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
