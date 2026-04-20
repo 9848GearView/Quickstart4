@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.atlas;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -40,6 +44,7 @@ import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
 
+@Config
 @TeleOp(name="Atlas Blue TeleOp", group="Iterative OpMode")
 public class AtlasTeleOpBlue extends OpMode {
     //private Limelight3A camera;
@@ -66,6 +71,8 @@ public class AtlasTeleOpBlue extends OpMode {
 
     //ColorSensor colSens = null;
 
+    private PIDFController turretController;
+    public static double kP = 0.0, kI = 0.0, kD = 0.0, ff = 0.0;
 
 
     ColorSensor.detectedColor detectedColor;
@@ -154,7 +161,8 @@ public class AtlasTeleOpBlue extends OpMode {
     private boolean close;
 
     private double tInc;
-
+    private double ffMult;
+    private double ffMultInc;
     private double velMPS;
 
 
@@ -174,8 +182,12 @@ public class AtlasTeleOpBlue extends OpMode {
         cannon.setGatePosition(0);
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
+
+        turretController = new PIDFController(kP, kI, kD, 0);
+
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         //axon.setTargetRotation(0);
-        cannon.setTurret(0.5);
         chassis.setHalfPark(0, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
@@ -204,6 +216,8 @@ public class AtlasTeleOpBlue extends OpMode {
 
         //Mrs. B Added
         tInc = 0.05;
+        ffMult = .006;
+        ffMultInc = .0005;
 
         //prism = hardwareMap.get(GoBildaPrismDriver.class,"prism");
 
@@ -254,6 +268,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
 
         //camera.start();
+        cannon.setTurret(0.7);
         cannon.setGatePosition(.15);
         cannon.setLightColor();
         follower.startTeleOpDrive(true);
@@ -272,6 +287,8 @@ public class AtlasTeleOpBlue extends OpMode {
         // indicator lights
         cannon.setLightColor();
         //prism.updateAllAnimations();
+
+        turretController.setPIDF(kP, kI, kD, 0);
 
         // heading (pedro)
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
@@ -355,13 +372,22 @@ public class AtlasTeleOpBlue extends OpMode {
             }
         }
 
+        if(gamepad1.dpad_up){
+            ffMult = ffMult+ ffMultInc;
+        }
+        if(gamepad1.dpad_down){
+            ffMult = ffMult - ffMultInc;
+        }
+
         //intake wheel end
 
-        if(gamepad1.y) {
+        /*if(gamepad1.y) {
             follower.setX(9.713344316095563);
             follower.setY(9.186161449752879);
             follower.setHeading(180);
         }
+        
+         */
 
         //paths = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
         //shootpos = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
@@ -395,14 +421,24 @@ public class AtlasTeleOpBlue extends OpMode {
 
         if (tLock) {
             if (vision.hasTarget()){
-                float Kp = -0.0004075f;
+
+                double turretIncrement = turretController.calculate(vision.getTx() , 0);
+
+                telemetry.addData("Turret Increment", turretIncrement);
+
+                float Kp = -0.000405f;
                 double tx = vision.getTx();
                 double deadband = vision.getDeadband();
-                double feedForward = ((rightX + leftX - leftY)/3.0) * .01;
+                double feedForward = ((rightX + leftX - leftY)/3.0) * ffMult;
                 double botCorr = (Kp * tx) - feedForward;
-                if(Math.abs(tx) > deadband) {
-                    cannon.setTurret(cannon.getTurretPos() + botCorr);
-                }
+
+                botCorr = turretIncrement;
+
+                cannon.setTurret(cannon.getTurretPos() + botCorr);
+
+//                if(Math.abs(tx) > deadband) {
+//                    cannon.setTurret(cannon.getTurretPos() + botCorr);
+//                }
             }
         }
         //end auto aim
@@ -416,7 +452,7 @@ public class AtlasTeleOpBlue extends OpMode {
         }
         if (gamepad2.right_trigger > 0.1) {
             // shoot far
-            wheel.FlywheelMotorOn(1350);
+            wheel.FlywheelMotorOn(1320);
             cannon.setActuatorPos(1);
         }
         if(gamepad2.x) {

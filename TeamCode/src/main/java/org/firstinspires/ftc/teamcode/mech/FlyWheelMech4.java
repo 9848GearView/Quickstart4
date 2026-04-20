@@ -17,8 +17,8 @@ public class FlyWheelMech4 {
     double curTargetVelocity = highVelocity;
 
     // Move these into the constructor or methods
-    double F = 16;
-    double P = 36;
+    double F = 14.1;
+    double P = 120;
 
 
     ElapsedTime feederTimer = new ElapsedTime();

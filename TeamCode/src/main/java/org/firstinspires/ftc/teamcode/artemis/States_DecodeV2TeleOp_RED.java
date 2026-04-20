@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
+import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
 
 //guarantee this wont work whatsoever

@@ -125,7 +125,7 @@ public class IntakeV3 implements Subsystem{
         outtakeT.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         outtakeB.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        intake.setDirection(DcMotorEx.Direction.REVERSE);
+        intake.setDirection(DcMotorEx.Direction.FORWARD);
         outtakeT.setDirection(DcMotorEx.Direction.REVERSE);
         outtakeB.setDirection(DcMotorEx.Direction.FORWARD);
 
@@ -229,7 +229,7 @@ public class IntakeV3 implements Subsystem{
     }
 
     public boolean limsReached(double i){
-        if(i >=.75| i <= .25){
+        if(i >=.7225| i <= .2725){
             return true;
         }
         return false;

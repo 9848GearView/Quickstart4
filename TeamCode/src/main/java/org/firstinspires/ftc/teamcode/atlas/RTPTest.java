@@ -24,7 +24,7 @@ public class RTPTest extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         GamepadPair gamepads = new GamepadPair(gamepad1, gamepad2);
         cannon = new IntakeV3(hardwareMap);
-        axon = cannon.getRTPAxon();
+        //axon = cannon.getRTPAxon();
 
         RTPAxon servo = new RTPAxon(hardwareMap);
 

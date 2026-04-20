@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
+import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
 
 import java.util.TimerTask;

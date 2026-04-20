@@ -161,7 +161,6 @@ public class AtlasTeleOpRed extends OpMode {
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
         //axon.setTargetRotation(0);
-        cannon.setTurret(0.5);
         chassis.setHalfPark(0, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
@@ -240,6 +239,7 @@ public class AtlasTeleOpRed extends OpMode {
 
 
         //camera.start();
+        cannon.setTurret(0.3);
         cannon.setGatePosition(.15);
         cannon.setLightColor();
         follower.startTeleOpDrive(true);
@@ -343,11 +343,13 @@ public class AtlasTeleOpRed extends OpMode {
 
         //intake wheel end
 
-        if(gamepad1.y) {
+        /*if(gamepad1.y) {
             follower.setX(9.713344316095563);
             follower.setY(9.186161449752879);
             follower.setHeading(180);
         }
+
+         */
 
         //paths = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
         //shootpos = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
@@ -381,10 +383,10 @@ public class AtlasTeleOpRed extends OpMode {
 
         if (tLock) {
             if (vision.hasTarget()){
-                float Kp = -0.0004075f;
+                float Kp = -0.000405f;
                 double tx = vision.getTx();
                 double deadband = vision.getDeadband();
-                double feedForward = ((rightX + leftX - leftY)/3.0) * .01;
+                double feedForward = ((rightX + leftX - leftY)/3.0) * .006;
                 double botCorr = (Kp * tx) - feedForward;
                 if(Math.abs(tx) > deadband) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);

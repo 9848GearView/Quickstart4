@@ -123,7 +123,7 @@ public class RTPTestYay extends OpMode {
     public void init() {
         cannon = new IntakeV3(hardwareMap);
         visionAid = new BlueLimelightAutoAim(hardwareMap);
-        axon = cannon.getRTPAxon();
+        //axon = cannon.getRTPAxon();
 
 
     }

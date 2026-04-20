@@ -28,6 +28,7 @@ public class AtlasBS extends OpMode {
     //RTPAxon axon = null;
     BlueLimelightAutoAim vision = null;
     private Timer pathTimer;
+    private Timer matchTimer;
     public int timesHumanIntake = 0;
     public int setTimesHumanIntake = 3;//change this for the amount of times it does human player (not including first intake)
 
@@ -47,6 +48,7 @@ public class AtlasBS extends OpMode {
         cannon.setTurret(0.385);
 
         pathTimer = new Timer();
+        matchTimer = new Timer();
 
         telemetry.addData("Status", "Initialized");
     }
@@ -114,6 +116,8 @@ public class AtlasBS extends OpMode {
         public PathChain shoothp;
         public PathChain park;
         public PathChain humanplayerPark;
+        public PathChain dynamicPark;
+
 
         public Paths(Follower follower) {
             shoot1 = follower.pathBuilder()
@@ -130,8 +134,9 @@ public class AtlasBS extends OpMode {
                     .addPath(
                             new BezierCurve(
                                     new Pose(59.000, 20.000),
-                                    new Pose(59.400, 9.200),
-                                    new Pose(9.100, 8.400)
+                                    new Pose(39.300, 18.700),
+                                    new Pose(12.790, 17.303),
+                                    new Pose(8.700, 9.000)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -140,7 +145,7 @@ public class AtlasBS extends OpMode {
 //            intake1Mid = follower.pathBuilder()
 //                    .addPath(
 //                            new BezierCurve(
-//                                    new Pose(9.100, 8.400),
+//                                    new Pose(8.300, 8.400),
 //                                    new Pose(8.200, 22.400),
 //                                    new Pose(18.100, 19.900)
 //                            )
@@ -162,7 +167,7 @@ public class AtlasBS extends OpMode {
             shoot2 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(11.400, 14.900),
+                                    new Pose(8.7, 9),
                                     new Pose(59.000, 20.000)
                             )
                     )
@@ -215,20 +220,20 @@ public class AtlasBS extends OpMode {
 
             humanplayer = follower.pathBuilder()
                     .addPath(
-                            new BezierLine(
+                            new BezierCurve(
                                     new Pose(59.000, 20.000),
-                                    //new Pose(59.400, 9.200),
-                                    //new Pose(9.100, 8.400)
-                                    new Pose(9.100, 14.900)
+                                    new Pose(39.300, 18.700),
+                                    new Pose(12.8, 17.3),
+                                    new Pose(8.700, 9.000)
                             )
                     )
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
 //            humanplayerMid = follower.pathBuilder()
 //                    .addPath(
 //                            new BezierCurve(
-//                                    new Pose(9.100, 8.400),
+//                                    new Pose(8.300, 8.400),
 //                                    new Pose(8.200, 22.400),
 //                                    new Pose(18.100, 19.900)
 //                            )
@@ -249,7 +254,7 @@ public class AtlasBS extends OpMode {
             shoothp = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(9.1, 14.900),
+                                    new Pose(8.7, 9),
                                     new Pose(59.000, 20.000)
                             )
                     )
@@ -269,17 +274,33 @@ public class AtlasBS extends OpMode {
             humanplayerPark = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(11.400, 14.900),
-                                    new Pose(40.000, 22.000)
+                                    new Pose(8.7, 9),
+                                    new Pose(44, 22.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-                    .build();        }
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
+                    .build();
+            dynamicPark = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    follower.getPose(),
+                                    new Pose(44, 22.000)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
+                    .build();
+
+        }
     }
 
 
 
     public int autonomousPathUpdate() {
+        // park if less than 3 seconds
+        /*if (matchTimer.getElapsedTimeSeconds() >= 27) {
+            setPathState(113);
+        }
+         */
         switch (pathState) {
             case 0:
                 timer.schedule(new LaunchAuto(), 0);
@@ -319,7 +340,7 @@ public class AtlasBS extends OpMode {
 //                break;
 
             case 3:
-                if (pathTimer.getElapsedTimeSeconds() > 3 || (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1)) {
+                if (pathTimer.getElapsedTimeSeconds() > 2.8 || (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1)) {
                     follower.followPath(paths.shoot2, true);
                     setPathState(4);
                 }
@@ -355,7 +376,7 @@ public class AtlasBS extends OpMode {
                     setPathState(82); // 8 to continue to pickup 3, 82 to go second human player, 11 to go to park early
                 }
                 break;
-            case 8:
+                case 8:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.7) {
                     follower.followPath(paths.intake3,.85, true);
                     pathTimer.resetTimer();
@@ -401,7 +422,7 @@ public class AtlasBS extends OpMode {
 //                }
 //                break;
             case 92:
-                if (pathTimer.getElapsedTimeSeconds() > 3 || !follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1) {
+                if (pathTimer.getElapsedTimeSeconds() > 2.8 || !follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shoothp, true);
                     setPathState(102);
@@ -413,11 +434,13 @@ public class AtlasBS extends OpMode {
                     timer.schedule(new IntakeAuto(1), 200);
                     timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
-                    if(timesHumanIntake < setTimesHumanIntake){
+                    setPathState(82);
+                    /*if(timesHumanIntake < setTimesHumanIntake){
                         setPathState(82);
                     } else {
                         setPathState(11);
                     }
+                     */
                 }
                 break;
             case 11:
@@ -436,7 +459,14 @@ public class AtlasBS extends OpMode {
                     setPathState(12);
                 }
                 break;
-
+            case 113:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1) {
+                    follower.followPath(paths.dynamicPark,true);
+                    timer.schedule(new IntakeAuto(0), 200);
+                    timer.schedule(new StopLaunchAuto(), 200);
+                    setPathState(67);
+                }
+                break;
         }
         return pathState;
 

@@ -6,12 +6,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 
 
 @TeleOp
 public class JoeyFlywheel extends OpMode {
     private DcMotorEx outtakeT;
     private DcMotorEx outtakeB;
+
+    IntakeV3 cannon = null;
 
     public double highVelocity = 1365;
     public double lowVelocity = 1200;
@@ -32,6 +35,7 @@ public class JoeyFlywheel extends OpMode {
         outtakeB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         outtakeT.setDirection(DcMotorSimple.Direction.REVERSE);
         outtakeB.setDirection(DcMotorSimple.Direction.FORWARD);
+        cannon = new IntakeV3(hardwareMap);
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0, 0, F);
         outtakeT.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
         outtakeB.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
@@ -78,6 +82,31 @@ public class JoeyFlywheel extends OpMode {
 
 
         double curVelocityT = outtakeT.getVelocity();
+
+        if(gamepad1.a){
+            cannon.intake(1);
+        }
+
+        if(gamepad1.b){
+            cannon.intake(0);
+        }
+
+        if(gamepad1.right_trigger > 0.1){
+            cannon.setActuatorPos(1);
+        }
+
+        if(gamepad1.x){
+            cannon.setGatePosition(0.15);
+        }
+
+        if(gamepad1.y){
+            cannon.setGatePosition(0);
+        }
+
+        if(gamepad1.left_stick_button){
+            F = 12.1;
+            P = 120;
+        }
 
         double error = curTargetVelocity - curVelocityT;
         telemetry.addData("Target Velocity", curTargetVelocity);
