@@ -211,13 +211,17 @@ public class AtlasRS extends OpMode {
             humanplayer = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(85, 20.000),
+                                    /*new Pose(85, 20.000),
                                     new Pose(104.7, 18.700),
                                     new Pose(131.2, 17.3),
-                                    new Pose(135.3, 9)
+                                    new Pose(135.3, 9)*/
+                                    new Pose(85.000, 20.000),
+                                    new Pose(129.900, 42.300),
+                                    new Pose(131.800, 10.300)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    //.setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .setConstantHeadingInterpolation(Math.toRadians(-70))
                     .build();
 
 //            humanplayerMid = follower.pathBuilder()
@@ -244,11 +248,12 @@ public class AtlasRS extends OpMode {
             shoothp = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(135.3, 9),
+                                    //new Pose(135.3, 9),
+                                    new Pose(131.800, 10.300),
                                     new Pose(85.000, 20.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(-70), Math.toRadians(0))
                     .build();
 
             park = follower.pathBuilder()

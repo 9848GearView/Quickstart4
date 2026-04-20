@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV2;
 import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
-@Disabled
+
 @Autonomous(name = "Artemis Blue Big", group = "Autonomous")
 public class AtlasBB extends OpMode {
     public Follower follower; // Pedro Pathing follower instance

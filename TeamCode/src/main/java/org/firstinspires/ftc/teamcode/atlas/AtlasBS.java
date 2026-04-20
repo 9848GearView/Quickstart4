@@ -221,13 +221,17 @@ public class AtlasBS extends OpMode {
             humanplayer = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(59.000, 20.000),
+                                    /*new Pose(59.000, 20.000),
                                     new Pose(39.300, 18.700),
                                     new Pose(12.8, 17.3),
-                                    new Pose(8.700, 9.000)
+                                    new Pose(8.700, 9.000)*/
+                                    new Pose(59.000, 20.000),
+                                    new Pose(14.100, 42.300),
+                                    new Pose(12.200, 10.300)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .setConstantHeadingInterpolation(Math.toRadians(250))
                     .build();
 
 //            humanplayerMid = follower.pathBuilder()
@@ -253,12 +257,17 @@ public class AtlasBS extends OpMode {
 
             shoothp = follower.pathBuilder()
                     .addPath(
-                            new BezierLine(
+                            /*new BezierLine(
                                     new Pose(8.7, 9),
+                                    new Pose(59.000, 20.000)
+                            )*/
+                            new BezierLine(
+                                    new Pose(12.200, 10.300),
                                     new Pose(59.000, 20.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(250), Math.toRadians(180))
                     .build();
 
             park = follower.pathBuilder()

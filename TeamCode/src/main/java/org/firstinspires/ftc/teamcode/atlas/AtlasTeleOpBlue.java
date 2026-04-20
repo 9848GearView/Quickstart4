@@ -72,7 +72,7 @@ public class AtlasTeleOpBlue extends OpMode {
     //ColorSensor colSens = null;
 
     private PIDFController turretController;
-    public static double kP = 0.0, kI = 0.0, kD = 0.0, ff = 0.0;
+    public static double kP = 0.000675, kI = 0.0, kD = 0.0001, ff = 0.0, kS = 0.0;
 
 
     ColorSensor.detectedColor detectedColor;
@@ -164,6 +164,8 @@ public class AtlasTeleOpBlue extends OpMode {
     private double ffMult;
     private double ffMultInc;
     private double velMPS;
+    int halfParkPos = 0;
+    private double forwardBrakingGain = 0.0;
 
 
     @Override
@@ -179,7 +181,7 @@ public class AtlasTeleOpBlue extends OpMode {
         //camera.pipelineSwitch(0);
         //camera.setPollRateHz(90);
         //chassis.setHalfPark(0.45);
-        cannon.setGatePosition(0);
+        //cannon.setGatePosition(0);
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
 
@@ -188,7 +190,7 @@ public class AtlasTeleOpBlue extends OpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         //axon.setTargetRotation(0);
-        chassis.setHalfPark(0, 1);
+        //chassis.setHalfPark(1000, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
         startingX = RobotStorage.PoseX;
@@ -287,6 +289,11 @@ public class AtlasTeleOpBlue extends OpMode {
         // indicator lights
         cannon.setLightColor();
         //prism.updateAllAnimations();
+        double drive = leftY;
+        double strafe = leftX;
+        if (Math.abs(drive) <= 0.01 && Math.abs(strafe) <= 0.01) {
+            drive = follower.getVelocity().getXComponent() * -forwardBrakingGain;
+        }
 
         turretController.setPIDF(kP, kI, kD, 0);
 
@@ -421,24 +428,25 @@ public class AtlasTeleOpBlue extends OpMode {
 
         if (tLock) {
             if (vision.hasTarget()){
-
-                double turretIncrement = turretController.calculate(vision.getTx() , 0);
-
-                telemetry.addData("Turret Increment", turretIncrement);
-
                 float Kp = -0.000405f;
                 double tx = vision.getTx();
                 double deadband = vision.getDeadband();
                 double feedForward = ((rightX + leftX - leftY)/3.0) * ffMult;
                 double botCorr = (Kp * tx) - feedForward;
+                double turretIncrement = turretController.calculate(vision.getTx() , 0);
+                if(turretIncrement > 0){
+                    turretIncrement += kS;
+                } else if (turretIncrement < 0){
+                    turretIncrement -= kS;
+                }
+
+                telemetry.addData("Turret Increment", turretIncrement);
 
                 botCorr = turretIncrement;
 
-                cannon.setTurret(cannon.getTurretPos() + botCorr);
-
-//                if(Math.abs(tx) > deadband) {
-//                    cannon.setTurret(cannon.getTurretPos() + botCorr);
-//                }
+                if(Math.abs(tx) > deadband) {
+                    cannon.setTurret(cannon.getTurretPos() + botCorr);
+                }
             }
         }
         //end auto aim
@@ -482,11 +490,20 @@ public class AtlasTeleOpBlue extends OpMode {
             chassis.slowTurn(-0.1);
         }
         else {
-            chassis.drive(leftY, -leftX, -rightX);
+            chassis.drive(drive, -leftX, -rightX);
         }
         //chassis
         if(gamepad1.x){
-            chassis.setHalfPark(1250, 1.0);
+            chassis.setHalfPark(3750, 1.0);
+        }
+        if(gamepad1.left_stick_y > 0.1){
+            halfParkPos+= 50;
+            chassis.setHalfPark(halfParkPos,1);
+        }
+
+        if(gamepad1.left_stick_y < -0.1){
+            halfParkPos -= 50;
+            chassis.setHalfPark(halfParkPos,1);
         }
 
         if(gamepad1.a){
@@ -643,6 +660,7 @@ public class AtlasTeleOpBlue extends OpMode {
         telemetry.addData("left joystick x:",leftX);
         telemetry.addData("left joystick y:",leftY);
         telemetry.addData("right joystick x", rightX);
+        telemetry.addData("half park position",halfParkPos);
 
         telemetry.update();
     }
