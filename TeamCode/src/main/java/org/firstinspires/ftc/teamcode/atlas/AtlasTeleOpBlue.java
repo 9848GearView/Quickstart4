@@ -71,8 +71,9 @@ public class AtlasTeleOpBlue extends OpMode {
 
     //ColorSensor colSens = null;
 
+    //pidfs for limelight
     private PIDFController turretController;
-    public static double kP = 0.000675, kI = 0.0, kD = 0.0001, ff = 0.0, kS = 0.0;
+    public static double kP = 0.001075, kI = 0.000015, kD = 0.0003, ff = 0.0, kS = 0.00002;
 
 
     ColorSensor.detectedColor detectedColor;
@@ -413,10 +414,10 @@ public class AtlasTeleOpBlue extends OpMode {
 
         // Manual controls for turret
         if (gamepad2.dpad_right && !oldDPadRightPressed) {
-            cannon.setTurret(cannon.getTurretPos() + tInc);
+            cannon.setTurret(cannon.getTurretPos() - tInc);
         }
         if (gamepad2.dpad_left && !oldDPadLeftPressed) {
-            cannon.setTurret(cannon.getTurretPos() - tInc);
+            cannon.setTurret(cannon.getTurretPos() + tInc);
         }
         if (gamepad2.dpad_up && !oldDPadUpPressed) {
             cannon.setTurret(.5);
@@ -433,7 +434,7 @@ public class AtlasTeleOpBlue extends OpMode {
                 double deadband = vision.getDeadband();
                 double feedForward = ((rightX + leftX - leftY)/3.0) * ffMult;
                 double botCorr = (Kp * tx) - feedForward;
-                double turretIncrement = turretController.calculate(vision.getTx() , 0);
+                double turretIncrement = turretController.calculate(vision.getTx() , 0.4);
                 if(turretIncrement > 0){
                     turretIncrement += kS;
                 } else if (turretIncrement < 0){
@@ -494,17 +495,22 @@ public class AtlasTeleOpBlue extends OpMode {
         }
         //chassis
         if(gamepad1.x){
-            chassis.setHalfPark(3750, 1.0);
-        }
-        if(gamepad1.left_stick_y > 0.1){
-            halfParkPos+= 50;
-            chassis.setHalfPark(halfParkPos,1);
-        }
 
-        if(gamepad1.left_stick_y < -0.1){
-            halfParkPos -= 50;
-            chassis.setHalfPark(halfParkPos,1);
+            //was 3750
+            chassis.setHalfPark(1000, 1.0);
         }
+        if(gamepad1.y){
+            chassis.setHalfPark(0, 1.0);
+        }
+//        if(gamepad1.left_stick_y > 0.1){
+//            halfParkPos+= 50;
+//            chassis.setHalfPark(halfParkPos,1);
+//        }
+//
+//        if(gamepad1.left_stick_y < -0.1){
+//            halfParkPos -= 50;
+//            chassis.setHalfPark(halfParkPos,1);
+//        }
 
         if(gamepad1.a){
             if(!posLock) {
