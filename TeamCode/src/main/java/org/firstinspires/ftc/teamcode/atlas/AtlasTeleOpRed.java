@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.atlas;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -13,10 +17,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.atlas.Prism.Color;
 import org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.atlas.Prism.PrismAnimations;
+import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.ColorSensor;
 import org.firstinspires.ftc.teamcode.mech.FlyWheelMech4;
 import org.firstinspires.ftc.teamcode.mech.IntakeV3;
-import org.firstinspires.ftc.teamcode.mech.RedLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.RobotStorage;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
@@ -26,6 +30,7 @@ import java.util.function.Supplier;
 
 //guarantee this wont work whatsoever
 
+@Config
 @TeleOp(name="Atlas Red TeleOp", group="Iterative OpMode")
 public class AtlasTeleOpRed extends OpMode {
     //private Limelight3A camera;
@@ -49,10 +54,11 @@ public class AtlasTeleOpRed extends OpMode {
     PrismAnimations.Solid gateBall = new PrismAnimations.Solid(Color.PURPLE);
     PrismAnimations.Solid noGateBall = new PrismAnimations.Solid(Color.TRANSPARENT);
 
-
     //ColorSensor colSens = null;
 
-
+    //pidfs for limelight
+    private PIDFController turretController;
+    public static double kP = 0.001075, kI = 0.000015, kD = 0.0003, ff = 0.0, kS = 0.00002;
 
     ColorSensor.detectedColor detectedColor;
 
@@ -140,9 +146,11 @@ public class AtlasTeleOpRed extends OpMode {
     private boolean close;
 
     private double tInc;
-
+    private double ffMult;
+    private double ffMultInc;
     private double velMPS;
-
+    int halfParkPos = 0;
+    private double forwardBrakingGain = 0.0;
 
     @Override
     public void init(){
@@ -157,11 +165,16 @@ public class AtlasTeleOpRed extends OpMode {
         //camera.pipelineSwitch(0);
         //camera.setPollRateHz(90);
         //chassis.setHalfPark(0.45);
-        cannon.setGatePosition(0);
+        //cannon.setGatePosition(0);
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
+
+        turretController = new PIDFController(kP, kI, kD, 0);
+
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         //axon.setTargetRotation(0);
-        chassis.setHalfPark(0, 1);
+        //chassis.setHalfPark(1000, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
         startingX = RobotStorage.PoseX;
@@ -185,10 +198,12 @@ public class AtlasTeleOpRed extends OpMode {
 
         tLock = false;
         velMPS = 0;
-
+        
 
         //Mrs. B Added
         tInc = 0.05;
+        ffMult = .006;
+        ffMultInc = .0005;
 
         //prism = hardwareMap.get(GoBildaPrismDriver.class,"prism");
 
@@ -239,7 +254,7 @@ public class AtlasTeleOpRed extends OpMode {
 
 
         //camera.start();
-        cannon.setTurret(0.3);
+        cannon.setTurret(0.7);
         cannon.setGatePosition(.15);
         cannon.setLightColor();
         follower.startTeleOpDrive(true);
@@ -258,6 +273,13 @@ public class AtlasTeleOpRed extends OpMode {
         // indicator lights
         cannon.setLightColor();
         //prism.updateAllAnimations();
+        double drive = leftY;
+        double strafe = leftX;
+        if (Math.abs(drive) <= 0.01 && Math.abs(strafe) <= 0.01) {
+            drive = follower.getVelocity().getXComponent() * -forwardBrakingGain;
+        }
+
+        turretController.setPIDF(kP, kI, kD, 0);
 
         // heading (pedro)
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
@@ -341,6 +363,13 @@ public class AtlasTeleOpRed extends OpMode {
             }
         }
 
+        if(gamepad1.dpad_up){
+            ffMult = ffMult+ ffMultInc;
+        }
+        if(gamepad1.dpad_down){
+            ffMult = ffMult - ffMultInc;
+        }
+
         //intake wheel end
 
         /*if(gamepad1.y) {
@@ -348,7 +377,7 @@ public class AtlasTeleOpRed extends OpMode {
             follower.setY(9.186161449752879);
             follower.setHeading(180);
         }
-
+        
          */
 
         //paths = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
@@ -368,10 +397,10 @@ public class AtlasTeleOpRed extends OpMode {
 
         // Manual controls for turret
         if (gamepad2.dpad_right && !oldDPadRightPressed) {
-            cannon.setTurret(cannon.getTurretPos() + tInc);
+            cannon.setTurret(cannon.getTurretPos() - tInc);
         }
         if (gamepad2.dpad_left && !oldDPadLeftPressed) {
-            cannon.setTurret(cannon.getTurretPos() - tInc);
+            cannon.setTurret(cannon.getTurretPos() + tInc);
         }
         if (gamepad2.dpad_up && !oldDPadUpPressed) {
             cannon.setTurret(.5);
@@ -383,11 +412,19 @@ public class AtlasTeleOpRed extends OpMode {
 
         if (tLock) {
             if (vision.hasTarget()){
-                float Kp = -0.000405f;
                 double tx = vision.getTx();
                 double deadband = vision.getDeadband();
-                double feedForward = ((rightX + leftX - leftY)/3.0) * .006;
-                double botCorr = (Kp * tx) - feedForward;
+                double turretIncrement = turretController.calculate(vision.getTx() , -0.4);
+                if(turretIncrement > 0){
+                    turretIncrement += kS;
+                } else if (turretIncrement < 0){
+                    turretIncrement -= kS;
+                }
+
+                telemetry.addData("Turret Increment", turretIncrement);
+
+                double botCorr = turretIncrement;
+
                 if(Math.abs(tx) > deadband) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);
                 }
@@ -404,7 +441,7 @@ public class AtlasTeleOpRed extends OpMode {
         }
         if (gamepad2.right_trigger > 0.1) {
             // shoot far
-            wheel.FlywheelMotorOn(1350);
+            wheel.FlywheelMotorOn(1320);
             cannon.setActuatorPos(1);
         }
         if(gamepad2.x) {
@@ -434,12 +471,26 @@ public class AtlasTeleOpRed extends OpMode {
             chassis.slowTurn(-0.1);
         }
         else {
-            chassis.drive(leftY, -leftX, -rightX);
+            chassis.drive(drive, -leftX, -rightX);
         }
         //chassis
         if(gamepad1.x){
-            chassis.setHalfPark(1250, 1.0);
+
+            //was 3750
+            chassis.setHalfPark(1000, 1.0);
         }
+        if(gamepad1.y){
+            chassis.setHalfPark(0, 1.0);
+        }
+//        if(gamepad1.left_stick_y > 0.1){
+//            halfParkPos+= 50;
+//            chassis.setHalfPark(halfParkPos,1);
+//        }
+//
+//        if(gamepad1.left_stick_y < -0.1){
+//            halfParkPos -= 50;
+//            chassis.setHalfPark(halfParkPos,1);
+//        }
 
         if(gamepad1.a){
             if(!posLock) {
@@ -595,6 +646,7 @@ public class AtlasTeleOpRed extends OpMode {
         telemetry.addData("left joystick x:",leftX);
         telemetry.addData("left joystick y:",leftY);
         telemetry.addData("right joystick x", rightX);
+        telemetry.addData("half park position",halfParkPos);
 
         telemetry.update();
     }

@@ -25,8 +25,6 @@ import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.mech.RobotStorage;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
 
-
-
 import static org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver.LayerHeight;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -68,13 +66,11 @@ public class AtlasTeleOpBlue extends OpMode {
     PrismAnimations.Solid gateBall = new PrismAnimations.Solid(Color.PURPLE);
     PrismAnimations.Solid noGateBall = new PrismAnimations.Solid(Color.TRANSPARENT);
 
-
     //ColorSensor colSens = null;
 
     //pidfs for limelight
     private PIDFController turretController;
     public static double kP = 0.001075, kI = 0.000015, kD = 0.0003, ff = 0.0, kS = 0.00002;
-
 
     ColorSensor.detectedColor detectedColor;
 
@@ -167,7 +163,6 @@ public class AtlasTeleOpBlue extends OpMode {
     private double velMPS;
     int halfParkPos = 0;
     private double forwardBrakingGain = 0.0;
-
 
     @Override
     public void init(){
@@ -429,11 +424,8 @@ public class AtlasTeleOpBlue extends OpMode {
 
         if (tLock) {
             if (vision.hasTarget()){
-                float Kp = -0.000405f;
                 double tx = vision.getTx();
                 double deadband = vision.getDeadband();
-                double feedForward = ((rightX + leftX - leftY)/3.0) * ffMult;
-                double botCorr = (Kp * tx) - feedForward;
                 double turretIncrement = turretController.calculate(vision.getTx() , 0.4);
                 if(turretIncrement > 0){
                     turretIncrement += kS;
@@ -442,8 +434,7 @@ public class AtlasTeleOpBlue extends OpMode {
                 }
 
                 telemetry.addData("Turret Increment", turretIncrement);
-
-                botCorr = turretIncrement;
+                double botCorr = turretIncrement;
 
                 if(Math.abs(tx) > deadband) {
                     cannon.setTurret(cannon.getTurretPos() + botCorr);
