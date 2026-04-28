@@ -11,7 +11,6 @@ import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -21,35 +20,19 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV3;
 import org.firstinspires.ftc.teamcode.mech.FlyWheelMech4;
 import org.firstinspires.ftc.teamcode.mech.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mech.BlueLimelightAutoAim;
-import org.firstinspires.ftc.teamcode.mech.RTPAxon;
 import org.firstinspires.ftc.teamcode.mech.RobotStorage;
 import org.firstinspires.ftc.teamcode.pedroPathing.ConstantsV3;
 
-import static org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver.LayerHeight;
-
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.atlas.Prism.Color;
-import org.firstinspires.ftc.teamcode.atlas.Prism.GoBildaPrismDriver;
-import org.firstinspires.ftc.teamcode.atlas.Prism.PrismAnimations;
-
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
-
 import java.util.function.Supplier;
-
 //guarantee this wont work whatsoever
 
 @Config
 @TeleOp(name="Atlas Blue TeleOp", group="Iterative OpMode")
 public class AtlasTeleOpBlue extends OpMode {
-    //private Limelight3A camera;
     MecanumDrive chassis = null;
     IntakeV3 cannon = null;
     FlyWheelMech4 wheel = null;
-    //RTPAxon axon = null;
     private Paths paths;
     private Supplier<PathChain> shootPos;
     private Supplier<PathChain> parkPos;
@@ -58,22 +41,10 @@ public class AtlasTeleOpBlue extends OpMode {
 
     //Mrs. B moved instantiation of hubs ArrayList to init method
     ArrayList<LynxModule> hubs;
-    GoBildaPrismDriver prism;
-    PrismAnimations.Solid intakeBall = new PrismAnimations.Solid(Color.PURPLE);
-    PrismAnimations.Solid noIntakeBall = new PrismAnimations.Solid(Color.TRANSPARENT);
-    PrismAnimations.Solid gateStatusOpen = new PrismAnimations.Solid(Color.GREEN);
-    PrismAnimations.Solid gateStatusClose = new PrismAnimations.Solid(Color.RED);
-    PrismAnimations.Solid gateBall = new PrismAnimations.Solid(Color.PURPLE);
-    PrismAnimations.Solid noGateBall = new PrismAnimations.Solid(Color.TRANSPARENT);
-
-    //ColorSensor colSens = null;
 
     //pidfs for limelight
     private PIDFController turretController;
     public static double kP = 0.001075, kI = 0.000015, kD = 0.0003, ff = 0.0, kS = 0.00002;
-
-    ColorSensor.detectedColor detectedColor;
-
 
     private boolean rStickPressed;
     private boolean oldrStickPressed;
@@ -170,14 +141,7 @@ public class AtlasTeleOpBlue extends OpMode {
         chassis = new MecanumDrive(hardwareMap);
         cannon = new IntakeV3(hardwareMap);
         wheel = new FlyWheelMech4(hardwareMap);
-        //axon = cannon.getRTPAxon();
         vision = new BlueLimelightAutoAim(hardwareMap);
-        //camera = hardwareMap.get(Limelight3A.class,"limabean");
-
-        //camera.pipelineSwitch(0);
-        //camera.setPollRateHz(90);
-        //chassis.setHalfPark(0.45);
-        //cannon.setGatePosition(0);
         cannon.setLightColor();
         cannon.setActuatorPos(.53);
 
@@ -185,7 +149,6 @@ public class AtlasTeleOpBlue extends OpMode {
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        //axon.setTargetRotation(0);
         //chassis.setHalfPark(1000, 1);
 
         follower = ConstantsV3.createFollower(hardwareMap);
@@ -217,44 +180,11 @@ public class AtlasTeleOpBlue extends OpMode {
         ffMult = .006;
         ffMultInc = .0005;
 
-        //prism = hardwareMap.get(GoBildaPrismDriver.class,"prism");
-
-        intakeBall.setBrightness(1);
-        noIntakeBall.setBrightness(1);
-        gateStatusOpen.setBrightness(1);
-        gateStatusClose.setBrightness(1);
-        gateBall.setBrightness(1);
-        noGateBall.setBrightness(1);
-
-        intakeBall.setStartIndex(0);
-        intakeBall.setStopIndex(4);
-        noIntakeBall.setStartIndex(0);
-        noIntakeBall.setStopIndex(4);
-        gateStatusOpen.setStartIndex(4);
-        gateStatusOpen.setStopIndex(7);
-        gateStatusClose.setStartIndex(4);
-        gateStatusClose.setStopIndex(7);
-        gateBall.setStartIndex(8);
-        gateBall.setStopIndex(12);
-        noGateBall.setStartIndex(8);
-        noGateBall.setStopIndex(12);
-        //colSens = new ColorSensor(hardwareMap);
-        //chassis.resetRobotAngle();//should be commented out to run teleOp after Auto & keep angle
-
         //set bulk read mode to manual for hubs
         for (LynxModule hub : hubs){
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
     }
-
-//    @Override
-//    public void init_loop(){
-//        axon.update();
-//        //telemetry.addData("Limit Reached", limReached);
-//        telemetry.addLine(axon.log());
-//
-//    }
-
     @Override
     public void start(){
         //shootPos = new Path(new BezierLine(new Pose(follower.getPose().getX(),follower.getPose().getY()), new Pose(shootX, shootY)));
@@ -284,7 +214,6 @@ public class AtlasTeleOpBlue extends OpMode {
         vision.update();
         // indicator lights
         cannon.setLightColor();
-        //prism.updateAllAnimations();
         double drive = leftY;
         double strafe = leftX;
         if (Math.abs(drive) <= 0.01 && Math.abs(strafe) <= 0.01) {
@@ -292,6 +221,7 @@ public class AtlasTeleOpBlue extends OpMode {
         }
 
         turretController.setPIDF(kP, kI, kD, 0);
+
 
         // heading (pedro)
         headingDegrees = Math.abs((360 + (follower.getPose().getHeading() * 180 / Math.PI))) % 360;
@@ -320,7 +250,6 @@ public class AtlasTeleOpBlue extends OpMode {
         } else {
             leftY = 0;
         }
-
         if (Math.abs(gamepad1.left_stick_x) > 0.05) {
             leftX = -gamepad1.left_stick_x;
         } else {
@@ -335,24 +264,10 @@ public class AtlasTeleOpBlue extends OpMode {
 
         if(cannon.getGatePosition() == .15){
             gateOn = true;
-            //prism.insertAnimation(LayerHeight.LAYER_1,gateStatusClose);
         }
 
         if(cannon.getGatePosition() == 0){
             gateOn = false;
-            //prism.insertAnimation(LayerHeight.LAYER_1,gateStatusOpen);
-        }
-
-        if(cannon.getDistanceIntake() < 4.5){
-            //prism.insertAnimation(LayerHeight.LAYER_0,intakeBall);
-        } else {
-            //prism.insertAnimation(LayerHeight.LAYER_0,noIntakeBall);
-        }
-
-        if(cannon.getDistanceGate() < 4.5){
-            //prism.insertAnimation(LayerHeight.LAYER_2,gateBall);
-        } else {
-           // prism.insertAnimation(LayerHeight.LAYER_2,noGateBall);
         }
 
         //intake
@@ -381,19 +296,6 @@ public class AtlasTeleOpBlue extends OpMode {
         if(gamepad1.dpad_down){
             ffMult = ffMult - ffMultInc;
         }
-
-        //intake wheel end
-
-        /*if(gamepad1.y) {
-            follower.setX(9.713344316095563);
-            follower.setY(9.186161449752879);
-            follower.setHeading(180);
-        }
-        
-         */
-
-        //paths = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
-        //shootpos = new Paths(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),);
 
         goalDistance = Math.sqrt(Math.pow(follower.getPose().getX() - 4,2) + Math.pow(140 - follower.getPose().getY(),2));
         goalAngle = Math.atan((140 - follower.getPose().getY()) / (follower.getPose().getX() - 4)) + 90;
@@ -444,11 +346,11 @@ public class AtlasTeleOpBlue extends OpMode {
         //end auto aim
 
 
-        //altitude actuator
+        //altitude actuator & shootig
         if (gamepad2.left_trigger > 0.1) {
             //shoot close
             wheel.FlywheelMotorOn(1040);
-            cannon.setActuatorPos(.8); //.53
+            cannon.setActuatorPos(.8);
         }
         if (gamepad2.right_trigger > 0.1) {
             // shoot far
@@ -466,13 +368,11 @@ public class AtlasTeleOpBlue extends OpMode {
             cannon.setLightColor();
             oldRBumperPressed = true;
         }
-
         if(lBumperPressed && oldRBumperPressed){
             cannon.setGatePosition(0); //open
             cannon.setLightColor();
             oldRBumperPressed = false;
         }
-
 
         //Slow turn code :D
         if (gamepad1.right_bumper){
@@ -484,24 +384,14 @@ public class AtlasTeleOpBlue extends OpMode {
         else {
             chassis.drive(drive, -leftX, -rightX);
         }
-        //chassis
+        //tiltpark
         if(gamepad1.x){
-
-            //was 3750
+            cannon.setTurret(.3);
             chassis.setHalfPark(1000, 1.0);
         }
         if(gamepad1.y){
             chassis.setHalfPark(0, 1.0);
         }
-//        if(gamepad1.left_stick_y > 0.1){
-//            halfParkPos+= 50;
-//            chassis.setHalfPark(halfParkPos,1);
-//        }
-//
-//        if(gamepad1.left_stick_y < -0.1){
-//            halfParkPos -= 50;
-//            chassis.setHalfPark(halfParkPos,1);
-//        }
 
         if(gamepad1.a){
             if(!posLock) {
@@ -533,90 +423,6 @@ public class AtlasTeleOpBlue extends OpMode {
             follower.breakFollowing();
             automatedDrive = false;
         }
-
-//
-//        if(gamepad1.a){
-//            if(!posLock) {
-//                shootX = follower.getPose().getX();
-//                shootY = follower.getPose().getY();
-//                //shootH = headingDegrees; // sets heading to 0-360 degree range
-//                shootH = (follower.getPose().getHeading() * 180 / Math.PI) % 360; // sets heading to -180-180 degree range, default for pedro pathing
-//                posLock = true;
-//            } else {
-//                posLock = false;
-//            }
-//        }
-//
-//        if(posLock && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
-//            follower.followPath(shootPos.get());
-//            automatedDrive = true;
-//        }
-//
-//        if(!posLock && !follower.isBusy()){
-//            follower.breakFollowing();
-//            follower.update();
-//            automatedDrive = false;
-//        }
-//        if(follower.isBusy())automatedDrive = false;
-
-//        if(posLock){
-//            if(follower.getPose().getX() - shootX > 0.5){
-//                correctionX = -0.4;
-//                needsCorrection = true;
-//            } else if(follower.getPose().getX() - shootX < -0.5){
-//                correctionX = 0.4;
-//                needsCorrection = true;
-//            } else {
-//                correctionX = 0;
-//            }
-//
-//            if(follower.getPose().getY() - shootY > 0.5){
-//                correctionY = -0.6;
-//                needsCorrection = true;
-//            } else if(follower.getPose().getY() - shootY < -0.5){
-//                correctionY = 0.6;
-//                needsCorrection = true;
-//            } else {
-//                correctionY = 0;
-//            }
-//
-//            if(Math.abs(headingDegrees - shootH) > 0.5) {
-//                if (shootH - headingDegrees < 0 && shootH - headingDegrees > -180) {
-//                    correctionH = -0.4;
-//                    needsCorrection = true;
-//                } else if (shootH - headingDegrees > 180 || shootH - headingDegrees < -180) {
-//                    correctionH = 0.4;
-//                    needsCorrection = true;
-//                }
-//            }  else {
-//                correctionH = 0;
-//            }
-//
-//            if(needsCorrection && !gamepad1.left_bumper && !gamepad1.right_bumper && leftX == 0 && leftY == 0 && rightX == 0){
-//                chassis.drive(correctionY,correctionX,/*correctionH*/ 0);
-//            } else  {
-//                chassis.drive(-leftY, leftX, rightX);
-//            }
-//            needsCorrection = false;
-//        }
-
-//        if(posLock){
-//            if(!follower.isBusy() && ((Math.abs(shootX - follower.getPose().getX()) > 2) || (Math.abs(shootY - follower.getPose().getY()) > 2) || (Math.abs(headingDegrees - shootH) > 0.5))) {
-//                shootPos = follower.pathBuilder()
-//                        .setGlobalDeceleration()
-//                        .addPath(new BezierLine(new Pose(follower.getPose().getX(), follower.getPose().getY()), new Pose(shootX, shootY)))
-//                        .setConstantHeadingInterpolation(shootH)
-//                        .build();
-//                follower.followPath(shootPos, true);
-//            } else {
-//                follower.breakFollowing();
-//            }
-//        } else {
-//            follower.breakFollowing();
-//        }
-
-
-
 
         if (gamepad2.y && !oldYPressed) {
             if (actuatorIsDown) {
@@ -654,9 +460,9 @@ public class AtlasTeleOpBlue extends OpMode {
         telemetry.addData("Limit Reached", limReached);
         telemetry.addData("Tilt Park Position:",chassis.getTiltPark());
         telemetry.addLine();
-        telemetry.addData("left joystick x:",leftX);
-        telemetry.addData("left joystick y:",leftY);
-        telemetry.addData("right joystick x", rightX);
+//        telemetry.addData("left joystick x:",leftX);
+//        telemetry.addData("left joystick y:",leftY);
+//        telemetry.addData("right joystick x", rightX);
         telemetry.addData("half park position",halfParkPos);
 
         telemetry.update();

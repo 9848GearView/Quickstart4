@@ -482,28 +482,19 @@ public class AtlasTeleOpRed extends OpMode {
         if(gamepad1.y){
             chassis.setHalfPark(0, 1.0);
         }
-//        if(gamepad1.left_stick_y > 0.1){
-//            halfParkPos+= 50;
-//            chassis.setHalfPark(halfParkPos,1);
-//        }
-//
-//        if(gamepad1.left_stick_y < -0.1){
-//            halfParkPos -= 50;
-//            chassis.setHalfPark(halfParkPos,1);
-//        }
 
         if(gamepad1.a){
-            if(!posLock) {
-                shootX = follower.getPose().getX();
-                shootY = follower.getPose().getY();
-                //shootH = headingDegrees; // sets heading to 0-360 degree range
-                shootH = (follower.getPose().getHeading() * 180 / Math.PI) % 360; // sets heading to -180-180 degree range, default for pedro pathing
-                posLock = true;
-            } else {
-                follower.breakFollowing();
-                automatedDrive = false;
-                posLock = false;
-            }
+//            if(!posLock) {
+//                shootX = follower.getPose().getX();
+//                shootY = follower.getPose().getY();
+//                //shootH = headingDegrees; // sets heading to 0-360 degree range
+//                shootH = (follower.getPose().getHeading() * 180 / Math.PI) % 360; // sets heading to -180-180 degree range, default for pedro pathing
+//                posLock = true;
+//            } else {
+//                follower.breakFollowing();
+//                automatedDrive = false;
+//                posLock = false;
+//            }
         }
 
         if(posLock && !automatedDrive && (Math.abs(follower.getPose().getX() - shootX) > 0.5 || Math.abs(follower.getPose().getY() - shootY) > 0.5 || Math.abs(follower.getPose().getHeading() - shootH) > 1)){
