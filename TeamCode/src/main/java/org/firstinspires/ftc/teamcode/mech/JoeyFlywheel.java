@@ -16,13 +16,13 @@ public class JoeyFlywheel extends OpMode {
 
     IntakeV3 cannon = null;
 
-    public double highVelocity = 1365;
-    public double lowVelocity = 1200;
+    public double highVelocity = 1320;
+    public double lowVelocity = 1040;
 
     double curTargetVelocity = highVelocity;
 
-    double F = 0;
-    double P = 0;
+    double F = 21.25;
+    double P = 212.3;
 
     double[] stepSizes = {10.0, 1.0, 0.1, 0.01, 0.001};
     int stepIndex = 1;
@@ -53,7 +53,10 @@ public class JoeyFlywheel extends OpMode {
             }
         }
 
-        if (gamepad1.leftBumperWasPressed()) {
+        if (gamepad2.rightBumperWasPressed()) {
+            stepIndex = (stepIndex - 1) % stepSizes.length;
+        }
+        if (gamepad2.leftBumperWasPressed()) {
             stepIndex = (stepIndex + 1) % stepSizes.length;
         }
 

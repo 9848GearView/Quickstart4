@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.atlas;
 
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.teamcode.mech.IntakeV2;
 
 import java.util.TimerTask;
 
-@Autonomous(name = "Artemis Blue Big", group = "Autonomous")
+@Autonomous(name = "Atlas Blue Big", group = "Autonomous")
 public class AtlasBB extends OpMode {
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
@@ -26,17 +27,24 @@ public class AtlasBB extends OpMode {
     java.util.Timer timer = new java.util.Timer();
     IntakeV3 cannon = null;
     BlueLimelightAutoAim vision = null;
+
+    private PIDFController turretController;
+    public static double kP = 0.001075, kI = 0.000015, kD = 0.0003, ff = 0.0, kS = 0.00002;
+
+
     private Timer pathTimer;
     private Timer globalTimer;
 
     @Override
     public void init() {
         follower = ConstantsV2.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(20, 124, Math.toRadians(233.8)));
+        follower.setStartingPose(new Pose(15.5, 112, Math.toRadians(180)));
 
         paths = new Paths(follower); // Build paths
 
         cannon = new IntakeV3(hardwareMap);
+        cannon.setTurret(0.413);
+        cannon.setGatePosition(0.15);
         //cannon.setTargetRotation(.25);
         vision = new BlueLimelightAutoAim(hardwareMap);
 
@@ -51,12 +59,20 @@ public class AtlasBB extends OpMode {
     public void loop() {
         vision.update();
         if (vision.hasTarget()){
-            float Kp = -0.0004f; //proportional control constant
-            //double feedForward = ((rightX + leftX)/2.0) * .005;
             double tx = vision.getTx();
-            double botCorr = (Kp * tx)/* - feedForward*/;
-            if(Math.abs(tx) > .5) {
-                //cannon.setTurretAngle(cannon.getTurretPos() + botCorr);
+            double deadband = vision.getDeadband();
+            double turretIncrement = turretController.calculate(vision.getTx() , 0.4);
+            if(turretIncrement > 0){
+                turretIncrement += kS;
+            } else if (turretIncrement < 0){
+                turretIncrement -= kS;
+            }
+
+            telemetry.addData("Turret Increment", turretIncrement);
+            double botCorr = turretIncrement;
+
+            if(Math.abs(tx) > deadband) {
+                cannon.setTurret(cannon.getTurretPos() + botCorr);
             }
 
         }
@@ -102,7 +118,7 @@ public class AtlasBB extends OpMode {
                                     new Pose(49.000, 84.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(143.5), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             intake1 = follower.pathBuilder()
@@ -144,28 +160,28 @@ public class AtlasBB extends OpMode {
                             new BezierCurve(
                                     new Pose(49.000, 84.000),
                                     new Pose(39.000, 62.700),
-                                    new Pose(12.300, 59.800)
+                                    new Pose(6.400, 61.300)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(150))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(155))
                     .build();
 
             shootGate = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(12.300, 59.800),
+                                    new Pose(6.400, 61.300),
                                     new Pose(38.700, 67.300),
                                     new Pose(49.000, 84.000)
                             )
                     )
-                    .setLinearHeadingInterpolation(Math.toRadians(150), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(155), Math.toRadians(180))
                     .build();
 
             intakeFinal = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
                                     new Pose(49.000, 84.000),
-                                    new Pose(18.000, 83.500)
+                                    new Pose(18.000, 81.600)
                             )
                     )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -174,7 +190,7 @@ public class AtlasBB extends OpMode {
             parkShoot = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(18.000, 83.500),
+                                    new Pose(18.000, 81.600),
                                     new Pose(60.500, 106.100)
                             )
                     )
@@ -187,26 +203,26 @@ public class AtlasBB extends OpMode {
         switch (pathState) {
             case 0:
                 globalTimer.resetTimer();
-                timer.schedule(new LaunchAuto(1100), 0);
-                timer.schedule(new IntakeAuto(.8), 0);
+                timer.schedule(new LaunchAuto(835), 0);
+                timer.schedule(new IntakeAuto(1), 750);
                 timer.schedule(new ActuatorAuto(.8),0);
-                timer.schedule(new AutoAim(0.7),0);
+                //timer.schedule(new AutoAim(0.7),0);
                 follower.followPath(paths.shoot1,  true);
                 pathTimer.resetTimer();
                 setPathState(1);
                 break;
             case 1:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 3200);
                     pathTimer.resetTimer();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.6) {
                     follower.followPath(paths.intake1, true);
+                    cannon.setGatePosition(0.15);
                     pathTimer.resetTimer();
                     setPathState(3);
                 }
@@ -228,21 +244,21 @@ public class AtlasBB extends OpMode {
                 break;
             case 5:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 3200);
                     pathTimer.resetTimer();
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.6) {
                     follower.followPath(paths.intakeGate, true);
+                    cannon.setGatePosition(0.15);
                     setPathState(7);
                 }
                 break;
             case 7:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5.5) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.shootGate, true);
                     setPathState(8);
@@ -250,9 +266,8 @@ public class AtlasBB extends OpMode {
                 break;
             case 8:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 3200);
                     pathTimer.resetTimer();
                     if(globalTimer.getElapsedTimeSeconds() < 20){
                         setPathState(6);
@@ -262,8 +277,9 @@ public class AtlasBB extends OpMode {
                 }
                 break;
             case 9:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.6) {
                     follower.followPath(paths.intakeFinal, true);
+                    cannon.setGatePosition(0.15);
                     setPathState(10);
                 }
                 break;
@@ -271,20 +287,20 @@ public class AtlasBB extends OpMode {
                 if (!follower.isBusy()) {
                     pathTimer.resetTimer();
                     follower.followPath(paths.parkShoot, true);
+                    cannon.setTurret(0.45);
                     setPathState(11);
                 }
                 break;
             case 11:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0.25), 100);
+                    timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.38), 3200);
                     pathTimer.resetTimer();
                     setPathState(12);
                 }
                 break;
             case 12:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.6) {
                     timer.schedule(new IntakeAuto(0), 0);
                     timer.schedule(new StopLaunchAuto(), 0);
                     setPathState(13);
@@ -356,10 +372,10 @@ public class AtlasBB extends OpMode {
     }
 
     public class AutoAim extends TimerTask {
-        double pos;
+        boolean tlock;
 
-        public AutoAim(double p) {
-            this.pos = p;
+        public AutoAim(boolean t) {
+            this.tlock = t;
         }
 
         @Override

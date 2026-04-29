@@ -79,7 +79,7 @@ public class IntakeV3 implements Subsystem{
     private String launchStatus;
 
 
-    PIDFCoefficients flywheelCoeffs = new PIDFCoefficients(36, 0, 0, 18);//possible values: 100p 12.917 f good?, 15.917 little overshoot//60.917
+    PIDFCoefficients flywheelCoeffs = new PIDFCoefficients(212.3, 0, 0, 21.25);//possible values: 100p 12.917 f good?, 15.917 little overshoot//60.917
 
 
     ElapsedTime feedTimer = new ElapsedTime();
@@ -186,17 +186,21 @@ public class IntakeV3 implements Subsystem{
             blinky.setPosition(.28);
             blinky2.setPosition(.28);//closed, red
         }
-        if (getDistanceGate() < 10){
+        if (getDistanceGate() < 20){
             distanceGateLight.setPosition(.388);
         } else {
             distanceGateLight.setPosition(0);
         }
 
-        if (getDistanceIntake() < 10){
+        if (getDistanceIntake() < 15){
             distanceIntakeLight.setPosition(.388);
         } else {
             distanceIntakeLight.setPosition(0);
         }
+    }
+
+    public boolean have3Artifacts(){
+        return (getDistanceGate() < 25) && (getDistanceIntake() < 15);
     }
 
     public void setGateLightColor(boolean isBall){
@@ -229,7 +233,7 @@ public class IntakeV3 implements Subsystem{
     }
 
     public boolean limsReached(double i){
-        if(i >=.7225| i <= .2725){
+        if(i >=.75| i <= .25){
             return true;
         }
         return false;
@@ -275,8 +279,8 @@ public class IntakeV3 implements Subsystem{
     public void launchAutoFar() {
         outtakeT.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
         outtakeB.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, flywheelCoeffs);
-        outtakeT.setVelocity(1150);
-        outtakeB.setVelocity(1150);
+        outtakeT.setVelocity(1230);
+        outtakeB.setVelocity(1230);
         launchStatus = "far";
     }//closes method
 

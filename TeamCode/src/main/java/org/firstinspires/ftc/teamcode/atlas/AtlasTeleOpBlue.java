@@ -44,7 +44,7 @@ public class AtlasTeleOpBlue extends OpMode {
 
     //pidfs for limelight
     private PIDFController turretController;
-    public static double kP = 0.001075, kI = 0.000015, kD = 0.0003, ff = 0.0, kS = 0.00002;
+    public static double kP = 0.001175, kI = 0.000015, kD = 0.00041, ff = 0.0, kS = 0.000015;
 
     private boolean rStickPressed;
     private boolean oldrStickPressed;
@@ -217,7 +217,7 @@ public class AtlasTeleOpBlue extends OpMode {
         double drive = leftY;
         double strafe = leftX;
         if (Math.abs(drive) <= 0.01 && Math.abs(strafe) <= 0.01) {
-            drive = follower.getVelocity().getXComponent() * -forwardBrakingGain;
+            //drive = follower.getVelocity().getXComponent() * -forwardBrakingGain;
         }
 
         turretController.setPIDF(kP, kI, kD, 0);
@@ -308,7 +308,6 @@ public class AtlasTeleOpBlue extends OpMode {
 
 
 //        //auto-aim
-
         // Manual controls for turret
         if (gamepad2.dpad_right && !oldDPadRightPressed) {
             cannon.setTurret(cannon.getTurretPos() - tInc);
@@ -328,7 +327,7 @@ public class AtlasTeleOpBlue extends OpMode {
             if (vision.hasTarget()){
                 double tx = vision.getTx();
                 double deadband = vision.getDeadband();
-                double turretIncrement = turretController.calculate(vision.getTx() , 0.4);
+                double turretIncrement = turretController.calculate(vision.getTx() , -0.4);
                 if(turretIncrement > 0){
                     turretIncrement += kS;
                 } else if (turretIncrement < 0){
@@ -345,8 +344,7 @@ public class AtlasTeleOpBlue extends OpMode {
         }
         //end auto aim
 
-
-        //altitude actuator & shootig
+        //altitude actuator & shooting
         if (gamepad2.left_trigger > 0.1) {
             //shoot close
             wheel.FlywheelMotorOn(1040);
@@ -386,8 +384,10 @@ public class AtlasTeleOpBlue extends OpMode {
         }
         //tiltpark
         if(gamepad1.x){
+
+            //was 3750
             cannon.setTurret(.3);
-            chassis.setHalfPark(1000, 1.0);
+            chassis.setHalfPark(1200, 1.0);
         }
         if(gamepad1.y){
             chassis.setHalfPark(0, 1.0);

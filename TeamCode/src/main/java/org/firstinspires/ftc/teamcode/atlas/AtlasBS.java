@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.atlas;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -31,15 +34,24 @@ public class AtlasBS extends OpMode {
     private Timer matchTimer;
     public int timesHumanIntake = 0;
     public int setTimesHumanIntake = 3;//change this for the amount of times it does human player (not including first intake)
+    //can run and tune limelight w/ this
+    private PIDFController turretController;
+    //public static double kP = 0.000675, kI = 0.0, kD = 0.0001, ff = 0.0, kS = 0.0;
+    public static double kP = 0.001175, kI = 0.000015, kD = 0.00041, ff = 0.0, kS = 0.000015;
+
+
 
     @Override
     public void init() {
         follower = ConstantsV2.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(56, 8, Math.toRadians(180)));
+        follower.setStartingPose(new Pose(56/* 56 normal 57 with long axle, change back to 56 after axle replacement*/, 8, Math.toRadians(180)));
 
         paths = new Paths(follower); // Build paths
 
         cannon = new IntakeV3(hardwareMap);
+        turretController = new PIDFController(kP, kI, kD, 0);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         //axon = cannon.getRTPAxon();
 
         //axon.setTargetRotation(0);
@@ -62,15 +74,24 @@ public class AtlasBS extends OpMode {
     }
 
     @Override
+    public void start(){
+        matchTimer.resetTimer();
+    }
+
+    @Override
     public void loop() {
         vision.update();
+        turretController.setPIDF(kP, kI, kD, 0);
         if (vision.hasTarget()){
             float Kp = -0.00041f;
             double tx = vision.getTx();
             double deadband = vision.getDeadband();
             double botCorr = (Kp * tx);
+            double turretIncrement = turretController.calculate(vision.getTx() , 0);
+            telemetry.addData("Turret Increment", turretIncrement);
+
             if(Math.abs(tx) > deadband) {
-                //cannon.setTurret(cannon.getTurretPos() + botCorr);
+                //cannon.setTurret(cannon.getTurretPos() + turretIncrement);
             }
 
         }
@@ -111,8 +132,8 @@ public class AtlasBS extends OpMode {
         public PathChain intake3;
         public PathChain shoot4;
         public PathChain humanplayer;
-        //public PathChain humanplayerMid;
-        //public PathChain humanplayerEnd;
+        public PathChain humanplayerMid;
+        public PathChain humanplayerEnd;
         public PathChain shoothp;
         public PathChain park;
         public PathChain humanplayerPark;
@@ -123,7 +144,7 @@ public class AtlasBS extends OpMode {
             shoot1 = follower.pathBuilder()
                     .addPath(
                             new BezierLine(
-                                    new Pose(56.000, 8.000),
+                                    new Pose(57.000, 8.000),
                                     new Pose(59.000, 20.000)
                             )
                     )
@@ -133,10 +154,14 @@ public class AtlasBS extends OpMode {
             intake1 = follower.pathBuilder()
                     .addPath(
                             new BezierCurve(
-                                    new Pose(59.000, 20.000),
+                                    /*new Pose(59.000, 20.000),
                                     new Pose(39.300, 18.700),
                                     new Pose(12.790, 17.303),
-                                    new Pose(8.700, 9.000)
+                                    new Pose(8.700, 9.000)*/
+                                    new Pose(59.000, 20.000),
+                                    new Pose(42.200, 10.800),
+                                    new Pose(23.70, 9.000),
+                                    new Pose(7.700, 9.000)
                             )
                     )
                     .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -226,8 +251,8 @@ public class AtlasBS extends OpMode {
                                     new Pose(12.8, 17.3),
                                     new Pose(8.700, 9.000)*/
                                     new Pose(59.000, 20.000),
-                                    new Pose(14.100, 42.300),
-                                    new Pose(12.200, 10.300)
+                                    new Pose(15.000, 59.300),
+                                    new Pose(14.800, 13.600)
                             )
                     )
                     //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
@@ -236,24 +261,47 @@ public class AtlasBS extends OpMode {
 
 //            humanplayerMid = follower.pathBuilder()
 //                    .addPath(
-//                            new BezierCurve(
-//                                    new Pose(8.300, 8.400),
-//                                    new Pose(8.200, 22.400),
-//                                    new Pose(18.100, 19.900)
+//                            new BezierLine(
+//                                    new Pose(59.000, 20.000),
+//                                    new Pose(24.500, 30.900)
 //                            )
 //                    )
-//                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(195))
+//                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(250))
 //                    .build();
-
+//
 //            humanplayerEnd = follower.pathBuilder()
 //                    .addPath(
-//                            new BezierLine(
-//                                    new Pose(18.100, 19.900),
-//                                    new Pose(12, 14.900)
+//                            new BezierCurve(
+//                                    new Pose(24.500, 30.900),
+//                                    new Pose(11.500, 23.100),
+//                                    new Pose(12.200, 10.300)
 //                            )
 //                    )
-//                    .setLinearHeadingInterpolation(Math.toRadians(195), Math.toRadians(195))
+//                    .setConstantHeadingInterpolation(Math.toRadians(250))
 //                    .build();
+
+            humanplayerMid = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(59.000, 20.000),
+                                    new Pose(26.900, 10.900),
+                                    new Pose(15.584, 11.588)
+                            )
+                    )
+                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .build();
+
+            humanplayerEnd = follower.pathBuilder()
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(15.584, 11.588),
+                                    new Pose(7.700, 8.400),
+                                    new Pose(9.000, 40.300)
+                            )
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(150),0.25)
+                    .build();
+
 
             shoothp = follower.pathBuilder()
                     .addPath(
@@ -262,12 +310,12 @@ public class AtlasBS extends OpMode {
                                     new Pose(59.000, 20.000)
                             )*/
                             new BezierLine(
-                                    new Pose(12.200, 10.300),
+                                    new Pose(9.000, 40.300),
                                     new Pose(59.000, 20.000)
                             )
                     )
                     //.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-                    .setLinearHeadingInterpolation(Math.toRadians(250), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(150), Math.toRadians(180))
                     .build();
 
             park = follower.pathBuilder()
@@ -320,15 +368,15 @@ public class AtlasBS extends OpMode {
                 break;
             case 1:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-                    timer.schedule(new GateAuto(0), 500);
-                    timer.schedule(new GateAuto(0.15), 3000);
+                    timer.schedule(new GateAuto(0), 600);
                     pathTimer.resetTimer();
-                    setPathState(2);
+                    setPathState(5);
                 }
                 break;
             case 2:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.7) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.6) {
                     follower.followPath(paths.intake1, true);
+                    timer.schedule(new GateAuto(0.15), 100);
                     pathTimer.resetTimer();
                     setPathState(3);
                 }
@@ -358,7 +406,6 @@ public class AtlasBS extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     setPathState(5);
                 }
@@ -366,6 +413,7 @@ public class AtlasBS extends OpMode {
             case 5:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.7) {
                     follower.followPath(paths.intake2,.85, true);
+                    timer.schedule(new GateAuto(0.15), 100);
                     setPathState(6);
                 }
                 break;
@@ -380,13 +428,12 @@ public class AtlasBS extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
-                    setPathState(82); // 8 to continue to pickup 3, 82 to go second human player, 11 to go to park early
+                    setPathState(83); // 8 to continue to pickup 3, 82 to go second human player, 11 to go to park early
                 }
                 break;
                 case 8:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.7) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.6) {
                     follower.followPath(paths.intake3,.85, true);
                     pathTimer.resetTimer();
                     setPathState(9);
@@ -403,33 +450,35 @@ public class AtlasBS extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
                     timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
                     setPathState(11);
                 }
                 break;
             case 82:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.7) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.6) {
                     follower.followPath(paths.humanplayer, true);
+                    timer.schedule(new GateAuto(0.15), 100);
                     pathTimer.resetTimer();
                     timesHumanIntake++;
                     setPathState(92); // 83 to do loop tech, 92 to just launch immediately
                 }
                 break;
-//            case 83:
-//                if (pathTimer.getElapsedTimeSeconds() > 2.5 || !follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0) {
-//                    follower.followPath(paths.humanplayerMid, true);
-//                    pathTimer.resetTimer();
-//                    setPathState(822);
-//                }
-//                break;
-//            case 822:
-//                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .4) {
-//                    follower.followPath(paths.humanplayerEnd, true);
-//                    pathTimer.resetTimer();
-//                    setPathState(112);// 92 to continue to launch, 112 to park early after picking up human player
-//                }
-//                break;
+            case 83:
+                if (pathTimer.getElapsedTimeSeconds() > 1.8 && !follower.isBusy() /*&& pathTimer.getElapsedTimeSeconds() > 0 */) {
+                    follower.followPath(paths.humanplayerMid, true);
+                    timer.schedule(new GateAuto(0.15), 100);
+                    pathTimer.resetTimer();
+                    setPathState(822);
+                }
+                break;
+            case 822:
+                if (pathTimer.getElapsedTimeSeconds() > 2.5 || (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.5)) {
+                    follower.followPath(paths.humanplayerEnd, true);
+                    pathTimer.resetTimer();
+                    timesHumanIntake++;
+                    setPathState(92);// 92 to continue to launch, 112 to park early after picking up human player
+                }
+                break;
             case 92:
                 if (pathTimer.getElapsedTimeSeconds() > 2.8 || !follower.isBusy() && pathTimer.getElapsedTimeSeconds() > .1) {
                     pathTimer.resetTimer();
@@ -441,9 +490,8 @@ public class AtlasBS extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 0.1) {
                     timer.schedule(new GateAuto(0), 100);
                     timer.schedule(new IntakeAuto(1), 200);
-                    timer.schedule(new GateAuto(0.15), 2950);
                     pathTimer.resetTimer();
-                    setPathState(82);
+                    setPathState(83);
                     /*if(timesHumanIntake < setTimesHumanIntake){
                         setPathState(82);
                     } else {
@@ -453,7 +501,7 @@ public class AtlasBS extends OpMode {
                 }
                 break;
             case 11:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.7) {
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1.6) {
                     follower.followPath(paths.park,true);
                     timer.schedule(new IntakeAuto(0), 200);
                     timer.schedule(new StopLaunchAuto(), 200);
@@ -476,6 +524,9 @@ public class AtlasBS extends OpMode {
                     setPathState(67);
                 }
                 break;
+        }
+        if(matchTimer.getElapsedTimeSeconds() > 999){
+            setPathState(113);
         }
         return pathState;
 
